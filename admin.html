@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Makka Halal Meat — Staff Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{ --ink:#221912; --paper:#faf6ef; --accent:#7a1f2b; --muted:#6b5f55; --line:rgba(0,0,0,.1); }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,sans-serif; background:var(--paper); color:var(--ink); }
+  header{ background:var(--accent); color:#fff; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; }
+  header h1{ font-size:1.1rem; margin:0; }
+  main{ max-width:1100px; margin:0 auto; padding:20px; }
+  .gate{ max-width:360px; margin:80px auto; text-align:center; }
+  .gate input{ width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); margin:12px 0; }
+  .gate button, .btn{ background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer; }
+  .btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  .btn.small{ padding:6px 10px; font-size:.8rem; }
+  .tabs{ display:flex; gap:6px; margin-bottom:18px; border-bottom:1px solid var(--line); }
+  .tab{ padding:10px 16px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; font-weight:600; }
+  .tab.active{ color:var(--accent); border-color:var(--accent); }
+  .panel{ display:none; } .panel.active{ display:block; }
+  table{ width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+  th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); font-size:.86rem; }
+  th{ background:#f1ece2; }
+  input, select{ padding:6px 8px; border-radius:6px; border:1px solid var(--line); font-size:.85rem; width:100%; }
+  .row-actions{ display:flex; gap:6px; }
+  .toolbar{ display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+  .toolbar input, .toolbar select{ width:auto; }
+  .card{ background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.06); margin-bottom:16px; }
+  .card label{ display:block; font-size:.8rem; color:var(--muted); margin:10px 0 4px; }
+  .badge{ font-size:.72rem; padding:2px 8px; border-radius:999px; background:#eee; }
+  .badge.paid{ background:#dff2e2; color:#1d6a37; }
+  .badge.new{ background:#fdeecb; color:#8a5b00; }
+  .msg{ font-size:.85rem; color:var(--muted); margin-top:8px; }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <h2>Staff sign-in</h2>
+  <p class="msg">Enter the admin token configured in Netlify (ADMIN_TOKEN).</p>
+  <input type="password" id="tokenInput" placeholder="Admin token">
+  <button onclick="signIn()">Continue</button>
+  <div class="msg" id="gateMsg"></div>
+</div>
+
+<div id="app" style="display:none;">
+  <header>
+    <h1>Makka Halal Meat — Staff Admin</h1>
+    <button class="btn ghost" style="background:rgba(255,255,255,.15); color:#fff; border-color:rgba(255,255,255,.4);" onclick="signOut()">Sign out</button>
+  </header>
+  <main>
+    <div class="tabs">
+      <div class="tab active" data-tab="orders" onclick="showTab('orders')">Orders</div>
+      <div class="tab" data-tab="products" onclick="showTab('products')">Products</div>
+      <div class="tab" data-tab="deals" onclick="showTab('deals')">Deals</div>
+      <div class="tab" data-tab="settings" onclick="showTab('settings')">Site settings</div>
+    </div>
+
+    <section class="panel active" id="panel-orders">
+      <div class="toolbar">
+        <button class="btn small" onclick="loadOrders()">Refresh</button>
+        <span class="msg" id="ordersMsg"></span>
+      </div>
+      <table>
+        <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Payment</th><th></th></tr></thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="panel-products">
+      <div class="toolbar">
+        <input id="productSearch" placeholder="Search products…" oninput="renderProducts()">
+        <select id="productDeptFilter" onchange="renderProducts()">
+          <option value="">All departments</option>
+          <option value="meat">Meat</option><option value="grocery">Grocery</option>
+          <option value="household">Household</option><option value="beauty">Beauty</option>
+          <option value="baby">Baby</option><option value="clothing">Clothing</option>
+        </select>
+        <button class="btn small" onclick="addProductRow()">+ New product</button>
+        <button class="btn small" onclick="loadProducts()">Refresh</button>
+        <span class="msg" id="productsMsg"></span>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Dept</th><th>Category</th><th>Price</th><th>Unit</th><th>Image path</th><th>Active</th><th></th></tr></thead>
+        <tbody id="productsBody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="panel-deals">
+      <div class="toolbar">
+        <button class="btn small" onclick="addDealRow()">+ New deal</button>
+        <button class="btn small" onclick="loadDeals()">Refresh</button>
+        <span class="msg" id="dealsMsg"></span>
+      </div>
+      <table>
+        <thead><tr><th>Title</th><th>Description</th><th>Requirements</th><th>Code</th><th>Expires</th><th>Active</th><th></th></tr></thead>
+        <tbody id="dealsBody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="panel-settings">
+      <div class="card" id="settingsForm"></div>
+      <button class="btn" onclick="saveSettings()">Save settings</button>
+      <span class="msg" id="settingsMsg"></span>
+    </section>
+  </main>
+</div>
+
+<script>
+let TOKEN = sessionStorage.getItem("mhm_admin_token") || "";
+let PRODUCTS = [];
+let SETTINGS = {};
+
+function api(path, opts = {}) {
+  return fetch(`/.netlify/functions/${path}`, {
+    ...opts,
+    cache: "no-store",
+    headers: { "Content-Type": "application/json", "x-admin-token": TOKEN, ...(opts.headers || {}) },
+  }).then(async (r) => {
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const detail = [data.code, data.error].filter(Boolean).join(": ");
+      throw new Error(detail || `Request failed (${r.status})`);
+    }
+    return data;
+  });
+}
+
+async function signIn() {
+  TOKEN = document.getElementById("tokenInput").value.trim();
+  try {
+    await api("admin-orders"); // cheap call to validate the token
+    sessionStorage.setItem("mhm_admin_token", TOKEN);
+    document.getElementById("gate").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    loadOrders(); loadProducts(); loadSettings(); loadDeals();
+  } catch (e) {
+    {
+      const msg = String(e && e.message ? e.message : e);
+      if (msg.includes("ADMIN_TOKEN_MISSING")) {
+        document.getElementById("gateMsg").textContent = "Netlify Function cannot see ADMIN_TOKEN. Make sure it has Functions scope, save it, then redeploy.";
+      } else if (msg.includes("ADMIN_TOKEN_INVALID")) {
+        document.getElementById("gateMsg").textContent = "Incorrect admin token. Enter the exact ADMIN_TOKEN value saved in Netlify.";
+      } else {
+        document.getElementById("gateMsg").textContent = "Admin sign-in failed: " + msg;
+      }
+    }
+  }
+}
+function signOut() { sessionStorage.removeItem("mhm_admin_token"); location.reload(); }
+
+if (TOKEN) {
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  loadOrders(); loadProducts(); loadSettings(); loadDeals();
+}
+
+function showTab(name) {
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === "panel-" + name));
+}
+
+/* ---------------- Orders ---------------- */
+async function loadOrders() {
+  document.getElementById("ordersMsg").textContent = "Loading…";
+  try {
+    const orders = await api("admin-orders");
+    document.getElementById("ordersBody").innerHTML = orders.map(orderRow).join("");
+    document.getElementById("ordersMsg").textContent = `${orders.length} orders`;
+  } catch (e) { document.getElementById("ordersMsg").textContent = e.message; }
+}
+function orderRow(o) {
+  const statuses = ["New", "Preparing", "Ready for Pickup", "Completed", "Cancelled", "Paid - Preparing"];
+  const badgeClass = o.status === "Completed" || o.status.startsWith("Paid") ? "paid" : "new";
+  return `<tr>
+    <td>${o.order_code}<div class="msg">${new Date(o.created_at).toLocaleString()}</div></td>
+    <td>${o.customer_name || ""}<div class="msg">${o.customer_phone || ""}</div></td>
+    <td>$${Number(o.total || 0).toFixed(2)}</td>
+    <td>
+      <select onchange="updateStatus(${o.id}, this.value)">
+        ${statuses.map((s) => `<option ${s === o.status ? "selected" : ""}>${s}</option>`).join("")}
+      </select>
+    </td>
+    <td><span class="badge ${badgeClass}">${o.status}</span></td>
+    <td class="row-actions">
+      ${o.stripe_session_id ? `
+        <button class="btn small" onclick="capturePayment('${o.stripe_session_id}', ${o.total})">Capture</button>
+        <button class="btn small ghost" onclick="cancelAuth('${o.stripe_session_id}')">Cancel</button>` : ""}
+    </td>
+  </tr>`;
+}
+async function updateStatus(id, status) {
+  try { await api("update-order-status", { method: "POST", body: JSON.stringify({ id, status }) }); }
+  catch (e) { alert(e.message); }
+}
+async function capturePayment(sessionId, total) {
+  const finalAmount = prompt("Final amount to charge (after weighing):", Number(total).toFixed(2));
+  if (!finalAmount) return;
+  try {
+    await api("capture-final-payment", { method: "POST", body: JSON.stringify({ sessionId, finalAmount: Number(finalAmount) }) });
+    loadOrders();
+  } catch (e) { alert(e.message); }
+}
+async function cancelAuth(sessionId) {
+  if (!confirm("Cancel this authorization? The customer will not be charged.")) return;
+  try { await api("cancel-authorization", { method: "POST", body: JSON.stringify({ sessionId }) }); loadOrders(); }
+  catch (e) { alert(e.message); }
+}
+
+/* ---------------- Products ---------------- */
+async function loadProducts() {
+  document.getElementById("productsMsg").textContent = "Loading…";
+  try { PRODUCTS = await api("admin-products"); renderProducts(); document.getElementById("productsMsg").textContent = `${PRODUCTS.length} products`; }
+  catch (e) { document.getElementById("productsMsg").textContent = e.message; }
+}
+function renderProducts() {
+  const q = document.getElementById("productSearch").value.toLowerCase();
+  const dept = document.getElementById("productDeptFilter").value;
+  const rows = PRODUCTS.filter((p) => (!dept || p.department === dept) && p.name.toLowerCase().includes(q));
+  document.getElementById("productsBody").innerHTML = rows.map(productRow).join("");
+}
+function productRow(p) {
+  return `<tr data-id="${p.id}">
+    <td><input value="${escAttr(p.name)}" data-field="name"></td>
+    <td><input value="${escAttr(p.department)}" data-field="department"></td>
+    <td><input value="${escAttr(p.category)}" data-field="category"></td>
+    <td><input value="${p.price == null ? "" : p.price}" data-field="price" type="number" step="0.01"></td>
+    <td><input value="${escAttr(p.unit || "")}" data-field="unit"></td>
+    <td><input value="${escAttr(p.image || "")}" data-field="image" placeholder="product-images/example.jpg"></td>
+    <td><input type="checkbox" data-field="active" ${p.active ? "checked" : ""}></td>
+    <td class="row-actions">
+      <button class="btn small" onclick="saveProduct(${p.id})">Save</button>
+      <button class="btn small ghost" onclick="deleteProduct(${p.id})">Remove</button>
+    </td>
+  </tr>`;
+}
+function readRow(id) {
+  const tr = document.querySelector(`tr[data-id="${id}"]`);
+  const get = (f) => tr.querySelector(`[data-field="${f}"]`);
+  return {
+    id,
+    name: get("name").value,
+    department: get("department").value,
+    category: get("category").value,
+    price: get("price").value === "" ? null : Number(get("price").value),
+    unit: get("unit").value,
+    image: get("image").value,
+    active: get("active").checked,
+  };
+}
+async function saveProduct(id) {
+  try { await api("admin-products", { method: "PATCH", body: JSON.stringify(readRow(id)) }); document.getElementById("productsMsg").textContent = "Saved."; }
+  catch (e) { alert(e.message); }
+}
+async function deleteProduct(id) {
+  if (!confirm("Remove this product from the storefront? (It stays on past orders.)")) return;
+  try { await api("admin-products", { method: "DELETE", body: JSON.stringify({ id }) }); loadProducts(); }
+  catch (e) { alert(e.message); }
+}
+async function addProductRow() {
+  const name = prompt("Product name:"); if (!name) return;
+  const department = prompt("Department (meat, grocery, household, beauty, baby, clothing):", "grocery");
+  try {
+    const created = await api("admin-products", { method: "POST", body: JSON.stringify({ id: Date.now(), name, department, category: department, price: null, unit: "each", active: true }) });
+    PRODUCTS.unshift(created); renderProducts();
+  } catch (e) { alert(e.message); }
+}
+
+/* ---------------- Deals ---------------- */
+async function loadDeals() {
+  document.getElementById("dealsMsg").textContent = "Loading…";
+  try { const deals = await api("admin-discounts"); window._deals = deals; renderDealsRows(deals); document.getElementById("dealsMsg").textContent = `${deals.length} deals`; }
+  catch (e) { document.getElementById("dealsMsg").textContent = e.message; }
+}
+function renderDealsRows(deals) {
+  document.getElementById("dealsBody").innerHTML = deals.map(dealRow).join("");
+}
+function dealRow(d) {
+  const expiresVal = d.expires_at ? new Date(d.expires_at).toISOString().slice(0,10) : "";
+  return `<tr data-id="${d.id}">
+    <td><input value="${escAttr(d.title)}" data-field="title"></td>
+    <td><input value="${escAttr(d.description || "")}" data-field="description"></td>
+    <td><input value="${escAttr(d.requirements || "")}" data-field="requirements"></td>
+    <td><input value="${escAttr(d.code || "")}" data-field="code"></td>
+    <td><input type="date" value="${expiresVal}" data-field="expires_at"></td>
+    <td><input type="checkbox" data-field="active" ${d.active ? "checked" : ""}></td>
+    <td class="row-actions">
+      <button class="btn small" onclick="saveDeal(${d.id})">Save</button>
+      <button class="btn small ghost" onclick="deleteDeal(${d.id})">Remove</button>
+    </td>
+  </tr>`;
+}
+function readDealRow(id) {
+  const tr = document.querySelector(`#dealsBody tr[data-id="${id}"]`);
+  const get = (f) => tr.querySelector(`[data-field="${f}"]`);
+  return {
+    id,
+    title: get("title").value,
+    description: get("description").value,
+    requirements: get("requirements").value,
+    code: get("code").value,
+    expires_at: get("expires_at").value || null,
+    active: get("active").checked,
+  };
+}
+async function saveDeal(id) {
+  try { await api("admin-discounts", { method: "PATCH", body: JSON.stringify(readDealRow(id)) }); document.getElementById("dealsMsg").textContent = "Saved."; }
+  catch (e) { alert(e.message); }
+}
+async function deleteDeal(id) {
+  if (!confirm("Remove this deal?")) return;
+  try { await api("admin-discounts", { method: "DELETE", body: JSON.stringify({ id }) }); loadDeals(); }
+  catch (e) { alert(e.message); }
+}
+async function addDealRow() {
+  const title = prompt("Deal title:"); if (!title) return;
+  try {
+    const created = await api("admin-discounts", { method: "POST", body: JSON.stringify({ title, active: true }) });
+    window._deals = [created, ...(window._deals || [])]; renderDealsRows(window._deals);
+  } catch (e) { alert(e.message); }
+}
+
+/* ---------------- Settings ---------------- */
+async function loadSettings() {
+  try { SETTINGS = await api("admin-settings"); renderSettingsForm(); }
+  catch (e) { document.getElementById("settingsMsg").textContent = e.message; }
+}
+const SETTINGS_FIELDS = [
+  ["home_title", "Store name shown at the top of the site"],
+  ["home_subtitle", "Subtitle under the store name"],
+  ["store_phone", "Store phone number"],
+  ["store_address", "Store address (shown in footer & directions link)"],
+  ["store_hours", "Store hours text"],
+  ["store_shopping", "Shopping options text, e.g. \"In-store & online\""],
+  ["store_order_options", "Order options text, e.g. \"Store pickup\""],
+  ["deal_title", "Deal-of-the-day label"],
+  ["deal_text", "Deal-of-the-day headline"],
+  ["deal_price_label", "Deal-of-the-day price text, e.g. $5.99/lb"],
+  ["deal_image", "Deal-of-the-day image path or URL"],
+];
+function renderSettingsForm() {
+  const wrap = document.getElementById("settingsForm");
+  wrap.innerHTML = SETTINGS_FIELDS.map(([key, label]) => `
+    <label>${label}</label>
+    <input id="set_${key}" value="${escAttr(SETTINGS[key] || "")}">
+  `).join("");
+}
+async function saveSettings() {
+  const patch = {};
+  SETTINGS_FIELDS.forEach(([key]) => { patch[key] = document.getElementById("set_" + key).value; });
+  try { SETTINGS = await api("admin-settings", { method: "PATCH", body: JSON.stringify(patch) }); document.getElementById("settingsMsg").textContent = "Saved."; }
+  catch (e) { document.getElementById("settingsMsg").textContent = e.message; }
+}
+
+function escAttr(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;"); }
+</script>
+</body>
+</html>

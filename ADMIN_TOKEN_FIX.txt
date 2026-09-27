@@ -1,0 +1,1 @@
+Admin authentication patched. ADMIN_TOKEN is primary; ADMIN_CAPTURE_TOKEN is a legacy fallback. Existing app files preserved.

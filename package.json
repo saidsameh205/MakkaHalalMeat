@@ -1,0 +1,6 @@
+{
+  "name": "makka-halal-meat",
+  "private": true,
+  "version": "2.0.0",
+  "dependencies": { "stripe": "^18.5.0" }
+}
