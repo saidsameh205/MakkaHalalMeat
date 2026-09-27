@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Makka Halal Meat — Order for Pickup</title>
+<meta name="description" content="Fresh halal meat, groceries and more from Makka Halal Meat. Order ahead for pickup.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#C0272D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#C0272D; --brand-dark:#8C1A1E; --brand-light:#E5555A;
+    --ink:#1E1712; --paper:#F6F3EE; --card:#FFFFFF;
+    --gold:#E2A63B; --gold-dark:#B9812A;
+    --fresh:#2E7D53; --fresh-light:#E5F3EC;
+    --line:rgba(30,23,18,.09);
+    --muted:#7A6E62;
+    --shadow-sm:0 2px 8px rgba(30,23,18,.06);
+    --shadow-md:0 10px 28px rgba(30,23,18,.12);
+    --radius-lg:20px; --radius-md:14px; --radius-sm:10px;
+
+    --bg: var(--paper); --fg: var(--ink); --card-bg: var(--card);
+    --accent: var(--brand); --accent-text:#fff; --dept-tint: var(--brand);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; font-family:'IBM Plex Sans',system-ui,sans-serif;
+    background:var(--bg); color:var(--fg); min-height:100vh;
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+    transition:background-color .35s ease, color .35s ease;
+  }
+  h1,h2,h3,.display{font-family:'Sora',sans-serif;}
+  button{font-family:inherit;}
+  img{max-width:100%; display:block;}
+
+  /* Each department gets its own full theme, but ONLY while its dedicated
+     page is open (data-view="dept") — Home always stays on the neutral
+     paper theme so it doesn't flash colors while scrolling. */
+  body[data-view="dept"][data-dept="meat"]      { --bg:#1C1512; --fg:#F3ECE2; --card-bg:#2A1E19; --accent:#D9B667; --accent-text:#1C1512; --muted:#C9B9AC; --dept-tint:#D9B667; }
+  body[data-view="dept"][data-dept="grocery"]   { --bg:#F3EAD9; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#8C1A1E; --accent-text:#fff; --muted:#7A6A58; --dept-tint:#8C1A1E; }
+  body[data-view="dept"][data-dept="household"] { --bg:#E7EEF1; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#2E6E7D; --accent-text:#fff; --muted:#5B7480; --dept-tint:#2E6E7D; }
+  body[data-view="dept"][data-dept="beauty"]    { --bg:#FBEAEC; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#A8506A; --accent-text:#fff; --muted:#8C6A72; --dept-tint:#A8506A; }
+  body[data-view="dept"][data-dept="baby"]      { --bg:#E7EFF5; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#4A6F9C; --accent-text:#fff; --muted:#63758A; --dept-tint:#4A6F9C; }
+  body[data-view="dept"][data-dept="clothing"]  { --bg:#EFE6DA; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#7D6633; --accent-text:#fff; --muted:#7A6A58; --dept-tint:#7D6633; }
+
+  header.topbar{
+    position:sticky; top:0; z-index:30; background:var(--card-bg);
+    padding-top:env(safe-area-inset-top,0px); box-shadow:var(--shadow-sm); transition:background-color .35s ease;
+  }
+  .topbar-row1{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px 6px; gap:10px; }
+  .brandmark{ display:flex; align-items:center; gap:8px; }
+  .brandmark .logo{ width:34px; height:34px; border-radius:9px; background:var(--brand); display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+  .brandmark .name{ font-weight:800; font-size:1.02rem; letter-spacing:-.01em; }
+  .pickup-line{ font-size:.72rem; color:var(--muted); margin-top:-2px; }
+  .icon-btn{ background:none; border:none; font-size:1.25rem; cursor:pointer; padding:6px; position:relative; color:var(--fg); }
+  .icon-btn .dot{ position:absolute; top:2px; right:2px; background:var(--brand); color:#fff; font-size:.62rem; font-weight:700; border-radius:999px; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 3px; }
+  .search-wrap{ padding:2px 16px 12px; }
+  .search-box{ display:flex; align-items:center; gap:8px; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:10px 16px; }
+  .search-box input{ border:none; background:none; outline:none; font-size:.92rem; width:100%; color:var(--ink); }
+  .search-box svg{ flex:0 0 auto; opacity:.55; }
+
+  .depts-strip{ display:flex; gap:8px; overflow-x:auto; padding:0 16px 12px; scrollbar-width:none; }
+  .depts-strip::-webkit-scrollbar{display:none;}
+  .dept-pill{ flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:999px; background:var(--paper); border:1px solid var(--line); font-size:.82rem; font-weight:600; color:var(--ink); cursor:pointer; transition:.18s; }
+  .dept-pill.active{ background:var(--dept-tint); color:#fff; border-color:transparent; }
+
+  main{ max-width:640px; margin:0 auto; padding:0 0 20px; }
+  .store-banner{ padding:12px 16px 4px; }
+  .store-banner img{ width:100%; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); display:block; }
+
+  .promo-scroller{ display:flex; gap:12px; overflow-x:auto; padding:14px 16px; scroll-snap-type:x mandatory; scrollbar-width:none; }
+  .promo-scroller::-webkit-scrollbar{display:none;}
+  .promo-card{ scroll-snap-align:start; flex:0 0 86%; border-radius:var(--radius-lg); padding:22px; display:flex; flex-direction:column; justify-content:center; gap:6px; min-height:150px; color:#fff; position:relative; overflow:hidden; box-shadow:var(--shadow-md); }
+  .promo-card.deal{ background:linear-gradient(135deg,var(--brand),var(--brand-dark)); }
+  .promo-card.pickup{ background:linear-gradient(135deg,var(--fresh),#1F5B3D); }
+  .promo-card.halal{ background:linear-gradient(135deg,var(--gold-dark),#8A6420); }
+  .promo-eyebrow{ font-size:.74rem; font-weight:700; opacity:.85; }
+  .promo-card h2{ font-size:1.35rem; margin:0; line-height:1.15; }
+  .promo-card p{ margin:0; font-size:.85rem; opacity:.92; max-width:26ch; }
+  .promo-card .btn{ margin-top:8px; align-self:flex-start; background:#fff; color:var(--ink); }
+
+  .quick-cats{ display:grid; grid-template-columns:repeat(6,1fr); gap:8px; padding:4px 16px 18px; }
+  .quick-cat{ display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; }
+  .quick-cat .tile{ width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:var(--shadow-sm); }
+  .quick-cat span{ font-size:.68rem; font-weight:600; color:var(--ink); text-align:center; line-height:1.15; }
+
+  .btn{ border:none; border-radius:999px; padding:10px 18px; font-weight:700; font-size:.88rem; cursor:pointer; background:var(--brand); color:#fff; }
+  .btn.ghost{ background:transparent; border:1.5px solid var(--brand); color:var(--brand); }
+  .btn.block{ width:100%; }
+  .link-btn{ background:none; border:none; color:var(--dept-tint); font-weight:700; font-size:.8rem; cursor:pointer; display:flex; align-items:center; gap:2px; }
+
+  .section{ padding:18px 0 4px; }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; padding:0 16px 10px; }
+  .section-head h2{ font-size:1.12rem; margin:0; color:var(--fg); }
+  .section-head .tint{ color:var(--dept-tint); }
+  .section-head .count{ font-size:.76rem; color:var(--muted); }
+
+  .row-scroller{ display:flex; gap:12px; overflow-x:auto; padding:2px 16px 8px; scroll-snap-type:x proximity; scrollbar-width:none; }
+  .row-scroller::-webkit-scrollbar{display:none;}
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; padding:2px 16px 4px; }
+
+  .card{ background:var(--card-bg); border-radius:var(--radius-md); padding:10px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:6px; position:relative; transition:transform .15s ease, box-shadow .15s ease, background-color .35s ease; scroll-snap-align:start; flex:0 0 132px; }
+  .grid .card{ flex-basis:auto; }
+  .card:active{ transform:scale(.97); }
+  .card-media{ height:88px; border-radius:10px; background:rgba(120,100,80,.12); display:flex; align-items:center; justify-content:center; font-size:2rem; background-size:cover; background-position:center; position:relative; overflow:hidden; }
+  .badge{ position:absolute; top:6px; left:6px; background:var(--gold); color:#3a2a06; font-size:.62rem; font-weight:700; padding:2px 7px; border-radius:999px; }
+  .fav-btn{ position:absolute; top:4px; right:4px; background:rgba(255,255,255,.85); border:none; border-radius:50%; width:26px; height:26px; font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .card h3{ font-size:.82rem; margin:0; font-weight:600; line-height:1.25; min-height:2.1em; color:var(--fg); }
+  .card .brand{ font-size:.66rem; color:var(--muted); margin-top:-4px; }
+  .price-row{ display:flex; align-items:center; justify-content:space-between; margin-top:auto; gap:6px; }
+  .price{ font-weight:700; font-size:.95rem; color:var(--fg); }
+  .price small{ font-weight:500; font-size:.66rem; color:var(--muted); }
+  .price.unknown{ font-size:.7rem; color:var(--muted); font-weight:500; }
+  .add-btn{ background:var(--accent); color:var(--accent-text); border:none; border-radius:999px; width:30px; height:30px; font-size:1.1rem; cursor:pointer; line-height:1; flex:0 0 auto; }
+  .add-btn.added{ background:var(--fresh); color:#fff; }
+  .stepper{ display:flex; align-items:center; gap:5px; background:rgba(120,100,80,.1); border-radius:999px; padding:2px 4px; flex:0 0 auto; }
+  .stepper button{ width:24px; height:24px; border-radius:50%; border:none; background:var(--card-bg); box-shadow:var(--shadow-sm); cursor:pointer; flex:0 0 auto; }
+  .stepper .qtytext{ min-width:30px; text-align:center; font-weight:700; font-size:.74rem; cursor:pointer; color:var(--fg); }
+
+  .skeleton{ background:linear-gradient(90deg,#EFEAE1 25%,#F6F3EE 37%,#EFEAE1 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:var(--radius-md); height:170px; }
+  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:-100% 0;} }
+
+  .cart-bar{ position:fixed; left:12px; right:12px; bottom:calc(70px + env(safe-area-inset-bottom,0px)); z-index:35; background:var(--ink); color:#fff; border-radius:16px; padding:12px 16px; display:none; align-items:center; justify-content:space-between; box-shadow:0 12px 28px rgba(0,0,0,.28); animation:barIn .25s ease both; }
+  .cart-bar.show{ display:flex; }
+  @keyframes barIn{ from{ opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  .cart-bar .left{ display:flex; align-items:center; gap:10px; font-size:.85rem; }
+  .cart-bar .count-chip{ background:var(--brand); border-radius:999px; padding:3px 9px; font-weight:700; font-size:.78rem; }
+  .cart-bar button{ background:#fff; color:var(--ink); border:none; border-radius:999px; padding:9px 16px; font-weight:700; font-size:.85rem; cursor:pointer; }
+
+  .tabbar{ position:fixed; left:0; right:0; bottom:0; z-index:34; background:var(--card); border-top:1px solid var(--line); display:flex; padding-bottom:env(safe-area-inset-bottom,0px); box-shadow:0 -4px 14px rgba(0,0,0,.05); }
+  .tab-btn{ flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 0 7px; background:none; border:none; cursor:pointer; color:var(--muted); font-size:.66rem; font-weight:600; position:relative; }
+  .tab-btn.active{ color:var(--brand); }
+  .tab-btn .ic{ font-size:1.25rem; }
+  .tab-btn .dot{ position:absolute; top:2px; right:calc(50% - 20px); background:var(--brand); color:#fff; font-size:.6rem; font-weight:700; border-radius:999px; min-width:15px; height:15px; display:flex; align-items:center; justify-content:center; }
+
+  /* ---------- department detail page ---------- */
+  .deptpage-header{ position:sticky; top:0; z-index:30; background:var(--card-bg); padding:env(safe-area-inset-top,0px) 0 0; box-shadow:var(--shadow-sm); transition:background-color .35s ease; }
+  .deptpage-topline{ display:flex; align-items:center; gap:10px; padding:14px 14px 10px; }
+  .back-btn{ background:rgba(120,100,80,.12); border:none; border-radius:50%; width:36px; height:36px; font-size:1.1rem; cursor:pointer; color:var(--fg); flex:0 0 auto; }
+  .deptpage-title{ font-weight:800; font-size:1.15rem; display:flex; align-items:center; gap:8px; color:var(--fg); }
+  .deptpage-count{ font-size:.76rem; color:var(--muted); margin-left:auto; }
+  .cat-chips{ display:flex; gap:8px; overflow-x:auto; padding:0 14px 12px; scrollbar-width:none; }
+  .cat-chips::-webkit-scrollbar{display:none;}
+  .cat-chip{ flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--bg); color:var(--fg); font-size:.8rem; font-weight:600; cursor:pointer; }
+  .cat-chip.active{ background:var(--accent); color:var(--accent-text); border-color:transparent; }
+  .deptpage-body{ max-width:640px; margin:0 auto; padding-bottom:10px; }
+  .cat-section{ padding:16px 0 2px; scroll-margin-top:132px; }
+  .cat-section h3{ padding:0 16px 8px; font-size:1rem; margin:0; color:var(--fg); }
+
+  /* ---------- weight picker modal ---------- */
+  .weight-modal .modal{ padding:0; overflow:hidden; }
+  .wm-media{ height:150px; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:3rem; background-color:rgba(120,100,80,.12); }
+  .wm-body{ padding:20px 22px 22px; }
+  .wm-body h3{ margin:0 0 2px; font-size:1.1rem; }
+  .wm-price{ color:var(--muted); font-size:.86rem; margin-bottom:14px; }
+  .wm-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .wm-chip{ padding:9px 14px; border-radius:999px; border:1.5px solid var(--line); background:#fff; font-weight:700; font-size:.86rem; cursor:pointer; color:var(--ink); }
+  .wm-chip.active{ background:var(--brand); color:#fff; border-color:transparent; }
+  .wm-custom{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .wm-custom input{ flex:1; padding:11px 13px; border-radius:10px; border:1px solid var(--line); font-size:1rem; }
+  .wm-total{ display:flex; justify-content:space-between; font-weight:700; font-size:1.05rem; padding:12px 0; border-top:1px solid var(--line); margin-bottom:12px; }
+  .wm-actions{ display:flex; gap:10px; }
+  .wm-remove{ background:none; border:none; color:var(--brand); font-size:.85rem; font-weight:700; cursor:pointer; margin-top:10px; width:100%; text-align:center; }
+
+  .overlay{ position:fixed; inset:0; background:rgba(20,14,11,.45); opacity:0; pointer-events:none; transition:.25s; z-index:40; }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+  .drawer{ position:fixed; top:0; right:0; height:100%; width:min(420px,92vw); background:var(--paper); color:var(--ink); z-index:41; transform:translateX(100%); transition:transform .3s ease; display:flex; flex-direction:column; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{ display:flex; justify-content:space-between; align-items:center; padding:18px 20px; border-bottom:1px solid var(--line); }
+  .drawer-items{ flex:1; overflow-y:auto; padding:12px 20px; }
+  .drawer-item{ display:flex; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+  .drawer-item .meta{ flex:1; } .drawer-item .name{ font-weight:600; font-size:.88rem; } .drawer-item .unit{ font-size:.74rem; color:var(--muted); }
+  .drawer-foot{ padding:16px 20px; border-top:1px solid var(--line); background:#fff; }
+  .totals-row{ display:flex; justify-content:space-between; font-size:.88rem; margin-bottom:4px; color:#5c5049; }
+  .totals-row.grand{ font-weight:700; color:var(--ink); font-size:1.05rem; margin-top:8px; }
+  .checkout-btn{ width:100%; margin-top:12px; background:var(--brand); color:#fff; border:none; border-radius:14px; padding:15px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .empty-state{ color:var(--muted); text-align:center; padding:50px 20px; }
+  .empty-state .big{ font-size:2.4rem; margin-bottom:8px; }
+
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,14,11,.5); z-index:50; display:none; align-items:center; justify-content:center; padding:16px; }
+  .modal-backdrop.open{ display:flex; }
+  .modal{ background:#fff; color:var(--ink); border-radius:20px; padding:26px; max-width:420px; width:100%; box-shadow:0 24px 60px rgba(0,0,0,.3); max-height:90vh; overflow-y:auto; }
+  .modal h3{ margin-top:0; }
+  .modal input{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); margin-bottom:12px; font-size:.95rem; }
+  .modal .row{ display:flex; gap:10px; } .modal .row .btn{ flex:1; text-align:center; }
+
+  .search-results{ padding:8px 16px 40px; }
+  .search-empty{ text-align:center; color:var(--muted); padding:60px 20px; }
+
+  .toast{ position:fixed; bottom:calc(140px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%) translateY(16px); opacity:0; background:var(--ink); color:#fff; padding:11px 20px; border-radius:999px; font-size:.85rem; z-index:60; transition:.25s ease; pointer-events:none; box-shadow:0 8px 20px rgba(0,0,0,.25); max-width:90vw; text-align:center; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  footer{ text-align:center; padding:20px 18px 10px; color:var(--muted); font-size:.8rem; }
+
+  .store-info-card{ margin:22px 16px 4px; background:#171310; color:#F3ECE2; border-radius:var(--radius-lg); padding:20px 22px; box-shadow:var(--shadow-md); }
+  .store-info-card h2{ font-size:1.15rem; margin:0 0 12px; }
+  .info-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:11px 0; border-top:1px solid rgba(255,255,255,.1); font-size:.88rem; }
+  .info-row:first-of-type{ border-top:none; }
+  .info-row span{ color:rgba(243,236,226,.7); flex:0 0 auto; }
+  .info-row strong{ text-align:right; font-weight:700; line-height:1.4; }
+
+  .deals-list{ padding:14px 16px 40px; display:flex; flex-direction:column; gap:12px; }
+  .deal-card{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); border-left:5px solid var(--brand); }
+  .deal-card h3{ margin:0 0 4px; font-size:1.02rem; }
+  .deal-card p{ margin:0 0 10px; font-size:.86rem; color:var(--muted); }
+  .deal-meta{ display:flex; flex-wrap:wrap; gap:8px; }
+  .deal-chip{ font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:999px; background:var(--paper); color:var(--ink); }
+  .deal-chip.expiry{ background:var(--gold); color:#3a2a06; }
+  .deal-chip.expiry.soon{ background:var(--brand); color:#fff; }
+  .deal-empty{ text-align:center; color:var(--muted); padding:60px 20px; }
+
+  @media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  @media (min-width:640px){ .tabbar{ display:none; } body{ padding-bottom:20px; } .cart-bar{ bottom:20px; } }
+</style>
+</head>
+<body data-view="home" data-dept="meat">
+
+  <!-- ===================== HOME ===================== -->
+  <header class="topbar" id="homeHeader">
+    <div class="topbar-row1">
+      <div class="brandmark">
+        <div class="logo">🥩</div>
+        <div>
+          <div class="name" id="storeName">Makka Halal Meat</div>
+          <div class="pickup-line">Pickup today · <span id="storeHours">11:00 AM–6:30 PM</span></div>
+        </div>
+      </div>
+      <button class="icon-btn" onclick="openCart()">🧺<span class="dot" id="cartDotTop" style="display:none;">0</span></button>
+    </div>
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="searchInput" placeholder="Search lamb, rice, halal deli…" oninput="onSearch()">
+      </div>
+    </div>
+    <nav class="depts-strip" id="deptNav"></nav>
+  </header>
+
+  <main id="homeView">
+    <div class="store-banner"><img src="banner-sign.jpg" alt="Makka Halal Meat, Inc. — Goat, Lamb, Beef, Chicken — 404-297-0008"></div>
+    <div class="promo-scroller" id="promoScroller"></div>
+    <div class="quick-cats" id="quickCats"></div>
+    <div id="homePreviews"></div>
+
+    <section class="store-info-card">
+      <h2>Store information</h2>
+      <div class="info-row"><span>📍 Address</span><strong id="infoAddress"></strong></div>
+      <div class="info-row"><span>📞 Phone</span><strong id="infoPhone"></strong></div>
+      <div class="info-row"><span>🛍️ Shopping</span><strong id="infoShopping"></strong></div>
+      <div class="info-row"><span>📦 Order options</span><strong id="infoOrderOptions"></strong></div>
+      <div class="info-row"><span>🕒 Hours</span><strong id="infoHours"></strong></div>
+    </section>
+
+    <footer>
+      <div style="margin-top:4px;">Prices shown are estimates — weighed items are finalized at pickup.</div>
+    </footer>
+  </main>
+
+  <main id="searchView" style="display:none;">
+    <header class="topbar">
+      <div class="topbar-row1">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="search-wrap" style="flex:1; padding:2px 0;">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="searchInput2" placeholder="Search lamb, rice, halal deli…" oninput="onSearch(true)">
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="search-results" id="searchResults"></div>
+  </main>
+
+  <!-- ===================== DEALS ===================== -->
+  <main id="dealsView" style="display:none;">
+    <header class="topbar">
+      <div class="topbar-row1">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="deptpage-title" style="font-size:1.05rem;">🏷️ Deals</div>
+      </div>
+    </header>
+    <div class="deals-list" id="dealsList"></div>
+  </main>
+
+  <!-- ===================== DEPARTMENT PAGE ===================== -->
+  <main id="deptView" style="display:none;">
+    <header class="deptpage-header">
+      <div class="deptpage-topline">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="deptpage-title"><span id="deptPageIcon"></span><span id="deptPageLabel"></span></div>
+        <span class="deptpage-count" id="deptPageCount"></span>
+      </div>
+      <div class="cat-chips" id="deptPageChips"></div>
+    </header>
+    <div class="deptpage-body" id="deptPageBody"></div>
+  </main>
+
+  <div class="cart-bar" id="cartBar" onclick="openCart()">
+    <div class="left"><span class="count-chip" id="cartBarCount">0</span><span id="cartBarSub">$0.00</span></div>
+    <button onclick="event.stopPropagation(); openCart()">View cart</button>
+  </div>
+
+  <nav class="tabbar">
+    <button class="tab-btn active" data-tab="home" onclick="switchView('home')"><span class="ic">🏠</span>Home</button>
+    <button class="tab-btn" data-tab="search" onclick="switchView('search')"><span class="ic">🔍</span>Search</button>
+    <button class="tab-btn" data-tab="deals" onclick="switchView('deals')"><span class="ic">🏷️</span>Deals</button>
+    <button class="tab-btn" data-tab="favorites" onclick="showFavorites()"><span class="ic">❤️</span>Saved</button>
+    <button class="tab-btn" onclick="openCart()"><span class="ic">🧺</span>Cart<span class="dot" id="cartDotTab" style="display:none;">0</span></button>
+  </nav>
+
+  <div class="overlay" id="overlay" onclick="closeCart()"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head"><strong>Your order</strong><button class="icon-btn" onclick="closeCart()">✕</button></div>
+    <div class="drawer-items" id="drawerItems"></div>
+    <div class="drawer-foot">
+      <div class="totals-row"><span>Subtotal</span><span id="sumSubtotal">$0.00</span></div>
+      <div class="totals-row"><span>Estimated tax</span><span id="sumTax">$0.00</span></div>
+      <div class="totals-row grand"><span>Total</span><span id="sumTotal">$0.00</span></div>
+      <button class="checkout-btn" onclick="openCheckoutModal()">Checkout</button>
+    </div>
+  </aside>
+
+  <div class="modal-backdrop" id="checkoutModal">
+    <div class="modal">
+      <h3>Pickup details</h3>
+      <input id="custName" placeholder="Full name">
+      <input id="custPhone" placeholder="Phone number">
+      <input id="custEmail" placeholder="Email (for receipt)">
+      <div class="row">
+        <button class="btn ghost" onclick="closeCheckoutModal()">Back</button>
+        <button class="btn" id="payBtn" onclick="submitCheckout()">Continue to payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weight picker for by-the-pound items -->
+  <div class="modal-backdrop weight-modal" id="weightModal">
+    <div class="modal">
+      <div class="wm-media" id="wmMedia"></div>
+      <div class="wm-body">
+        <h3 id="wmName"></h3>
+        <div class="wm-price" id="wmPrice"></div>
+        <div class="wm-chips" id="wmChips"></div>
+        <div class="wm-custom">
+          <span style="font-weight:600; font-size:.85rem;">Custom:</span>
+          <input type="number" id="wmCustom" step="0.25" min="0.25" placeholder="e.g. 2.75">
+          <span style="font-weight:600; font-size:.85rem;">lb</span>
+        </div>
+        <div class="wm-total"><span>Estimated total</span><span id="wmTotal">$0.00</span></div>
+        <div class="wm-actions">
+          <button class="btn ghost" style="flex:1;" onclick="closeWeightModal()">Cancel</button>
+          <button class="btn" style="flex:1;" onclick="confirmWeight()">Add to order</button>
+        </div>
+        <button class="wm-remove" id="wmRemoveBtn" style="display:none;" onclick="removeFromWeightModal()">Remove from order</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://zbsesllddfjwfsowxlgp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_fgQoJ3lUEfNIxqbOSxit3Q_FK89Oxn_";
+
+const DEPTS = [
+  { id:"meat",      label:"Fresh Meat & Poultry", icon:"🥩", tile:"#8C1A1E" },
+  { id:"grocery",   label:"Grocery",              icon:"🛒", tile:"#B9812A" },
+  { id:"household", label:"Household",            icon:"🧼", tile:"#2E6E7D" },
+  { id:"beauty",    label:"Beauty",               icon:"💄", tile:"#A8506A" },
+  { id:"baby",      label:"Baby",                 icon:"👶", tile:"#4A6F9C" },
+  { id:"clothing",  label:"Clothing",             icon:"🧕", tile:"#7D6633" },
+];
+const DEPT_MAP = Object.fromEntries(DEPTS.map(d=>[d.id,d]));
+const WEIGHT_CHIPS = [0.5, 1, 1.5, 2, 3, 5];
+
+let PRODUCTS = [];
+let SETTINGS = {};
+let DISCOUNTS = [];
+let CART = {};        // id -> quantity (lb for weighted items, count for "each" items)
+let FAVORITES = {};
+let currentView = "home";
+let currentDeptPage = null;
+let weightModalProductId = null;
+
+async function sb(path){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } });
+  if(!res.ok) throw new Error("Unable to load data");
+  return res.json();
+}
+
+async function init(){
+  renderSkeleton();
+  try{
+    const [products, settingsRows, discounts] = await Promise.all([
+      sb("products?select=*&active=eq.true&order=sort_order.asc,name.asc"),
+      sb("app_settings?key=eq.ui_config&select=value"),
+      sb("discounts?select=*&active=eq.true&order=expires_at.asc.nullslast"),
+    ]);
+    PRODUCTS = products;
+    SETTINGS = (settingsRows[0] && settingsRows[0].value) || {};
+    DISCOUNTS = discounts;
+  }catch(e){ showToast("Couldn't load the catalog — check your connection."); console.error(e); }
+  applySettings();
+  renderDeptNav();
+  renderQuickCats();
+  renderPromos();
+  renderHomePreviews();
+  renderDeals();
+  restoreLocal();
+}
+
+function applySettings(){
+  if(SETTINGS.home_title) document.getElementById("storeName").textContent = SETTINGS.home_title;
+  if(SETTINGS.store_hours) document.getElementById("storeHours").textContent = SETTINGS.store_hours;
+  document.getElementById("infoAddress").textContent = SETTINGS.store_address || "—";
+  document.getElementById("infoPhone").textContent = SETTINGS.store_phone || "—";
+  document.getElementById("infoShopping").textContent = SETTINGS.store_shopping || "In-store & online";
+  document.getElementById("infoOrderOptions").textContent = SETTINGS.store_order_options || "Store pickup";
+  document.getElementById("infoHours").textContent = SETTINGS.store_hours || "—";
+}
+
+function departmentsInOrder(){
+  const order = SETTINGS.department_order || DEPTS.map(d=>d.id);
+  const hidden = new Set(SETTINGS.hidden_departments || []);
+  return order.filter(d => !hidden.has(d) && DEPT_MAP[d]);
+}
+
+/* ---------------- weight helpers ---------------- */
+function isWeighted(p){ return !!(p.unit && p.unit.toLowerCase().includes("lb")); }
+function stepFor(p){ return isWeighted(p) ? 0.5 : 1; }
+function fmtQty(p, qty){ return isWeighted(p) ? `${qty} lb` : `${qty}`; }
+
+/* ---------------- nav / quick cats / promos ---------------- */
+function renderDeptNav(){
+  document.getElementById("deptNav").innerHTML = departmentsInOrder().map(id => {
+    const d = DEPT_MAP[id];
+    return `<button class="dept-pill" data-dept="${id}" onclick="openDeptPage('${id}')">${d.icon} ${d.label}</button>`;
+  }).join("");
+}
+function renderQuickCats(){
+  document.getElementById("quickCats").innerHTML = departmentsInOrder().map(id => {
+    const d = DEPT_MAP[id];
+    return `<button class="quick-cat" onclick="openDeptPage('${id}')">
+      <span class="tile" style="background:${d.tile}22; color:${d.tile};">${d.icon}</span>
+      <span>${d.label}</span>
+    </button>`;
+  }).join("");
+}
+function renderPromos(){
+  const deal = SETTINGS.deal_text || "Today's best cut, ready for pickup";
+  const dealPrice = SETTINGS.deal_price_label || "";
+  document.getElementById("promoScroller").innerHTML = `
+    <div class="promo-card deal">
+      <span class="promo-eyebrow">${SETTINGS.deal_title || "Deal of the day"}</span>
+      <h2>${escapeHtml(deal)}</h2>
+      ${dealPrice ? `<p>${escapeHtml(dealPrice)}</p>` : ""}
+      <button class="btn" onclick="openDeptPage('meat')">Shop now</button>
+    </div>
+    <div class="promo-card pickup">
+      <span class="promo-eyebrow">Free pickup</span>
+      <h2>Order ahead, skip the line</h2>
+      <p>We'll have it ready when you arrive.</p>
+    </div>
+    <div class="promo-card halal">
+      <span class="promo-eyebrow">100% halal</span>
+      <h2>Freshly cut, every day</h2>
+      <p>Sourced and prepared to halal standards.</p>
+    </div>
+  `;
+}
+
+/* ---------------- HOME: preview rows with "See all" ---------------- */
+function renderSkeleton(){
+  document.getElementById("homePreviews").innerHTML = `<div class="grid">${'<div class="skeleton"></div>'.repeat(6)}</div>`;
+}
+function renderHomePreviews(){
+  const wrap = document.getElementById("homePreviews");
+  wrap.innerHTML = "";
+  departmentsInOrder().forEach(id => {
+    const d = DEPT_MAP[id];
+    const items = PRODUCTS.filter(p => p.department === id);
+    if(!items.length) return;
+    const preview = items.slice(0, 10);
+    const section = document.createElement("section");
+    section.className = "section";
+    section.innerHTML = `
+      <div class="section-head">
+        <h2><span class="tint">${d.icon}</span> ${d.label}</h2>
+        <button class="link-btn" onclick="openDeptPage('${id}')">See all (${items.length}) →</button>
+      </div>
+      <div class="row-scroller" id="rowhome-${id}"></div>
+    `;
+    wrap.appendChild(section);
+    document.getElementById(`rowhome-${id}`).innerHTML = preview.map(cardHtml).join("");
+  });
+}
+
+/* ---------------- VIEW SWITCHING ---------------- */
+function switchView(name){
+  currentView = name;
+  document.getElementById("homeView").style.display = name==="home" ? "block" : "none";
+  document.getElementById("homeHeader").style.display = name==="home" ? "block" : "none";
+  document.getElementById("searchView").style.display = name==="search" ? "block" : "none";
+  document.getElementById("dealsView").style.display = name==="deals" ? "block" : "none";
+  document.getElementById("deptView").style.display = name==="dept" ? "block" : "none";
+  document.querySelectorAll(".tab-btn").forEach(t => t.classList.toggle("active", t.dataset.tab===name));
+  if(name !== "dept"){ document.body.setAttribute("data-view", name==="home" ? "home" : "search"); }
+  window.scrollTo(0,0);
+  if(name==="search") setTimeout(()=>{ const el=document.getElementById("searchInput2"); if(el) el.focus(); }, 50);
+}
+
+/* ---------------- DEALS ---------------- */
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const diff = new Date(dateStr) - new Date();
+  return Math.ceil(diff / (1000*60*60*24));
+}
+function formatExpiry(dateStr){
+  if(!dateStr) return null;
+  const days = daysUntil(dateStr);
+  if(days < 0) return null;
+  if(days === 0) return "Expires today";
+  if(days === 1) return "Expires tomorrow";
+  if(days <= 7) return `Expires in ${days} days`;
+  return "Expires " + new Date(dateStr).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+}
+function renderDeals(){
+  const wrap = document.getElementById("dealsList");
+  const active = DISCOUNTS.filter(d => !d.expires_at || daysUntil(d.expires_at) >= 0);
+  if(!active.length){ wrap.innerHTML = `<div class="deal-empty">No active deals right now — check back soon!</div>`; return; }
+  wrap.innerHTML = active.map(d => {
+    const expiry = formatExpiry(d.expires_at);
+    const soon = d.expires_at && daysUntil(d.expires_at) <= 3;
+    return `<div class="deal-card">
+      <h3>${escapeHtml(d.title)}</h3>
+      ${d.description ? `<p>${escapeHtml(d.description)}</p>` : ""}
+      <div class="deal-meta">
+        ${d.requirements ? `<span class="deal-chip">${escapeHtml(d.requirements)}</span>` : ""}
+        ${d.code ? `<span class="deal-chip">Code: ${escapeHtml(d.code)}</span>` : ""}
+        ${expiry ? `<span class="deal-chip expiry${soon?' soon':''}">${expiry}</span>` : `<span class="deal-chip">No expiration</span>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------------- DEPARTMENT PAGE (dedicated screen) ---------------- */
+function openDeptPage(id, categoryFilter){
+  currentDeptPage = id;
+  document.body.setAttribute("data-view","dept");
+  document.body.setAttribute("data-dept", id);
+  switchView("dept");
+  const d = DEPT_MAP[id];
+  const items = PRODUCTS.filter(p => p.department === id);
+  document.getElementById("deptPageIcon").textContent = d.icon;
+  document.getElementById("deptPageLabel").textContent = d.label;
+  document.getElementById("deptPageCount").textContent = `${items.length} items`;
+
+  const cats = [...new Set(items.map(p => p.category).filter(Boolean))];
+  const chipsHtml = [`<button class="cat-chip${!categoryFilter?' active':''}" onclick="openDeptPage('${id}', null)">All</button>`]
+    .concat(cats.map(c => `<button class="cat-chip${categoryFilter===c?' active':''}" onclick="openDeptPage('${id}', '${escAttrJs(c)}')">${escapeHtml(c)}</button>`));
+  document.getElementById("deptPageChips").innerHTML = chipsHtml.join("");
+
+  const body = document.getElementById("deptPageBody");
+  const groups = categoryFilter ? [categoryFilter] : cats;
+  body.innerHTML = groups.map(cat => {
+    const catItems = items.filter(p => p.category === cat);
+    if(!catItems.length) return "";
+    return `<section class="cat-section">
+      <h3>${escapeHtml(cat)}</h3>
+      <div class="grid">${catItems.map(cardHtml).join("")}</div>
+    </section>`;
+  }).join("");
+}
+
+/* ---------------- product cards ---------------- */
+function cardHtml(p){
+  const media = p.image
+    ? `<div class="card-media" style="background-image:url('${escapeAttr(p.image)}')"></div>`
+    : `<div class="card-media">${p.emoji||"🛒"}</div>`;
+  const priceHtml = p.price != null
+    ? `<span class="price">$${Number(p.price).toFixed(2)} <small>${escapeHtml(p.unit||"")}</small></span>`
+    : `<span class="price unknown">Ask in store</span>`;
+  const qty = CART[p.id]||0;
+  let control = "";
+  if(p.price != null){
+    if(qty>0){
+      const step = stepFor(p);
+      const editAttr = isWeighted(p) ? ` onclick="openWeightModal(${p.id})"` : "";
+      control = `<div class="stepper">
+        <button onclick="event.stopPropagation(); changeQty(${p.id},${-step})">−</button>
+        <span class="qtytext"${editAttr}>${fmtQty(p,qty)}</span>
+        <button onclick="event.stopPropagation(); changeQty(${p.id},${step})">+</button>
+      </div>`;
+    } else {
+      control = isWeighted(p)
+        ? `<button class="add-btn" onclick="openWeightModal(${p.id})">+</button>`
+        : `<button class="add-btn" onclick="bumpAdd(this,${p.id})">+</button>`;
+    }
+  }
+  const fav = FAVORITES[p.id] ? "❤️" : "🤍";
+  return `<div class="card" data-pid="${p.id}">
+    ${media}
+    <button class="fav-btn" onclick="toggleFav(${p.id}, this)">${fav}</button>
+    <h3>${escapeHtml(p.name)}</h3>
+    ${p.brand ? `<div class="brand">${escapeHtml(p.brand)}</div>` : ""}
+    <div class="price-row">${priceHtml}${control}</div>
+  </div>`;
+}
+
+function bumpAdd(btn, id){
+  changeQty(id,1);
+  btn.classList.add("added"); btn.textContent="✓";
+}
+
+function changeQty(id, delta){
+  const p = PRODUCTS.find(x=>x.id===id);
+  const step = stepFor(p);
+  let next = Math.round(((CART[id]||0)+delta)/step)*step;
+  next = Math.max(0, Math.round(next*100)/100);
+  if(next<=0) delete CART[id]; else CART[id]=next;
+  saveLocal();
+  refreshAllCardsFor(id);
+  renderCartChrome();
+  renderDrawer();
+}
+
+function refreshAllCardsFor(id){
+  document.querySelectorAll(`.card[data-pid="${id}"]`).forEach(el => {
+    const p = PRODUCTS.find(x=>x.id===id);
+    el.outerHTML = cardHtml(p);
+  });
+}
+
+function toggleFav(id, btn){
+  if(FAVORITES[id]) delete FAVORITES[id]; else FAVORITES[id]=true;
+  saveLocal();
+  if(btn) btn.textContent = FAVORITES[id] ? "❤️" : "🤍";
+}
+
+/* ---------------- weight picker modal ---------------- */
+function openWeightModal(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  weightModalProductId = id;
+  document.getElementById("wmMedia").style.backgroundImage = p.image ? `url('${escapeAttr(p.image)}')` : "none";
+  document.getElementById("wmMedia").textContent = p.image ? "" : (p.emoji||"🛒");
+  document.getElementById("wmName").textContent = p.name;
+  document.getElementById("wmPrice").textContent = `$${Number(p.price).toFixed(2)} ${p.unit||""}`;
+  const current = CART[id] || 0;
+  document.getElementById("wmChips").innerHTML = WEIGHT_CHIPS.map(w =>
+    `<button class="wm-chip${current===w?' active':''}" onclick="pickWeightChip(${w}, this)">${w} lb</button>`
+  ).join("");
+  const customInput = document.getElementById("wmCustom");
+  customInput.value = (current && !WEIGHT_CHIPS.includes(current)) ? current : "";
+  updateWeightTotal(current || WEIGHT_CHIPS[1]);
+  if(!current) document.querySelectorAll(".wm-chip")[1]?.classList.add("active");
+  document.getElementById("wmRemoveBtn").style.display = current>0 ? "block" : "none";
+  document.getElementById("weightModal").classList.add("open");
+  customInput.oninput = () => {
+    document.querySelectorAll(".wm-chip").forEach(c=>c.classList.remove("active"));
+    updateWeightTotal(parseFloat(customInput.value)||0);
+  };
+}
+function pickWeightChip(w, btn){
+  document.querySelectorAll(".wm-chip").forEach(c=>c.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("wmCustom").value = "";
+  updateWeightTotal(w);
+}
+function updateWeightTotal(w){
+  const p = PRODUCTS.find(x=>x.id===weightModalProductId);
+  document.getElementById("wmTotal").textContent = "$"+((p.price||0)*w).toFixed(2);
+  document.getElementById("weightModal").dataset.pendingWeight = w;
+}
+function confirmWeight(){
+  const custom = parseFloat(document.getElementById("wmCustom").value);
+  const activeChip = document.querySelector(".wm-chip.active");
+  const weight = custom > 0 ? custom : (activeChip ? Number(activeChip.textContent) : WEIGHT_CHIPS[1]);
+  if(!weight || weight<=0){ showToast("Enter a weight greater than 0."); return; }
+  CART[weightModalProductId] = Math.round(weight*100)/100;
+  saveLocal();
+  refreshAllCardsFor(weightModalProductId);
+  renderCartChrome(); renderDrawer();
+  closeWeightModal();
+  const p = PRODUCTS.find(x=>x.id===weightModalProductId);
+  showToast(`Added ${weight} lb of ${p.name}`);
+}
+function removeFromWeightModal(){
+  delete CART[weightModalProductId];
+  saveLocal();
+  refreshAllCardsFor(weightModalProductId);
+  renderCartChrome(); renderDrawer();
+  closeWeightModal();
+}
+function closeWeightModal(){ document.getElementById("weightModal").classList.remove("open"); weightModalProductId=null; }
+
+/* ---------------- search ---------------- */
+function showFavorites(){
+  switchView("search");
+  const ids = Object.keys(FAVORITES).map(Number);
+  const items = PRODUCTS.filter(p => ids.includes(p.id));
+  renderSearchResults(items, "Saved items");
+}
+function onSearch(fromSecondary){
+  const q = (fromSecondary ? document.getElementById("searchInput2").value : document.getElementById("searchInput").value).trim().toLowerCase();
+  if(!fromSecondary){ switchView("search"); document.getElementById("searchInput2").value = q; }
+  if(!q){ renderSearchResults([], ""); return; }
+  const items = PRODUCTS.filter(p => p.name.toLowerCase().includes(q) || (p.brand||"").toLowerCase().includes(q));
+  renderSearchResults(items, `Results for "${q}"`);
+}
+function renderSearchResults(items, label){
+  const wrap = document.getElementById("searchResults");
+  if(!label && !items.length){ wrap.innerHTML = `<div class="search-empty">Search for lamb, rice, chicken, halal deli…</div>`; return; }
+  if(!items.length){ wrap.innerHTML = `<div class="search-empty">No matches. Try a different word.</div>`; return; }
+  wrap.innerHTML = `<div class="section-head" style="padding:14px 0 8px;"><h2>${label}</h2><span class="count">${items.length} items</span></div><div class="grid">${items.map(cardHtml).join("")}</div>`;
+}
+
+/* ---------------- cart ---------------- */
+function renderCartChrome(){
+  const lines = cartLines();
+  const count = lines.length;
+  const subtotal = lines.reduce((s,{p,qty})=>s+p.price*qty,0);
+  ["cartDotTop","cartDotTab"].forEach(id=>{
+    const el = document.getElementById(id);
+    el.style.display = count>0 ? "flex" : "none";
+    el.textContent = count;
+  });
+  const bar = document.getElementById("cartBar");
+  bar.classList.toggle("show", count>0);
+  document.getElementById("cartBarCount").textContent = count;
+  document.getElementById("cartBarSub").textContent = "$"+subtotal.toFixed(2);
+}
+function cartLines(){
+  return Object.entries(CART).map(([id,qty])=>{
+    const p = PRODUCTS.find(x=>x.id===Number(id));
+    return p ? {p,qty} : null;
+  }).filter(Boolean);
+}
+function renderDrawer(){
+  const wrap = document.getElementById("drawerItems");
+  const lines = cartLines();
+  wrap.innerHTML = lines.length ? lines.map(({p,qty})=>{
+    const step = stepFor(p);
+    const editAttr = isWeighted(p) ? ` onclick="openWeightModal(${p.id})" style="cursor:pointer;"` : "";
+    return `<div class="drawer-item">
+      <div class="meta"><div class="name">${escapeHtml(p.name)}</div><div class="unit">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div></div>
+      <div class="stepper"><button onclick="changeQty(${p.id},${-step})">−</button><span class="qtytext"${editAttr}>${fmtQty(p,qty)}</span><button onclick="changeQty(${p.id},${step})">+</button></div>
+    </div>`;
+  }).join("") : `<div class="empty-state"><div class="big">🧺</div>Your cart is empty.<br>Find something delicious above.</div>`;
+  const subtotal = lines.reduce((s,{p,qty})=>s+p.price*qty,0);
+  const tax = subtotal*0.03;
+  document.getElementById("sumSubtotal").textContent = "$"+subtotal.toFixed(2);
+  document.getElementById("sumTax").textContent = "$"+tax.toFixed(2);
+  document.getElementById("sumTotal").textContent = "$"+(subtotal+tax).toFixed(2);
+}
+function openCart(){ document.getElementById("drawer").classList.add("open"); document.getElementById("overlay").classList.add("open"); renderDrawer(); }
+function closeCart(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("overlay").classList.remove("open"); }
+function openCheckoutModal(){ if(!cartLines().length){ showToast("Your cart is empty."); return; } document.getElementById("checkoutModal").classList.add("open"); }
+function closeCheckoutModal(){ document.getElementById("checkoutModal").classList.remove("open"); }
+
+async function submitCheckout(){
+  const name = document.getElementById("custName").value.trim();
+  const phone = document.getElementById("custPhone").value.trim();
+  const email = document.getElementById("custEmail").value.trim();
+  if(!name || !phone){ showToast("Please add your name and phone number."); return; }
+  const payBtn = document.getElementById("payBtn");
+  payBtn.disabled = true; payBtn.textContent = "Redirecting…";
+  const items = cartLines().map(({p,qty})=>({id:p.id, qty}));
+  try{
+    const res = await fetch("/.netlify/functions/create-checkout-session", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ items, name, phone, email }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Unable to start checkout");
+    window.location.href = data.url;
+  }catch(e){ showToast(e.message); payBtn.disabled=false; payBtn.textContent="Continue to payment"; }
+}
+
+async function handlePaymentReturn(){
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get("session_id");
+  if(params.get("payment")==="authorized" && sessionId){
+    try{
+      const res = await fetch(`/.netlify/functions/verify-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+      const data = await res.json();
+      if(data.authorized){ CART={}; saveLocal(); renderCartChrome(); renderHomePreviews(); showToast(`Order ${data.orderCode||""} confirmed! We'll text you when it's ready.`); }
+    }catch(e){ console.error(e); }
+    window.history.replaceState({}, "", window.location.pathname);
+  } else if(params.get("payment")==="cancelled"){
+    showToast("Checkout cancelled — your cart is still saved.");
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}
+
+function saveLocal(){ try{ localStorage.setItem("mhm_cart", JSON.stringify(CART)); localStorage.setItem("mhm_favs", JSON.stringify(FAVORITES)); }catch(e){} }
+function restoreLocal(){
+  try{ CART = JSON.parse(localStorage.getItem("mhm_cart")||"{}"); }catch(e){ CART={}; }
+  try{ FAVORITES = JSON.parse(localStorage.getItem("mhm_favs")||"{}"); }catch(e){ FAVORITES={}; }
+  renderCartChrome(); renderDrawer();
+  handlePaymentReturn();
+}
+
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 3000);
+}
+
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeAttr(s){ return escapeHtml(s).replace(/'/g,"\\'"); }
+function escAttrJs(s){ return String(s||"").replace(/'/g,"\\'"); }
+
+if("serviceWorker" in navigator){ window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+
+init();
+</script>
+</body>
+</html>
