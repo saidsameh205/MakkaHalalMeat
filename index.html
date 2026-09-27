@@ -365,7 +365,7 @@
 
 <script>
 const SUPABASE_URL = "https://zbsesllddfjwfsowxlgp.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpic2VzbGxkZGZqd2Zzb3d4bGdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTYwMDgsImV4cCI6MjEwMzA3MjAwOH0.ZzTDXww1jjqu2R_FekkYnmbH-6ZAWqyog8LZ83N5eH4";
+const SUPABASE_ANON_KEY = "sb_publishable_fgQoJ3lUEfNIxqbOSxit3Q_FK89Oxn_";
 
 const DEPTS = [
   { id:"meat",      label:"Fresh Meat & Poultry", icon:"🥩", tile:"#8C1A1E" },
@@ -776,12 +776,6 @@ async function submitCheckout(){
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ items, name, phone, email }),
     });
-    const contentType = res.headers.get("content-type") || "";
-    if(!contentType.includes("application/json")){
-      const text = await res.text();
-      console.error("Checkout function returned non-JSON:", res.status, text.slice(0,500));
-      throw new Error("Checkout service is unavailable. Netlify Function did not return JSON.");
-    }
     const data = await res.json();
     if(!res.ok) throw new Error(data.error || "Unable to start checkout");
     window.location.href = data.url;
@@ -794,8 +788,6 @@ async function handlePaymentReturn(){
   if(params.get("payment")==="authorized" && sessionId){
     try{
       const res = await fetch(`/.netlify/functions/verify-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
-      const contentType = res.headers.get("content-type") || "";
-      if(!contentType.includes("application/json")) throw new Error("Payment verification service did not return JSON.");
       const data = await res.json();
       if(data.authorized){ CART={}; saveLocal(); renderCartChrome(); renderHomePreviews(); showToast(`Order ${data.orderCode||""} confirmed! We'll text you when it's ready.`); }
     }catch(e){ console.error(e); }
