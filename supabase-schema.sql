@@ -21,11 +21,16 @@ create table if not exists public.products (
   brand text default '',
   active boolean not null default true,
   sort_order int not null default 0,
+  stock integer,                   -- null = unlimited stock; otherwise auto-decreases as orders are placed
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create index if not exists idx_products_department on public.products (department, active);
+
+-- Adds the stock column even if this table already existed from an earlier
+-- run of this file (CREATE TABLE IF NOT EXISTS alone wouldn't add it).
+alter table public.products add column if not exists stock integer;
 
 -- ---------- APP SETTINGS ----------
 -- Single-row config table for site-wide, remotely-editable content:
@@ -84,12 +89,35 @@ create table if not exists public.orders (
   stripe_session_id text,
   status text not null default 'New',   -- New | Preparing | Ready for Pickup | Completed | Cancelled | Paid - Preparing
   notes text default '',
+  pickup_time timestamptz,          -- staff-confirmed pickup time
+  staff_notes text default '',      -- internal notes staff add, not shown to the customer
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create index if not exists idx_orders_status on public.orders (status, created_at desc);
 create index if not exists idx_orders_session on public.orders (stripe_session_id);
+create index if not exists idx_orders_code on public.orders (order_code);
+
+-- Adds these columns even if the orders table already existed from an
+-- earlier run of this file.
+alter table public.orders add column if not exists pickup_time timestamptz;
+alter table public.orders add column if not exists staff_notes text default '';
+
+-- ---------- PRODUCT PHOTO STORAGE ----------
+-- A public bucket so admin.html can upload real photos instead of typing
+-- image links. Uploads go through the admin-upload-photo function using
+-- the service-role key; anyone can VIEW an uploaded photo (that's the
+-- point — it needs to show on the public storefront), but only that
+-- function can add one.
+insert into storage.buckets (id, name, public)
+values ('product-photos', 'product-photos', true)
+on conflict (id) do nothing;
+
+drop policy if exists "public can view product photos" on storage.objects;
+create policy "public can view product photos"
+  on storage.objects for select
+  using (bucket_id = 'product-photos');
 
 -- ============================================================
 -- ROW LEVEL SECURITY
@@ -133,6 +161,23 @@ grant usage on schema public to anon, authenticated;
 grant select on public.products to anon, authenticated;
 grant select on public.app_settings to anon, authenticated;
 grant select on public.discounts to anon, authenticated;
+
+-- service_role is used by every Netlify function (checkout, admin panel,
+-- order management). It's meant to bypass RLS entirely, but this project's
+-- default privileges were never set up for it either — same root cause as
+-- the anon grants above — so it needs the same explicit treatment.
+grant usage on schema public to service_role;
+grant all privileges on all tables in schema public to service_role;
+grant usage, select on all sequences in schema public to service_role;
+
+-- Given this project's default privileges were missing for the public
+-- schema too, grant storage access explicitly as well — needed for
+-- admin-upload-photo to actually save uploaded files.
+grant usage on schema storage to service_role, anon, authenticated;
+grant all privileges on storage.objects to service_role;
+grant select on storage.objects to anon, authenticated;
+grant all privileges on storage.buckets to service_role;
+grant select on storage.buckets to anon, authenticated;
 
 -- No policy is created granting the anon key access to orders, so the
 -- default (no access) applies: the storefront cannot read anyone's orders.

@@ -24,20 +24,10 @@ function safeEqual(a, b) {
 // environment variable to be set in Netlify — if it's missing, admin
 // endpoints refuse to run rather than silently allowing access.
 function requireAdmin(event) {
-  const configured = String(process.env.ADMIN_TOKEN || process.env.ADMIN_CAPTURE_TOKEN || '').trim();
-  const headers = event.headers || {};
-  const provided = String(headers['x-admin-token'] || headers['X-Admin-Token'] || headers['X-ADMIN-TOKEN'] || '').trim();
-
-  if (!configured) return { ok: false, response: json(500, {
-    error: 'ADMIN_TOKEN is not available to this Netlify Function.',
-    code: 'ADMIN_TOKEN_MISSING'
-  }) };
-
-  if (!safeEqual(provided, configured)) return { ok: false, response: json(401, {
-    error: 'The admin token does not match the token configured in Netlify.',
-    code: 'ADMIN_TOKEN_INVALID'
-  }) };
-
+  const configured = process.env.ADMIN_TOKEN;
+  const provided = event.headers['x-admin-token'] || event.headers['X-Admin-Token'] || '';
+  if (!configured) return { ok: false, response: json(500, { error: 'Server is missing the ADMIN_TOKEN environment variable.' }) };
+  if (!safeEqual(provided, configured)) return { ok: false, response: json(401, { error: 'Unauthorized' }) };
   return { ok: true };
 }
 
@@ -67,4 +57,24 @@ async function supabaseFetch(path, options = {}) {
   return text ? JSON.parse(text) : null;
 }
 
-module.exports = { json, safeEqual, requireAdmin, supabaseFetch, JSON_HEADERS };
+// Thin wrapper around Supabase's Storage REST API (different endpoint than
+// the Postgres REST API above) using the service-role key. Uploads a file
+// buffer to a bucket and returns its public URL.
+async function supabaseStorageUpload(bucket, path, buffer, contentType) {
+  const { url, serviceKey } = supabaseConfig();
+  const res = await fetch(`${url}/storage/v1/object/${bucket}/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      'Content-Type': contentType || 'application/octet-stream',
+      'x-upsert': 'true',
+    },
+    body: buffer,
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `Storage upload failed (${res.status})`);
+  return `${url}/storage/v1/object/public/${bucket}/${path}`;
+}
+
+module.exports = { json, safeEqual, requireAdmin, supabaseFetch, supabaseStorageUpload, JSON_HEADERS };

@@ -74,5 +74,6 @@ function sanitizeProduct(b) {
   if (b.brand !== undefined) out.brand = String(b.brand).slice(0, 100);
   if (b.active !== undefined) out.active = !!b.active;
   if (b.sort_order !== undefined) out.sort_order = Number(b.sort_order) || 0;
+  if (b.stock !== undefined) out.stock = b.stock === null || b.stock === '' ? null : Number(b.stock);
   return out;
 }

@@ -1,5 +1,6 @@
 const Stripe = require('stripe');
-const { json, requireAdmin } = require('./_util');
+const { json, requireAdmin, supabaseFetch } = require('./_util');
+const { restoreStock } = require('./create-checkout-session');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
@@ -24,6 +25,27 @@ exports.handler = async (event) => {
       return json(200, { ok: true, status: 'canceled' });
     } else {
       throw new Error(`Payment is ${pi.status}; it cannot be canceled from this screen.`);
+    }
+
+    // Give back any inventory this order had reserved, and mark it Cancelled.
+    try {
+      const orders = await supabaseFetch(`orders?stripe_session_id=eq.${encodeURIComponent(sid)}&select=id,items,status`);
+      const order = orders && orders[0];
+      if (order && order.status !== 'Cancelled') {
+        for (const item of order.items || []) {
+          if (item && item.id && item.qty) {
+            try { await restoreStock(Number(item.id), Number(item.qty)); }
+            catch (e2) { console.error('cancel-authorization stock restore failed', item, e2); }
+          }
+        }
+        await supabaseFetch(`orders?id=eq.${order.id}`, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({ status: 'Cancelled', updated_at: new Date().toISOString() }),
+        });
+      }
+    } catch (e2) {
+      console.error('cancel-authorization order lookup/update failed', e2);
     }
 
     return json(200, { ok: true, status: 'canceled' });

@@ -6,8 +6,16 @@ const { json, supabaseFetch } = require('./_util');
 // and the *real* per-item prices are looked up server-side from Supabase
 // before anything is written to the orders table, so a tampered client
 // total can't be used to under-charge or spoof an order record.
+//
+// It also reserves inventory up front: stock is decremented the moment an
+// order is placed (not when payment is captured later), using an
+// optimistic-concurrency check so two customers can't both buy the last
+// item. If a reservation fails partway through, everything already
+// reserved for this order is rolled back.
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
+
+  const reserved = []; // { id, qty } successfully decremented so far, for rollback
 
   try {
     const body = JSON.parse(event.body || '{}');
@@ -15,20 +23,41 @@ exports.handler = async (event) => {
     if (!items.length) throw new Error('Your cart is empty');
 
     const ids = items.map((i) => Number(i.id)).filter(Number.isFinite);
-    const qs = `products?id=in.(${ids.join(',')})&select=id,name,price,active`;
+    const qs = `products?id=in.(${ids.join(',')})&select=id,name,price,active,stock`;
     const catalog = await supabaseFetch(qs);
     const byId = Object.fromEntries(catalog.map((p) => [p.id, p]));
 
     let subtotal = 0;
     const lineDescriptions = [];
+    const toReserve = []; // items whose stock we still need to decrement
+
     for (const item of items) {
       const p = byId[Number(item.id)];
       const qty = Math.max(1, Math.min(50, Number(item.qty) || 1));
       if (!p || !p.active || p.price == null) continue; // skip unknown/priceless items rather than trusting the client
+      if (p.stock != null && qty > p.stock) {
+        throw new Error(`Only ${p.stock} of "${p.name}" left in stock — please adjust your cart.`);
+      }
       subtotal += p.price * qty;
       lineDescriptions.push(`${qty} x ${p.name}`);
+      if (p.stock != null) toReserve.push({ id: p.id, qty, currentStock: p.stock });
     }
     if (subtotal <= 0) throw new Error('No valid priced items in cart');
+
+    // Reserve stock one item at a time with an optimistic-concurrency
+    // check: the update only applies if stock still matches what we just
+    // read, so a simultaneous purchase can't oversell the same item.
+    for (const r of toReserve) {
+      const rows = await supabaseFetch(`products?id=eq.${r.id}&stock=eq.${r.currentStock}`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({ stock: r.currentStock - r.qty }),
+      });
+      if (!rows || !rows.length) {
+        throw new Error('Someone just bought the last of one of your items — please refresh and try again.');
+      }
+      reserved.push({ id: r.id, qty: r.qty });
+    }
 
     const foodTaxable = subtotal; // simple flat estimate; adjust categories as needed
     const tax = Math.round(foodTaxable * 0.03 * 100) / 100;
@@ -80,6 +109,27 @@ exports.handler = async (event) => {
     return json(200, { id: session.id, url: session.url });
   } catch (err) {
     console.error('create-checkout-session', err);
+    // Give back any inventory we already reserved for this failed attempt.
+    for (const r of reserved) {
+      try {
+        await restoreStock(r.id, r.qty);
+      } catch (e2) {
+        console.error('create-checkout-session rollback failed', r, e2);
+      }
+    }
     return json(500, { error: err.message || 'Unable to start payment' });
   }
 };
+
+async function restoreStock(id, qty) {
+  const rows = await supabaseFetch(`products?id=eq.${id}&select=stock`);
+  const current = rows && rows[0] ? rows[0].stock : null;
+  if (current == null) return; // stock is untracked for this item, nothing to restore
+  await supabaseFetch(`products?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ stock: current + qty }),
+  });
+}
+
+module.exports.restoreStock = restoreStock;

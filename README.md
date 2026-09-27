@@ -19,6 +19,29 @@ security gaps called out in your own launch checklist are fixed.
 - `product-images/` — your existing meat/poultry/fish photos
 - `manifest.json`, `sw.js` — makes the site installable as a home-screen app
 
+## What's new: inventory, pickup times, order lookup, and photo uploads
+
+If you're updating an existing deployment, **re-run `supabase-schema.sql`** in
+the SQL editor first — it's safe to run again (it only adds what's missing)
+and adds the new `stock`, `pickup_time`, and `staff_notes` columns plus a
+storage bucket for photos.
+
+- **Stock/inventory**: set a number in `admin.html` → Products → Stock for
+  any item you want to limit (leave it blank for unlimited). It
+  automatically goes down as orders come in, and back up if an order is
+  cancelled. Customers can't order more than what's in stock.
+- **Pickup time & staff notes**: in `admin.html` → Orders, you can now set a
+  pickup time and add internal notes per order, saved with the Save button
+  in that row.
+- **My Orders tab**: customers now have an "Orders" tab (replacing the old
+  "Saved" tab — favorites still work via the heart icon on any item) that
+  remembers their past orders on that device and shows live status and
+  pickup time, without needing an account.
+- **Real photo uploads**: in `admin.html` → Products, there's now a file
+  picker per row — choose a photo from your computer or phone and it
+  uploads to Supabase Storage automatically, filling in the Image field
+  for you. No more typing image links by hand (though that still works too).
+
 ## 1. Set up Supabase
 
 1. Create a project at supabase.com (or reuse your existing one).

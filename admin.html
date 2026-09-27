@@ -65,7 +65,7 @@
         <span class="msg" id="ordersMsg"></span>
       </div>
       <table>
-        <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Payment</th><th></th></tr></thead>
+        <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Pickup time</th><th>Staff notes</th><th></th></tr></thead>
         <tbody id="ordersBody"></tbody>
       </table>
     </section>
@@ -84,7 +84,7 @@
         <span class="msg" id="productsMsg"></span>
       </div>
       <table>
-        <thead><tr><th>Name</th><th>Dept</th><th>Category</th><th>Price</th><th>Unit</th><th>Image path</th><th>Active</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Dept</th><th>Category</th><th>Price</th><th>Unit</th><th>Stock</th><th>Image path</th><th>Photo</th><th>Active</th><th></th></tr></thead>
         <tbody id="productsBody"></tbody>
       </table>
     </section>
@@ -117,14 +117,10 @@ let SETTINGS = {};
 function api(path, opts = {}) {
   return fetch(`/.netlify/functions/${path}`, {
     ...opts,
-    cache: "no-store",
     headers: { "Content-Type": "application/json", "x-admin-token": TOKEN, ...(opts.headers || {}) },
   }).then(async (r) => {
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      const detail = [data.code, data.error].filter(Boolean).join(": ");
-      throw new Error(detail || `Request failed (${r.status})`);
-    }
+    if (!r.ok) throw new Error(data.error || "Request failed");
     return data;
   });
 }
@@ -138,16 +134,7 @@ async function signIn() {
     document.getElementById("app").style.display = "block";
     loadOrders(); loadProducts(); loadSettings(); loadDeals();
   } catch (e) {
-    {
-      const msg = String(e && e.message ? e.message : e);
-      if (msg.includes("ADMIN_TOKEN_MISSING")) {
-        document.getElementById("gateMsg").textContent = "Netlify Function cannot see ADMIN_TOKEN. Make sure it has Functions scope, save it, then redeploy.";
-      } else if (msg.includes("ADMIN_TOKEN_INVALID")) {
-        document.getElementById("gateMsg").textContent = "Incorrect admin token. Enter the exact ADMIN_TOKEN value saved in Netlify.";
-      } else {
-        document.getElementById("gateMsg").textContent = "Admin sign-in failed: " + msg;
-      }
-    }
+    document.getElementById("gateMsg").textContent = "Incorrect token, or ADMIN_TOKEN isn't set in Netlify yet.";
   }
 }
 function signOut() { sessionStorage.removeItem("mhm_admin_token"); location.reload(); }
@@ -175,7 +162,8 @@ async function loadOrders() {
 function orderRow(o) {
   const statuses = ["New", "Preparing", "Ready for Pickup", "Completed", "Cancelled", "Paid - Preparing"];
   const badgeClass = o.status === "Completed" || o.status.startsWith("Paid") ? "paid" : "new";
-  return `<tr>
+  const pickupVal = o.pickup_time ? new Date(o.pickup_time).toISOString().slice(0,16) : "";
+  return `<tr data-order-id="${o.id}">
     <td>${o.order_code}<div class="msg">${new Date(o.created_at).toLocaleString()}</div></td>
     <td>${o.customer_name || ""}<div class="msg">${o.customer_phone || ""}</div></td>
     <td>$${Number(o.total || 0).toFixed(2)}</td>
@@ -183,14 +171,24 @@ function orderRow(o) {
       <select onchange="updateStatus(${o.id}, this.value)">
         ${statuses.map((s) => `<option ${s === o.status ? "selected" : ""}>${s}</option>`).join("")}
       </select>
+      <div class="badge ${badgeClass}" style="margin-top:4px;">${o.status}</div>
     </td>
-    <td><span class="badge ${badgeClass}">${o.status}</span></td>
+    <td><input type="datetime-local" data-field="pickup_time" value="${pickupVal}"></td>
+    <td><input data-field="staff_notes" value="${escAttr(o.staff_notes || "")}" placeholder="e.g. called, ready early"></td>
     <td class="row-actions">
+      <button class="btn small" onclick="saveOrderDetails(${o.id})">Save</button>
       ${o.stripe_session_id ? `
         <button class="btn small" onclick="capturePayment('${o.stripe_session_id}', ${o.total})">Capture</button>
         <button class="btn small ghost" onclick="cancelAuth('${o.stripe_session_id}')">Cancel</button>` : ""}
     </td>
   </tr>`;
+}
+async function saveOrderDetails(id) {
+  const tr = document.querySelector(`tr[data-order-id="${id}"]`);
+  const pickup_time = tr.querySelector('[data-field="pickup_time"]').value || null;
+  const staff_notes = tr.querySelector('[data-field="staff_notes"]').value;
+  try { await api("update-order-status", { method: "POST", body: JSON.stringify({ id, pickup_time, staff_notes }) }); document.getElementById("ordersMsg").textContent = "Saved."; }
+  catch (e) { alert(e.message); }
 }
 async function updateStatus(id, status) {
   try { await api("update-order-status", { method: "POST", body: JSON.stringify({ id, status }) }); }
@@ -229,13 +227,44 @@ function productRow(p) {
     <td><input value="${escAttr(p.category)}" data-field="category"></td>
     <td><input value="${p.price == null ? "" : p.price}" data-field="price" type="number" step="0.01"></td>
     <td><input value="${escAttr(p.unit || "")}" data-field="unit"></td>
+    <td><input value="${p.stock == null ? "" : p.stock}" data-field="stock" type="number" step="1" placeholder="blank = unlimited"></td>
     <td><input value="${escAttr(p.image || "")}" data-field="image" placeholder="product-images/example.jpg"></td>
+    <td>
+      <input type="file" accept="image/*" style="max-width:110px;" onchange="uploadPhoto(${p.id}, this)">
+      <div class="msg" data-field="uploadMsg"></div>
+    </td>
     <td><input type="checkbox" data-field="active" ${p.active ? "checked" : ""}></td>
     <td class="row-actions">
       <button class="btn small" onclick="saveProduct(${p.id})">Save</button>
       <button class="btn small ghost" onclick="deleteProduct(${p.id})">Remove</button>
     </td>
   </tr>`;
+}
+async function uploadPhoto(productId, input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const tr = input.closest("tr");
+  const msgEl = tr.querySelector('[data-field="uploadMsg"]');
+  msgEl.textContent = "Uploading…";
+  try {
+    const dataBase64 = await fileToBase64(file);
+    const result = await api("admin-upload-photo", {
+      method: "POST",
+      body: JSON.stringify({ productId, filename: file.name, contentType: file.type, dataBase64 }),
+    });
+    tr.querySelector('[data-field="image"]').value = result.url;
+    msgEl.textContent = "Uploaded — click Save to apply.";
+  } catch (e) {
+    msgEl.textContent = e.message || "Upload failed";
+  }
+}
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 function readRow(id) {
   const tr = document.querySelector(`tr[data-id="${id}"]`);
@@ -247,6 +276,7 @@ function readRow(id) {
     category: get("category").value,
     price: get("price").value === "" ? null : Number(get("price").value),
     unit: get("unit").value,
+    stock: get("stock").value === "" ? null : Number(get("stock").value),
     image: get("image").value,
     active: get("active").checked,
   };
