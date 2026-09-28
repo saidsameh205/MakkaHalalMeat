@@ -1,5 +1,5 @@
 const Stripe = require('stripe');
-const { json } = require('./_util');
+const { json, supabaseFetch } = require('./_util');
 
 exports.handler = async (event) => {
   try {
@@ -9,6 +9,23 @@ exports.handler = async (event) => {
     const s = await stripe.checkout.sessions.retrieve(id, { expand: ['payment_intent'] });
     const pi = s.payment_intent;
     const authorized = !!pi && pi.status === 'requires_capture';
+
+    // The moment payment is confirmed, hand the order to the store: flip it
+    // from "Awaiting Payment" to "New" so it shows up in GIF. (If the
+    // customer never returns to the site, GIF's reconcile step does the
+    // same thing on its own.)
+    if (authorized) {
+      try {
+        await supabaseFetch(`orders?stripe_session_id=eq.${encodeURIComponent(id)}&status=eq.Awaiting%20Payment`, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({ status: 'New', payment_status: 'authorized', placed_at: new Date().toISOString(), updated_at: new Date().toISOString() }),
+        });
+      } catch (e) {
+        console.error('verify-checkout-session: could not promote order', e);
+      }
+    }
+
     return json(200, {
       authorized,
       orderCode: s.client_reference_id || '',

@@ -1,6 +1,5 @@
 const Stripe = require('stripe');
-const { json, requireAdmin, supabaseFetch } = require('./_util');
-const { restoreStock } = require('./create-checkout-session');
+const { json, requireAdmin, supabaseFetch, restoreOrderStock } = require('./_util');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
@@ -22,26 +21,30 @@ exports.handler = async (event) => {
     } else if (pi.status === 'succeeded') {
       throw new Error('Payment was already captured. Refund it from Stripe or add a refund workflow before using live payments.');
     } else if (pi.status === 'canceled') {
-      return json(200, { ok: true, status: 'canceled' });
+      // Already released — fall through so the order record still gets tidied up.
     } else {
       throw new Error(`Payment is ${pi.status}; it cannot be canceled from this screen.`);
     }
 
     // Give back any inventory this order had reserved, and mark it Cancelled.
     try {
-      const orders = await supabaseFetch(`orders?stripe_session_id=eq.${encodeURIComponent(sid)}&select=id,items,status`);
+      const orders = await supabaseFetch(`orders?stripe_session_id=eq.${encodeURIComponent(sid)}&select=id,items,status,cancel_request_status`);
       const order = orders && orders[0];
-      if (order && order.status !== 'Cancelled') {
-        for (const item of order.items || []) {
-          if (item && item.id && item.qty) {
-            try { await restoreStock(Number(item.id), Number(item.qty)); }
-            catch (e2) { console.error('cancel-authorization stock restore failed', item, e2); }
-          }
-        }
+      if (order) {
+        const alreadyReleased = order.status === 'Cancelled' || order.status === 'Abandoned';
+        if (!alreadyReleased) await restoreOrderStock(order.items);
         await supabaseFetch(`orders?id=eq.${order.id}`, {
           method: 'PATCH',
           headers: { Prefer: 'return=minimal' },
-          body: JSON.stringify({ status: 'Cancelled', updated_at: new Date().toISOString() }),
+          body: JSON.stringify({
+            status: alreadyReleased ? order.status : 'Cancelled',
+            payment_status: 'cancelled',
+            // If the customer had asked to cancel, cancelling here is the approval.
+            ...(order.cancel_request_status === 'pending'
+              ? { cancel_request_status: 'approved', cancel_decided_at: new Date().toISOString() }
+              : {}),
+            updated_at: new Date().toISOString(),
+          }),
         });
       }
     } catch (e2) {

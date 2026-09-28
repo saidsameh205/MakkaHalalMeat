@@ -13,6 +13,14 @@ exports.handler = async (event) => {
     if (!sessionId.startsWith('cs_')) throw new Error('Missing or invalid Stripe Checkout Session ID');
     if (!Number.isFinite(finalAmount) || finalAmount < 0.5) throw new Error('Final amount must be at least $0.50');
 
+    // Don't charge the card while the customer's cancellation request is unresolved.
+    const held = await supabaseFetch(
+      `orders?stripe_session_id=eq.${encodeURIComponent(sessionId)}&cancel_request_status=eq.pending&select=id`
+    );
+    if (held && held.length) {
+      throw new Error('The customer asked to cancel this order. Approve or deny the request (in GIF) before charging.');
+    }
+
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
     const pi = session.payment_intent;
@@ -28,6 +36,8 @@ exports.handler = async (event) => {
 
     const captured = await stripe.paymentIntents.capture(pi.id, { amount_to_capture: cents });
 
+    // Record the payment separately from the fulfilment status, so charging
+    // an order never bumps it back a step in staff's picking workflow.
     let orderUpdated = false;
     try {
       await supabaseFetch(`orders?stripe_session_id=eq.${encodeURIComponent(sessionId)}`, {
@@ -35,7 +45,7 @@ exports.handler = async (event) => {
         headers: { Prefer: 'return=minimal' },
         body: JSON.stringify({
           total: cents / 100,
-          status: 'Paid - Preparing',
+          payment_status: 'captured',
           updated_at: new Date().toISOString(),
         }),
       });

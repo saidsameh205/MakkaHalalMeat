@@ -21,7 +21,7 @@ create table if not exists public.products (
   brand text default '',
   active boolean not null default true,
   sort_order int not null default 0,
-  stock integer,                   -- null = unlimited stock; otherwise auto-decreases as orders are placed
+  stock numeric(10,2),             -- null = unlimited stock; otherwise auto-decreases as orders are placed (can be fractional for by-the-pound items)
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -30,7 +30,9 @@ create index if not exists idx_products_department on public.products (departmen
 
 -- Adds the stock column even if this table already existed from an earlier
 -- run of this file (CREATE TABLE IF NOT EXISTS alone wouldn't add it).
-alter table public.products add column if not exists stock integer;
+alter table public.products add column if not exists stock numeric(10,2);
+-- If stock was created earlier as a whole number, allow fractional pounds:
+alter table public.products alter column stock type numeric(10,2);
 
 -- ---------- APP SETTINGS ----------
 -- Single-row config table for site-wide, remotely-editable content:
@@ -87,10 +89,28 @@ create table if not exists public.orders (
   tax numeric(10,2),
   total numeric(10,2),
   stripe_session_id text,
-  status text not null default 'New',   -- New | Preparing | Ready for Pickup | Completed | Cancelled | Paid - Preparing
+  status text not null default 'New',   -- Awaiting Payment | New | Preparing | Ready for Pickup | Completed | Cancelled | Abandoned
   notes text default '',
   pickup_time timestamptz,          -- staff-confirmed pickup time
   staff_notes text default '',      -- internal notes staff add, not shown to the customer
+  requested_pickup timestamptz,     -- pickup time the customer asked for (null = as soon as possible)
+  substitution_pref text default 'call',   -- what the customer wants if an item is out: substitute | call | skip
+  adjusted_subtotal numeric(10,2),  -- recalculated by GIF as items are picked / substituted / marked unavailable
+  adjusted_total numeric(10,2),     -- adjusted_subtotal plus tax: the amount to capture after picking
+  payment_status text,              -- unpaid | authorized | captured | cancelled | refunded | partially_refunded
+  placed_at timestamptz,            -- when payment was confirmed; the customer's cancellation window starts here
+  cancel_request_status text,       -- customer asked to cancel: pending | approved | denied
+  cancel_requested_at timestamptz,
+  cancel_request_reason text,
+  cancel_decided_at timestamptz,
+  cancel_decision_note text,        -- optional message from the store to the customer
+  refund_request_status text,       -- customer asked for a refund after pickup: pending | approved | denied
+  refund_requested_at timestamptz,
+  refund_request_reason text,
+  refund_decided_at timestamptz,
+  refund_decision_note text,
+  refund_approved_amount numeric(10,2),
+  refunded_amount numeric(10,2),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -103,6 +123,24 @@ create index if not exists idx_orders_code on public.orders (order_code);
 -- earlier run of this file.
 alter table public.orders add column if not exists pickup_time timestamptz;
 alter table public.orders add column if not exists staff_notes text default '';
+alter table public.orders add column if not exists requested_pickup timestamptz;
+alter table public.orders add column if not exists substitution_pref text default 'call';
+alter table public.orders add column if not exists adjusted_subtotal numeric(10,2);
+alter table public.orders add column if not exists adjusted_total numeric(10,2);
+alter table public.orders add column if not exists payment_status text;
+alter table public.orders add column if not exists placed_at timestamptz;
+alter table public.orders add column if not exists cancel_request_status text;
+alter table public.orders add column if not exists cancel_requested_at timestamptz;
+alter table public.orders add column if not exists cancel_request_reason text;
+alter table public.orders add column if not exists cancel_decided_at timestamptz;
+alter table public.orders add column if not exists cancel_decision_note text;
+alter table public.orders add column if not exists refund_request_status text;
+alter table public.orders add column if not exists refund_requested_at timestamptz;
+alter table public.orders add column if not exists refund_request_reason text;
+alter table public.orders add column if not exists refund_decided_at timestamptz;
+alter table public.orders add column if not exists refund_decision_note text;
+alter table public.orders add column if not exists refund_approved_amount numeric(10,2);
+alter table public.orders add column if not exists refunded_amount numeric(10,2);
 
 -- ---------- PRODUCT PHOTO STORAGE ----------
 -- A public bucket so admin.html can upload real photos instead of typing
@@ -185,13 +223,13 @@ grant select on storage.buckets to anon, authenticated;
 
 -- Example discount — edit or delete this from admin.html → Deals whenever you like.
 insert into public.discounts (title, description, requirements, expires_at, active)
-values (
+select
   'New customer welcome',
   '$5 off your first online pickup order.',
   'Minimum $25 purchase · First-time customers only',
   (now() + interval '30 days'),
   true
-);
+where not exists (select 1 from public.discounts where title = 'New customer welcome');
 
 -- ============================================================
 -- SECURITY NOTE

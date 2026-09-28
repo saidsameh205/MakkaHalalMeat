@@ -19,6 +19,63 @@ security gaps called out in your own launch checklist are fixed.
 - `product-images/` — your existing meat/poultry/fish photos
 - `manifest.json`, `sw.js` — makes the site installable as a home-screen app
 
+## GIF — the staff picking app
+
+GIF is a separate installable app for your team, at **`yoursite/gif.html`**.
+
+**Setup (once):**
+1. In Netlify → Environment variables, add **`STAFF_TOKEN`** — a code you give your workers.
+   It only lets them pick orders. It can NOT edit products, prices, settings or payments.
+   (Your own `ADMIN_TOKEN` also works in GIF.)
+2. In Supabase's SQL editor, run **`supabase-update-gif.sql`** (safe to re-run).
+3. On each staff phone/tablet, open `yoursite/gif.html`, sign in, then
+   *Share → Add to Home Screen* (iPhone) or *Install app* (Android/Chrome).
+   It installs as **GIF** with its own icon.
+
+**How it works:**
+- New paid orders appear at the top of **To do**, sorted by pickup time —
+  the most urgent order is always first, and overdue ones turn red.
+- Tap an order → for each item tap **Picked** (enter the real weight for
+  by-the-pound items), **Unavailable**, or **Substitute** (search the catalog).
+  The customer's choice at checkout (substitute / call me / skip) is shown at the top.
+- When every item is handled, tap **Mark Ready for Pickup**, then
+  **Handed to customer** at the counter.
+- The order's **updated total** (after real weights, substitutes and unavailable
+  items) is calculated automatically. In `admin.html` the **Capture** button is
+  pre-filled with that amount.
+- **New-order alerts:** a chime, vibration and banner, repeating every 30 seconds
+  until someone starts picking (or taps *Silence 10 min*). For reliable alerts, leave GIF
+  open on a plugged-in tablet or phone at the counter with the sound up
+  (GIF keeps the screen awake). Alerts can't ring while the phone is locked or GIF is closed —
+  true background push notifications are a possible future add-on.
+
+Orders are only handed to the store once payment is confirmed. Checkouts that are
+abandoned are closed automatically after about 30 minutes and their reserved
+stock is released.
+
+## Cancellations & refunds (all approved by the store admin)
+
+- **Cancel within 5 minutes:** on the customer's **Orders** tab, a "Request cancellation"
+  button with a live countdown appears for 5 minutes after the order is placed
+  (the clock starts when payment is confirmed).
+- **Refund after pickup:** once an order is picked up, the customer can send a
+  "Request a refund" with a reason, for up to 7 days.
+- **Nothing happens automatically.** Every request waits in GIF for the store admin.
+  Only someone signed into GIF with the **admin code** (`ADMIN_TOKEN`) sees the
+  Approve / Deny buttons; workers signed in with `STAFF_TOKEN` can see requests
+  but cannot decide them (the server refuses, not just the screen).
+- **Cancellation requests pause picking.** GIF shows a red "CANCEL REQUESTED" notice,
+  moves that order to the top, sounds the alarm, and blocks Start picking / Picked /
+  Ready until the admin approves or denies. Approve = card hold released (or refunded if
+  already charged) and items go back in stock. Deny = the order carries on.
+- **Refund approvals** let the admin choose the amount (full or partial) and add a
+  message to the customer. The refund is sent through Stripe only at that moment.
+- Each order can have one cancellation request and one refund request. The customer
+  sees the decision (and your message) on their Orders tab.
+- To change the 5 minutes / 7 days, edit `CANCEL_WINDOW_MINUTES` / `REFUND_WINDOW_DAYS`
+  at the top of `netlify/functions/_util.js`.
+- One-time database update: run **`supabase-update-requests.sql`** in Supabase.
+
 ## What's new: inventory, pickup times, order lookup, and photo uploads
 
 If you're updating an existing deployment, **re-run `supabase-schema.sql`** in

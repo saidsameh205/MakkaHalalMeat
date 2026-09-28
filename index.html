@@ -187,6 +187,8 @@
   .modal{ background:#fff; color:var(--ink); border-radius:20px; padding:26px; max-width:420px; width:100%; box-shadow:0 24px 60px rgba(0,0,0,.3); max-height:90vh; overflow-y:auto; }
   .modal h3{ margin-top:0; }
   .modal input{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); margin-bottom:12px; font-size:.95rem; }
+  .modal select{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); margin-bottom:12px; font-size:.95rem; background:#fff; color:var(--ink); font-family:inherit; }
+  .modal .flabel{ display:block; font-size:.78rem; font-weight:700; color:var(--muted); margin:2px 2px 5px; }
   .modal .row{ display:flex; gap:10px; } .modal .row .btn{ flex:1; text-align:center; }
 
   .search-results{ padding:8px 16px 40px; }
@@ -342,6 +344,14 @@
       <input id="custName" placeholder="Full name">
       <input id="custPhone" placeholder="Phone number">
       <input id="custEmail" placeholder="Email (for receipt)">
+      <label class="flabel" for="pickupSlot">Pickup time</label>
+      <select id="pickupSlot"></select>
+      <label class="flabel" for="subPref">If something is out of stock</label>
+      <select id="subPref">
+        <option value="call">Call or text me first</option>
+        <option value="substitute">Substitute a similar item</option>
+        <option value="skip">Just skip it</option>
+      </select>
       <div class="row">
         <button class="btn ghost" onclick="closeCheckoutModal()">Back</button>
         <button class="btn" id="payBtn" onclick="submitCheckout()">Continue to payment</button>
@@ -368,6 +378,19 @@
           <button class="btn" style="flex:1;" onclick="confirmWeight()">Add to order</button>
         </div>
         <button class="wm-remove" id="wmRemoveBtn" style="display:none;" onclick="removeFromWeightModal()">Remove from order</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="requestModal">
+    <div class="modal">
+      <h3 id="rqTitle">Request</h3>
+      <p id="rqIntro" style="margin:0 0 12px;color:var(--muted);font-size:.9rem;line-height:1.45;"></p>
+      <label class="flabel" for="rqReason" id="rqLabel">Reason</label>
+      <textarea id="rqReason" rows="3" maxlength="300" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);font-size:.95rem;font-family:inherit;margin-bottom:12px;resize:vertical;"></textarea>
+      <div class="row">
+        <button class="btn ghost" onclick="closeRequestModal()">Back</button>
+        <button class="btn" id="rqSend" onclick="submitRequest()">Send request</button>
       </div>
     </div>
   </div>
@@ -789,7 +812,48 @@ function renderDrawer(){
 }
 function openCart(){ document.getElementById("drawer").classList.add("open"); document.getElementById("overlay").classList.add("open"); renderDrawer(); }
 function closeCart(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("overlay").classList.remove("open"); }
-function openCheckoutModal(){ if(!cartLines().length){ showToast("Your cart is empty."); return; } document.getElementById("checkoutModal").classList.add("open"); }
+function openCheckoutModal(){
+  if(!cartLines().length){ showToast("Your cart is empty."); return; }
+  buildPickupSlots();
+  document.getElementById("checkoutModal").classList.add("open");
+}
+
+/* ---------------- pickup time slots (store time) ---------------- */
+const STORE_TZ = "America/New_York";
+const OPEN_MIN = 11*60, LAST_PICKUP_MIN = 18*60;   // open 11:00 AM; last pickup slot 6:00 PM (meat counter closes at 6)
+const CLOSED_WEEKDAY = 1;                          // Monday
+function etParts(date){
+  const f = new Intl.DateTimeFormat("en-US",{timeZone:STORE_TZ,year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",weekday:"short",hour12:false});
+  const o = {}; f.formatToParts(date).forEach(p=>{ o[p.type]=p.value; });
+  const wd = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(o.weekday);
+  return { y:+o.year, m:+o.month, d:+o.day, h:(+o.hour)%24, min:+o.minute, wd };
+}
+function etWallToInstant(y,m,d,h,min){
+  const guess = Date.UTC(y,m-1,d,h,min);
+  const p = etParts(new Date(guess));
+  const asUTC = Date.UTC(p.y,p.m-1,p.d,p.h,p.min);
+  return new Date(guess - (asUTC - guess));
+}
+function buildPickupSlots(){
+  const sel = document.getElementById("pickupSlot");
+  const opts = [`<option value="">As soon as possible (about 45 min)</option>`];
+  const nowD = new Date(), p = etParts(nowD);
+  const earliestMin = Math.ceil((p.h*60 + p.min + 30)/30)*30;      // at least ~30 min from now, on the half hour
+  let added = 0;
+  for(let dayOffset=0; dayOffset<4 && added<14; dayOffset++){
+    const base = etWallToInstant(p.y,p.m,p.d+dayOffset,12,0);        // noon that day, to read its weekday safely
+    const bp = etParts(base);
+    if(bp.wd === CLOSED_WEEKDAY) continue;
+    const label = dayOffset===0 ? "Today" : (dayOffset===1 ? "Tomorrow" : ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][bp.wd]);
+    for(let t = Math.max(OPEN_MIN, dayOffset===0 ? earliestMin : 0); t <= LAST_PICKUP_MIN && added<14; t += 30){
+      const inst = etWallToInstant(bp.y,bp.m,bp.d,Math.floor(t/60),t%60);
+      const txt = inst.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZone:STORE_TZ});
+      opts.push(`<option value="${inst.toISOString()}">${label} ${txt}</option>`);
+      added++;
+    }
+  }
+  sel.innerHTML = opts.join("");
+}
 function closeCheckoutModal(){ document.getElementById("checkoutModal").classList.remove("open"); }
 
 async function submitCheckout(){
@@ -803,7 +867,7 @@ async function submitCheckout(){
   try{
     const res = await fetch("/.netlify/functions/create-checkout-session", {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ items, name, phone, email }),
+      body: JSON.stringify({ items, name, phone, email, requested_pickup: document.getElementById("pickupSlot").value || null, substitution_pref: document.getElementById("subPref").value }),
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error || "Unable to start checkout");
@@ -821,7 +885,7 @@ async function handlePaymentReturn(){
       const data = await res.json();
       if(data.authorized){
         CART={}; saveLocal(); renderCartChrome(); renderHomePreviews();
-        showToast(`Order ${data.orderCode||""} confirmed! We'll text you when it's ready.`);
+        showToast(`Order ${data.orderCode||""} confirmed! Changed your mind? You can request a cancellation from the Orders tab for the next 5 minutes.`);
         try{
           const phone = localStorage.getItem("mhm_pending_phone") || "";
           if(data.orderCode && phone) rememberOrder(data.orderCode, phone);
@@ -844,34 +908,128 @@ function rememberOrder(orderCode, phone){
   list = list.slice(0, 20); // keep the most recent 20 on this device
   try{ localStorage.setItem("mhm_my_orders", JSON.stringify(list)); }catch(e){}
 }
-async function renderMyOrders(){
+let myOrdersBusy = false;
+async function renderMyOrders(silent){
   const wrap = document.getElementById("myOrdersList");
   let list = [];
   try{ list = JSON.parse(localStorage.getItem("mhm_my_orders")||"[]"); }catch(e){ list = []; }
   if(!list.length){ wrap.innerHTML = `<div class="deal-empty">No orders yet on this device.<br>Your pickup orders will show up here.</div>`; return; }
-  wrap.innerHTML = `<div class="deal-empty">Loading your orders…</div>`;
-  const results = await Promise.all(list.map(async o => {
-    try{
-      const res = await fetch(`/.netlify/functions/order-status?order_code=${encodeURIComponent(o.order_code)}&phone=${encodeURIComponent(o.phone)}`);
-      if(!res.ok) return null;
-      return await res.json();
-    }catch(e){ return null; }
-  }));
-  const cards = results.filter(Boolean).map(orderCardHtml).join("");
-  wrap.innerHTML = cards || `<div class="deal-empty">Couldn't load your orders right now.</div>`;
+  if(myOrdersBusy) return; myOrdersBusy = true;
+  if(!silent) wrap.innerHTML = `<div class="deal-empty">Loading your orders…</div>`;
+  try{
+    const results = await Promise.all(list.map(async o => {
+      try{
+        const res = await fetch(`/.netlify/functions/order-status?order_code=${encodeURIComponent(o.order_code)}&phone=${encodeURIComponent(o.phone)}`);
+        if(!res.ok) return null;
+        const data = await res.json();
+        data._phone = o.phone;
+        data._exp = Date.now() + (data.cancel_seconds_left||0)*1000;   // when the cancel window closes, by the store's clock
+        return data;
+      }catch(e){ return null; }
+    }));
+    const cards = results.filter(Boolean).map(orderCardHtml).join("");
+    if(currentView !== "orders") return;
+    wrap.innerHTML = cards || `<div class="deal-empty">Couldn't load your orders right now.</div>`;
+    tickCancel();
+  } finally { myOrdersBusy = false; }
 }
+/* refresh the Orders tab while it's open so decisions show up on their own */
+setInterval(() => { if(currentView === "orders" && !document.hidden && !document.getElementById("requestModal").classList.contains("open")) renderMyOrders(true); }, 20000);
+/* live countdown on the cancel button */
+setInterval(tickCancel, 1000);
+function tickCancel(){
+  document.querySelectorAll("[data-cxl-exp]").forEach(el => {
+    const left = Math.round((Number(el.dataset.cxlExp) - Date.now())/1000);
+    if(left <= 0){ const box = el.closest(".cxl-box"); if(box) box.remove(); return; }
+    el.textContent = Math.floor(left/60) + ":" + String(left%60).padStart(2,"0");
+  });
+}
+const ORDER_STATUS_LABEL = {
+  "Awaiting Payment":"Awaiting payment", "New":"Order received", "Preparing":"Being prepared",
+  "Ready for Pickup":"Ready for pickup!", "Completed":"Picked up", "Cancelled":"Cancelled",
+  "Abandoned":"Not completed", "Paid - Preparing":"Being prepared"
+};
+function requestLine(text, color){ return `<div style="font-size:.84rem;margin-top:8px;padding:9px 11px;border-radius:10px;background:rgba(0,0,0,.05);color:${color||"inherit"};line-height:1.4;">${text}</div>`; }
 function orderCardHtml(o){
-  const statusClass = (o.status==="Completed") ? "" : (o.status==="Cancelled" ? "" : "soon");
-  const pickup = o.pickup_time ? new Date(o.pickup_time).toLocaleString(undefined,{weekday:"short",hour:"numeric",minute:"2-digit"}) : null;
-  return `<div class="deal-card">
+  const cancelled = o.status==="Cancelled";
+  const label = ORDER_STATUS_LABEL[o.status] || o.status;
+  const ready = o.status==="Ready for Pickup";
+  const when = o.pickup_time || o.requested_pickup;
+  const whenTxt = when ? new Date(when).toLocaleString("en-US",{weekday:"short",hour:"numeric",minute:"2-digit",timeZone:STORE_TZ}) : null;
+  const changes = (o.items||[]).filter(i=>i.pick_status==="unavailable"||i.pick_status==="substituted").map(i=>
+    i.pick_status==="unavailable"
+      ? `<div style="font-size:.82rem;color:#b3262d;margin-top:4px;">✕ ${escapeHtml(i.name)} — not available</div>`
+      : `<div style="font-size:.82rem;color:#8a5b00;margin-top:4px;">⇄ ${escapeHtml(i.name)} → ${escapeHtml(i.substitute?i.substitute.name:"substitute")}</div>`
+  ).join("");
+  const showUpdated = o.adjusted_total!=null && Number(o.adjusted_total)!==Number(o.total) && (o.status==="Ready for Pickup"||o.status==="Completed");
+
+  // ---- cancellation / refund: buttons + where each request stands ----
+  let req = "";
+  const code = escapeHtml(o.order_code), ph = escapeHtml(o._phone||"");
+  if(o.cancel_request_status==="pending"){
+    req += requestLine("⏳ <b>Cancellation requested.</b> The store will review it shortly. Your order is on hold until they reply.", "#8a5b00");
+  } else if(o.cancel_request_status==="approved"){
+    req += requestLine("✓ <b>Cancellation approved.</b> Your card hold or payment is being released — it can take a few days to show on your statement." + (o.cancel_decision_note?` “${escapeHtml(o.cancel_decision_note)}”`:""), "#2E7D53");
+  } else if(o.cancel_request_status==="denied"){
+    req += requestLine("<b>Cancellation wasn't approved.</b> Your order is continuing." + (o.cancel_decision_note?` “${escapeHtml(o.cancel_decision_note)}”`:"") + " Please call the store with any questions.", "#b3262d");
+  } else if(o.can_request_cancel){
+    req += `<div class="cxl-box" style="margin-top:10px;"><button class="btn ghost" style="width:100%;padding:11px 14px;" data-code="${code}" data-phone="${ph}" onclick="openRequestModal('cancel', this)">Request cancellation · <span data-cxl-exp="${o._exp}">${Math.floor(o.cancel_seconds_left/60)}:${String(o.cancel_seconds_left%60).padStart(2,"0")}</span> left</button></div>`;
+  }
+  if(o.refund_request_status==="pending"){
+    req += requestLine("⏳ <b>Refund requested.</b> The store reviews every refund before anything is sent — they'll update this page.", "#8a5b00");
+  } else if(o.refund_request_status==="approved"){
+    req += requestLine(`✓ <b>Refund approved${o.refund_approved_amount!=null?` — $${Number(o.refund_approved_amount).toFixed(2)}`:""}.</b> It can take 5–10 days to appear on your statement.` + (o.refund_decision_note?` “${escapeHtml(o.refund_decision_note)}”`:""), "#2E7D53");
+  } else if(o.refund_request_status==="denied"){
+    req += requestLine("<b>Refund wasn't approved.</b>" + (o.refund_decision_note?` “${escapeHtml(o.refund_decision_note)}”`:"") + " Please call the store if you'd like to talk it through.", "#b3262d");
+  } else if(o.can_request_refund){
+    req += `<div style="margin-top:10px;"><button class="btn ghost" style="width:100%;padding:11px 14px;" data-code="${code}" data-phone="${ph}" onclick="openRequestModal('refund', this)">Request a refund</button></div>`;
+  }
+
+  return `<div class="deal-card"${ready?' style="border-left-color:#2E7D53;"':(cancelled?' style="border-left-color:#999;opacity:.85;"':'')}>
     <h3>${escapeHtml(o.order_code)}</h3>
     ${o.notes ? `<p>${escapeHtml(o.notes)}</p>` : ""}
-    <div class="deal-meta">
-      <span class="deal-chip expiry${statusClass}">${escapeHtml(o.status)}</span>
-      ${pickup ? `<span class="deal-chip">Pickup: ${pickup}</span>` : ""}
-      <span class="deal-chip">Total: $${Number(o.total||0).toFixed(2)}</span>
+    ${changes}
+    <div class="deal-meta" style="margin-top:10px;">
+      <span class="deal-chip expiry${ready?'':' soon'}"${ready?' style="background:#2E7D53;color:#fff;"':(cancelled?' style="background:#999;color:#fff;"':'')}>${escapeHtml(label)}</span>
+      ${cancelled ? "" : (whenTxt ? `<span class="deal-chip">${o.pickup_time?"Pickup":"Requested pickup"}: ${whenTxt}</span>` : `<span class="deal-chip">Pickup: as soon as possible</span>`)}
+      <span class="deal-chip">${showUpdated?"Updated total":"Total"}: $${Number(showUpdated?o.adjusted_total:(o.total||0)).toFixed(2)}</span>
     </div>
+    ${req}
   </div>`;
+}
+
+/* ---------------- cancellation / refund request form ---------------- */
+let requestCtx = null;
+function openRequestModal(type, btn){
+  requestCtx = { type, code: btn.dataset.code, phone: btn.dataset.phone };
+  const isCancel = type === "cancel";
+  document.getElementById("rqTitle").textContent = isCancel ? "Cancel this order?" : "Request a refund";
+  document.getElementById("rqIntro").textContent = isCancel
+    ? "Tell us why (optional). The store reviews every cancellation — your order is put on hold until they reply, and you're only refunded once it's approved."
+    : "Tell us what went wrong. The store reviews every refund request before anything is sent, and will update this page with their decision.";
+  document.getElementById("rqLabel").textContent = isCancel ? "Reason (optional)" : "What went wrong?";
+  document.getElementById("rqReason").value = "";
+  document.getElementById("rqSend").textContent = isCancel ? "Send cancellation request" : "Send refund request";
+  document.getElementById("rqSend").disabled = false;
+  document.getElementById("requestModal").classList.add("open");
+}
+function closeRequestModal(){ document.getElementById("requestModal").classList.remove("open"); }
+async function submitRequest(){
+  if(!requestCtx) return;
+  const reason = document.getElementById("rqReason").value.trim();
+  if(requestCtx.type === "refund" && reason.length < 5){ showToast("Please tell us what went wrong."); return; }
+  const btn = document.getElementById("rqSend"); btn.disabled = true; btn.textContent = "Sending…";
+  try{
+    const res = await fetch("/.netlify/functions/order-request", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ order_code: requestCtx.code, phone: requestCtx.phone, type: requestCtx.type, reason }),
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error || "Couldn't send your request");
+    closeRequestModal();
+    showToast("Request sent — the store will review it.");
+  }catch(e){ showToast(e.message); btn.disabled = false; btn.textContent = "Try again"; }
+  renderMyOrders(true);
 }
 
 function saveLocal(){ try{ localStorage.setItem("mhm_cart", JSON.stringify(CART)); localStorage.setItem("mhm_favs", JSON.stringify(FAVORITES)); }catch(e){} }

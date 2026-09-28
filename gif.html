@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>GIF — Staff</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="gif-manifest.json">
+<link rel="apple-touch-icon" href="gif-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GIF">
+<meta name="theme-color" content="#1E1712">
+<style>
+  :root{
+    --bg:#15100D; --panel:#211915; --panel2:#2B211B; --line:rgba(255,255,255,.09);
+    --ink:#F4EDE4; --muted:#A99C90; --brand:#C0272D; --brand-l:#E5555A;
+    --gold:#E2A63B; --green:#3BB273; --orange:#F08A24; --red:#E5484D;
+    --radius:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  body{min-height:100vh; padding-bottom:env(safe-area-inset-bottom,0px);}
+  button{font-family:inherit; color:inherit; cursor:pointer;}
+  [hidden]{display:none !important;}
+  input,textarea{font-family:inherit; color:var(--ink);}
+
+  /* ---------- sign-in ---------- */
+  .login{max-width:380px; margin:0 auto; padding:14vh 22px 40px; text-align:center;}
+  .logo{width:84px; height:84px; margin:0 auto 18px; border-radius:22px; background:var(--brand);
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.7rem; letter-spacing:.02em; box-shadow:0 10px 30px rgba(192,39,45,.35);}
+  .login h1{margin:0 0 6px; font-size:1.6rem;}
+  .login p{margin:0 0 22px; color:var(--muted); font-size:.95rem;}
+  .field{width:100%; padding:16px 16px; border-radius:14px; border:1.5px solid var(--line); background:var(--panel); font-size:1.05rem; margin-bottom:12px; outline:none;}
+  .field:focus{border-color:var(--brand-l);}
+  .btn{border:none; border-radius:14px; padding:16px 18px; font-weight:800; font-size:1rem; background:var(--brand); color:#fff; width:100%; min-height:52px;}
+  .btn.secondary{background:var(--panel2); border:1px solid var(--line); color:var(--ink);}
+  .btn.green{background:var(--green); color:#062414;}
+  .btn.small{width:auto; padding:10px 14px; min-height:44px; font-size:.9rem; border-radius:12px;}
+  .btn:disabled{opacity:.45;}
+  .err{color:var(--brand-l); font-size:.9rem; min-height:1.3em; margin-top:10px;}
+
+  /* ---------- header ---------- */
+  header.top{position:sticky; top:0; z-index:20; background:var(--bg); padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 8px; border-bottom:1px solid var(--line);}
+  .toprow{display:flex; align-items:center; gap:10px;}
+  .brandbox{display:flex; align-items:center; gap:10px; flex:1;}
+  .mini-logo{width:38px; height:38px; border-radius:11px; background:var(--brand); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.8rem;}
+  .brandbox b{font-size:1.1rem;} .brandbox small{display:block; color:var(--muted); font-size:.72rem; margin-top:1px;}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--green); display:inline-block; margin-right:5px;}
+  .dot.off{background:var(--red);}
+  .iconbtn{width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--panel); font-size:1.15rem;}
+  .tabs{display:flex; gap:8px; margin-top:10px;}
+  .tab{flex:1; padding:12px 2px; border-radius:12px; border:1px solid var(--line); background:var(--panel); font-weight:700; font-size:.82rem; white-space:nowrap;}
+  .tab.active{background:var(--ink); color:#1a120d; border-color:transparent;}
+  .tab .n{display:inline-block; min-width:22px; padding:1px 7px; margin-left:4px; border-radius:999px; background:var(--brand); color:#fff; font-size:.78rem;}
+  .tab.active .n{background:var(--brand);}
+
+  .banner{margin:10px 14px 0; padding:13px 14px; border-radius:14px; display:flex; align-items:center; gap:10px; font-weight:700; font-size:.95rem;}
+  .banner.alert{background:var(--brand); animation:pulse 1.4s ease-in-out infinite;}
+  .banner.info{background:var(--panel2); border:1px solid var(--line); font-weight:600; color:var(--muted);}
+  .banner .grow{flex:1;}
+  .banner button{border:none; border-radius:10px; padding:9px 12px; font-weight:800; background:rgba(255,255,255,.2); font-size:.85rem;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(229,72,77,.55);} 50%{box-shadow:0 0 0 9px rgba(229,72,77,0);}}
+
+  /* ---------- order cards ---------- */
+  main{padding:12px 14px 40px; max-width:760px; margin:0 auto;}
+  .empty{text-align:center; color:var(--muted); padding:70px 20px; line-height:1.5;}
+  .empty .big{font-size:2.6rem; margin-bottom:8px;}
+  .card{display:flex; width:100%; text-align:left; margin-bottom:10px; border:1px solid var(--line); background:var(--panel); border-radius:var(--radius); padding:0; overflow:hidden;}
+  .card .bar{width:7px; background:#5B4F47; flex:0 0 auto;}
+  .card.soon .bar{background:var(--orange);} .card.late .bar{background:var(--red);} .card.ready .bar{background:var(--green);}
+  .card.late{border-color:rgba(229,72,77,.6);}
+  .card.isnew{box-shadow:0 0 0 2px rgba(226,166,59,.65);}
+  .cbody{flex:1; padding:13px 14px;}
+  .row1{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .code{font-weight:900; font-size:1.15rem; letter-spacing:.01em;}
+  .pill{font-size:.68rem; font-weight:900; padding:3px 8px; border-radius:999px; background:var(--panel2); border:1px solid var(--line); color:var(--muted);}
+  .pill.new{background:var(--gold); color:#2b1c00; border-color:transparent;}
+  .cust{margin-top:3px; color:var(--muted); font-size:.95rem;}
+  .due{margin-top:8px; font-weight:800; font-size:1.02rem;}
+  .card.late .due{color:var(--red);} .card.soon .due{color:var(--orange);}
+  .meta{display:flex; align-items:center; justify-content:space-between; margin-top:9px; font-size:.82rem; color:var(--muted); gap:8px; flex-wrap:wrap;}
+  .prog{height:5px; border-radius:99px; background:var(--panel2); overflow:hidden; margin-top:10px;}
+  .prog i{display:block; height:100%; background:var(--green);}
+  .pref{padding:3px 9px; border-radius:999px; font-weight:800; font-size:.72rem;}
+  .pref.substitute{background:rgba(59,178,115,.18); color:#7ee0aa;}
+  .pref.call{background:rgba(240,138,36,.18); color:#ffb35c;}
+  .pref.skip{background:rgba(255,255,255,.1); color:#cfc4b9;}
+
+  /* ---------- order sheet ---------- */
+  .sheet{position:fixed; inset:0; z-index:40; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .sheet .inner{max-width:760px; margin:0 auto; padding:0 14px calc(150px + env(safe-area-inset-bottom,0px));}
+  .sheet header{position:sticky; top:0; background:var(--bg); z-index:2; padding:calc(env(safe-area-inset-top,0px) + 10px) 0 10px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px;}
+  .back{width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--panel); font-size:1.2rem;}
+  .sh-title{flex:1; min-width:0;} .sh-title b{font-size:1.2rem; display:block;} .sh-title span{color:var(--muted); font-size:.88rem;}
+  .contact{display:flex; gap:8px; margin:12px 0;}
+  .contact a{flex:1; text-align:center; text-decoration:none; padding:13px 8px; border-radius:12px; background:var(--panel2); border:1px solid var(--line); font-weight:800; color:var(--ink); font-size:.95rem;}
+  .callout{padding:12px 14px; border-radius:14px; margin:10px 0; font-size:.92rem; line-height:1.4; border:1px solid var(--line); background:var(--panel);}
+  .callout.substitute{border-color:rgba(59,178,115,.5);} .callout.call{border-color:rgba(240,138,36,.6);} .callout.skip{border-color:rgba(255,255,255,.2);}
+  .callout b{display:block; margin-bottom:2px;}
+  .timeline{color:var(--muted); font-size:.88rem; margin:6px 0 2px;}
+
+  .item{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:12px; margin-bottom:10px;}
+  .item.picked{border-color:rgba(59,178,115,.55);} .item.unavailable{border-color:rgba(229,72,77,.55);} .item.substituted{border-color:rgba(226,166,59,.6);}
+  .irow{display:flex; gap:12px; align-items:center;}
+  .ipic{width:62px; height:62px; border-radius:12px; background:var(--panel2) center/cover no-repeat; display:flex; align-items:center; justify-content:center; font-size:1.7rem; flex:0 0 auto;}
+  .iname{font-weight:800; font-size:1.02rem; line-height:1.25;}
+  .iqty{margin-top:3px; font-size:1.05rem; font-weight:900; color:var(--gold);}
+  .istate{margin-top:8px; font-weight:800; font-size:.92rem;}
+  .istate.picked{color:var(--green);} .istate.unavailable{color:var(--red);} .istate.substituted{color:var(--gold);}
+  .iactions{display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:8px; margin-top:12px;}
+  .iactions button{border:none; border-radius:12px; padding:14px 6px; font-weight:900; font-size:.9rem; min-height:50px;}
+  .a-pick{background:var(--green); color:#062414;} .a-out{background:rgba(229,72,77,.2); color:#ff8b8f; border:1px solid rgba(229,72,77,.5) !important;}
+  .a-sub{background:rgba(226,166,59,.2); color:var(--gold); border:1px solid rgba(226,166,59,.5) !important;}
+  .weigh{display:flex; gap:8px; margin-top:12px; align-items:center;}
+  .weigh input{flex:1; min-width:0; padding:14px; font-size:1.3rem; font-weight:800; border-radius:12px; border:2px solid var(--green); background:var(--panel2); text-align:center; outline:none;}
+  .weigh span{font-weight:800; color:var(--muted);}
+  .undo{background:none; border:none; color:var(--muted); text-decoration:underline; font-size:.85rem; padding:8px 0 0; margin-top:4px;}
+  .note-in{width:100%; margin-top:8px; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--panel2); font-size:.95rem; outline:none;}
+
+  .footer{position:fixed; left:0; right:0; bottom:0; background:linear-gradient(180deg, rgba(21,16,13,0) 0%, var(--bg) 22%); padding:26px 14px calc(14px + env(safe-area-inset-bottom,0px)); z-index:3;}
+  .footer .in{max-width:760px; margin:0 auto;}
+  .totalrow{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; font-size:.9rem; color:var(--muted);}
+  .totalrow b{color:var(--ink); font-size:1.25rem;}
+  .footer .two{display:grid; grid-template-columns:1fr 2fr; gap:8px;}
+
+  /* ---------- modal / substitute ---------- */
+  .modal{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.65); display:flex; align-items:flex-end; justify-content:center;}
+  .mbox{background:var(--panel); width:100%; max-width:560px; border-radius:22px 22px 0 0; padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px)); border:1px solid var(--line);}
+  .mbox h3{margin:0 0 6px; font-size:1.15rem;} .mbox p{margin:0 0 14px; color:var(--muted); font-size:.92rem; line-height:1.45;}
+  .mbox .btn{margin-top:8px;}
+  .subres{max-height:52vh; overflow-y:auto; margin-top:10px;}
+  .subrow{display:flex; width:100%; text-align:left; gap:12px; align-items:center; padding:11px; border-radius:12px; background:var(--panel2); border:1px solid var(--line); margin-bottom:8px;}
+  .subrow .n{flex:1; font-weight:700; font-size:.95rem;} .subrow .p{color:var(--gold); font-weight:800; font-size:.9rem; white-space:nowrap;}
+  .subrow:disabled{opacity:.4;}
+  .chk{display:flex; gap:10px; align-items:center; margin:12px 0 4px; color:var(--muted); font-size:.9rem;}
+  .chk input{width:22px; height:22px;}
+  .menu-row{display:flex; justify-content:space-between; align-items:center; padding:14px 2px; border-bottom:1px solid var(--line); font-weight:700;}
+  .switch{width:52px; height:30px; border-radius:99px; background:#4a3f38; border:none; position:relative;}
+  .switch::after{content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; transition:.15s;}
+  .switch.on{background:var(--green);} .switch.on::after{left:25px;}
+
+  .pill.red{background:var(--red); color:#fff; border-color:transparent;}
+  .card.hold{border-color:rgba(229,72,77,.75); background:linear-gradient(0deg, rgba(229,72,77,.10), rgba(229,72,77,.10)), var(--panel);}
+  .card.hold .bar{background:var(--red);}
+  .holdline{margin-top:8px; color:#ff9a9d; font-weight:800; font-size:.9rem;}
+  .callout.block{border-color:rgba(229,72,77,.75); background:rgba(229,72,77,.12);}
+  .callout .two2{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;}
+  .waitadmin{margin-top:10px; color:var(--muted); font-weight:700; font-size:.9rem;}
+  .lbl{display:block; margin:12px 2px 6px; font-size:.8rem; color:var(--muted); font-weight:700;}
+  .reason{margin-top:8px; padding:9px 11px; border-radius:10px; background:var(--panel2); font-size:.92rem; line-height:1.35; font-style:italic;}
+  .sect{margin:16px 2px 8px; color:var(--muted); font-weight:800; font-size:.8rem; text-transform:uppercase; letter-spacing:.06em;}
+  .lockline{margin:12px 0 14px; color:#ff9a9d; font-weight:800; font-size:.88rem; line-height:1.35;}
+  .toast{position:fixed; left:50%; bottom:calc(120px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(14px); opacity:0; background:#fff; color:#111; padding:12px 18px; border-radius:999px; font-weight:800; font-size:.92rem; z-index:80; pointer-events:none; transition:.2s; max-width:92vw; text-align:center;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<!-- ============ SIGN IN ============ -->
+<div id="login" class="login">
+  <div class="logo">GIF</div>
+  <h1>Staff sign-in</h1>
+  <p>Makka Halal Meat · order picking</p>
+  <input id="tokenInput" class="field" type="password" placeholder="Staff code" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
+  <button class="btn" id="loginBtn" onclick="signIn()">Start shift</button>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="toprow">
+      <div class="brandbox">
+        <div class="mini-logo">GIF</div>
+        <div><b>Orders</b><small><span class="dot" id="dot"></span><span id="statusText">Connecting…</span></small></div>
+      </div>
+      <button class="iconbtn" id="soundBtn" onclick="toggleSound()" aria-label="Sound">🔔</button>
+      <button class="iconbtn" onclick="openMenu()" aria-label="Menu">⚙️</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab-todo" onclick="setTab('todo')">To do<span class="n" id="n-todo">0</span></button>
+      <button class="tab" id="tab-ready" onclick="setTab('ready')">Ready<span class="n" id="n-ready" style="background:var(--green);color:#052">0</span></button>
+      <button class="tab" id="tab-req" onclick="setTab('req')">Requests<span class="n" id="n-req" style="background:var(--orange);display:none">0</span></button>
+      <button class="tab" id="tab-done" onclick="setTab('done')">Done</button>
+    </div>
+  </header>
+
+  <div id="alertBanner" class="banner alert" hidden>
+    <span style="font-size:1.4rem">🔔</span>
+    <span class="grow" id="alertText">New order</span>
+    <button onclick="silence()">Silence 10 min</button>
+  </div>
+  <div id="soundBanner" class="banner info" hidden>
+    <span class="grow">Tap to turn on sound alerts for new orders</span>
+    <button onclick="unlockAudio(true)">Turn on</button>
+  </div>
+
+  <main id="list"></main>
+</div>
+
+<!-- ============ ORDER SHEET ============ -->
+<div id="sheet" class="sheet" hidden></div>
+
+<!-- ============ MODALS ============ -->
+<div id="modal" class="modal" hidden onclick="if(event.target===this)closeModal()"><div class="mbox" id="mbox"></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "/.netlify/functions/";
+const TZ = "America/New_York";
+const POLL_MS = 12000;
+const ALARM_REPEAT_MS = 30000;
+
+let TOKEN = localStorage.getItem("gif_token") || "";
+let ORDERS = [];          // active orders
+let DONE = [];            // completed orders (loaded when that tab is open)
+let CATALOG = null;
+let skew = 0;             // server clock minus device clock, so a wrong device clock can't mislabel due times
+let tab = "todo";
+let openId = null;
+let weighing = null;      // { id, idx } while entering a picked weight
+let subCtx = null;        // { id, idx, product }
+let knownIds = null;      // ids we've already seen (null until first load)
+let IS_ADMIN = false;     // true only when signed in with the store admin code
+let REQUESTS = [];        // orders that have a cancellation / refund request
+let knownReqKeys = null;  // requests we've already alerted about
+let silencedUntil = 0;
+let lastChime = 0;
+let soundOn = localStorage.getItem("gif_sound") !== "0";
+let keepAwake = localStorage.getItem("gif_awake") !== "0";
+let audioCtx = null;
+let wakeLock = null;
+let online = true;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = (n) => (n == null ? "—" : "$" + Number(n).toFixed(2));
+const now = () => Date.now() + skew;
+
+/* ---------------- API ---------------- */
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { "Content-Type": "application/json", "x-staff-token": TOKEN, ...(opts.headers || {}) },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { signOut("That code isn't right — please sign in again."); throw new Error("Unauthorized"); }
+  if (!res.ok) throw new Error(data.error || "Something went wrong");
+  return data;
+}
+
+/* ---------------- sign in / out ---------------- */
+async function signIn() {
+  TOKEN = $("tokenInput").value.trim();
+  if (!TOKEN) { $("loginErr").textContent = "Enter your staff code."; return; }
+  $("loginBtn").disabled = true; $("loginErr").textContent = "";
+  unlockAudio(false); // the tap on "Start shift" lets the browser allow sound
+  try {
+    await api("staff-orders");
+    localStorage.setItem("gif_token", TOKEN);
+    startApp();
+  } catch (e) {
+    if (e.message !== "Unauthorized") $("loginErr").textContent = e.message;
+  }
+  $("loginBtn").disabled = false;
+}
+function signOut(msg) {
+  localStorage.removeItem("gif_token"); TOKEN = "";
+  clearInterval(window._poll); clearInterval(window._tick);
+  releaseWake(); closeSheet(true);
+  $("app").hidden = true; $("login").hidden = false;
+  $("loginErr").textContent = msg || "";
+  $("tokenInput").value = "";
+  document.title = "GIF — Staff";
+  if (navigator.clearAppBadge) navigator.clearAppBadge();
+}
+
+/* ---------------- start ---------------- */
+function startApp() {
+  $("login").hidden = true; $("app").hidden = false;
+  knownIds = null; knownReqKeys = null;
+  refresh();
+  clearInterval(window._poll); clearInterval(window._tick);
+  window._poll = setInterval(refresh, POLL_MS);
+  window._tick = setInterval(() => { render(); alarmCheck(); }, 5000);
+  if (keepAwake) requestWake();
+  updateSoundUi();
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && TOKEN) { refresh(); if (keepAwake) requestWake(); } });
+
+/* ---------------- data ---------------- */
+async function refresh() {
+  if (!TOKEN) return;
+  try {
+    const data = await api("staff-orders?view=active");
+    skew = new Date(data.server_time).getTime() - Date.now();
+    setOnline(true);
+
+    const fresh = data.orders;
+    const isNewIds = fresh.filter((o) => o.status === "New" && knownIds && !knownIds.has(o.id));
+    knownIds = new Set(fresh.map((o) => o.id));
+    ORDERS = fresh;
+    IS_ADMIN = !!data.is_admin;
+    REQUESTS = data.requests || [];
+    const pend = pendingRequests();
+    const newReqs = pend.filter((r) => knownReqKeys && !knownReqKeys.has(r.key));
+    knownReqKeys = new Set(pend.map((r) => r.key));
+
+    if (tab === "done") await loadDone();
+    if (isNewIds.length) onNewOrders(isNewIds);
+    if (newReqs.length) onNewRequests(newReqs);
+    render();
+    if (openId != null && !isTyping()) renderSheet();
+    updateBadges();
+  } catch (e) {
+    if (e.message !== "Unauthorized") setOnline(false);
+  }
+}
+async function loadDone() {
+  try { const d = await api("staff-orders?view=done"); DONE = d.orders; } catch (e) { /* keep old */ }
+}
+function setOnline(v) {
+  online = v;
+  $("dot").classList.toggle("off", !v);
+  $("statusText").textContent = v ? "Live · updates every few seconds" : "Offline — trying to reconnect…";
+}
+function isTyping() {
+  const a = document.activeElement;
+  return a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA") && $("sheet").contains(a);
+}
+
+/* ---------------- time helpers ---------------- */
+function fmtTime(iso) {
+  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ });
+}
+function dayKey(ms) { return new Date(ms).toLocaleDateString("en-CA", { timeZone: TZ }); }
+function fmtDue(iso) {
+  const t = new Date(iso).getTime();
+  const sameDay = dayKey(t) === dayKey(now());
+  if (sameDay) return fmtTime(iso);
+  const wd = new Date(iso).toLocaleDateString("en-US", { weekday: "short", timeZone: TZ });
+  return wd + " " + fmtTime(iso);
+}
+function dueInfo(o) {
+  if (o.status === "Cancelled") return { cls: "", label: "Cancelled" };
+  if (o.status === "Completed") return { cls: "", label: "Completed " + fmtTime(o.updated_at) };
+  const mins = Math.round((new Date(o.due_at).getTime() - now()) / 60000);
+  const at = fmtDue(o.due_at);
+  if (o.status === "Ready for Pickup") {
+    return { cls: mins < -15 ? "late ready" : "ready", label: mins < 0 ? `Waiting for pickup · was due ${at}` : `Ready · pickup ${at}` };
+  }
+  if (mins < 0) return { cls: "late", label: `OVERDUE ${Math.abs(mins)} min · was ${at}` };
+  if (mins <= 20) return { cls: "soon", label: `Due in ${mins} min · ${at}` };
+  if (mins < 90) return { cls: "", label: `Due in ${mins} min · ${at}` };
+  return { cls: "", label: `Pickup ${at}` };
+}
+const prefLabel = (p) => (p === "substitute" ? "OK to substitute" : p === "skip" ? "Skip if out" : "Call/text me first");
+
+/* ---------------- list ---------------- */
+function setTab(t) {
+  tab = t;
+  ["todo", "ready", "req", "done"].forEach((x) => $("tab-" + x).classList.toggle("active", x === t));
+  if (t === "done") loadDone().then(render);
+  render();
+}
+function listFor(t) {
+  if (t === "done") return [...DONE].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+  const want = t === "ready" ? ["Ready for Pickup"] : ["New", "Preparing"];
+  // Closest pickup first — that's the priority order for the counter.
+  // Orders waiting on an admin decision come first (they're blocked), then closest pickup time.
+  return ORDERS.filter((o) => want.includes(o.status)).sort((a, b) => onHold(b) - onHold(a) || new Date(a.due_at) - new Date(b.due_at) || new Date(a.created_at) - new Date(b.created_at));
+}
+const onHold = (o) => (o.cancel_request && o.cancel_request.status === "pending" ? 1 : 0);
+
+/* ---------------- cancellation & refund requests ---------------- */
+function requestItems() {
+  const items = [];
+  for (const o of REQUESTS) {
+    if (o.cancel_request) items.push({ key: o.id + ":cancel", kind: "cancel", order: o, req: o.cancel_request });
+    if (o.refund_request) items.push({ key: o.id + ":refund", kind: "refund", order: o, req: o.refund_request });
+  }
+  const pend = items.filter((x) => x.req.status === "pending").sort((a, b) => new Date(a.req.requested_at) - new Date(b.req.requested_at));
+  const dec = items.filter((x) => x.req.status !== "pending").sort((a, b) => new Date(b.req.decided_at || 0) - new Date(a.req.decided_at || 0));
+  return { pend, dec };
+}
+function pendingRequests() { return requestItems().pend; }
+function renderRequests() {
+  const { pend, dec } = requestItems();
+  let html = IS_ADMIN ? "" : `<div class="banner info" style="margin:0 0 12px">👀 Only the store admin can approve or deny these. Sign in with the admin code to decide.</div>`;
+  if (!pend.length && !dec.length) {
+    html += `<div class="empty"><div class="big">✅</div>No cancellation or refund requests.<br>They'll show up here for the admin to review.</div>`;
+  } else {
+    html += pend.length ? pend.map(reqCardHtml).join("") : `<div class="empty" style="padding:26px 10px 8px">Nothing waiting for a decision. 🎉</div>`;
+    if (dec.length) html += `<div class="sect">Recently decided</div>` + dec.map(reqCardHtml).join("");
+  }
+  $("list").innerHTML = html;
+}
+function reqCardHtml(x) {
+  const o = x.order, r = x.req, isC = x.kind === "cancel";
+  const pending = r.status === "pending";
+  const cls = pending ? "late" : r.status === "approved" ? "ready" : "";
+  const label = `${isC ? "CANCEL" : "REFUND"} · ${pending ? "WAITING" : r.status === "approved" ? "APPROVED" : "DENIED"}`;
+  const paid = isC ? "" : `<div class="due" style="font-size:.95rem">Paid ${money(o.total)}${r.status === "approved" && r.approved_amount != null ? ` · refunded ${money(r.approved_amount)}` : ""}</div>`;
+  let actions = "";
+  if (pending) {
+    actions = IS_ADMIN
+      ? `<div class="callout" style="border:none;background:none;padding:0"><div class="two2"><button class="btn green small" onclick="decide(${o.id},'${x.kind}','approve')">${isC ? "Approve cancel" : "Approve refund"}</button><button class="btn secondary small" onclick="decide(${o.id},'${x.kind}','deny')">Deny</button></div></div>`
+      : `<div class="waitadmin">⏳ Waiting for the store admin to decide</div>`;
+  } else if (r.note) {
+    actions = `<div class="cust" style="margin-top:8px">Message to customer: “${esc(r.note)}”</div>`;
+  }
+  return `<div class="card ${cls} ${pending ? "hold" : ""}"><div class="bar"></div><div class="cbody">
+    <div class="row1"><span class="code">${esc(o.order_code)}</span><span class="pill ${pending ? "red" : ""}">${label}</span></div>
+    <div class="cust">${esc(o.customer_name || "Customer")}</div>
+    ${paid}
+    ${r.reason ? `<div class="reason">“${esc(r.reason)}”</div>` : ""}
+    <div class="meta"><span>Asked ${esc(fmtDue(r.requested_at))}</span><button class="btn small secondary" style="min-height:38px;padding:8px 12px" onclick="openOrder(${o.id})">View order</button></div>
+    ${actions}
+  </div></div>`;
+}
+function requestBlocks(o) {
+  let h = "";
+  const c = o.cancel_request, r = o.refund_request;
+  const decideBtns = (kind, yes) => IS_ADMIN
+    ? `<div class="two2"><button class="btn green small" onclick="decide(${o.id},'${kind}','approve')">${yes}</button><button class="btn secondary small" onclick="decide(${o.id},'${kind}','deny')">Deny${kind === "cancel" ? " — continue order" : ""}</button></div>`
+    : `<div class="waitadmin">⏳ Only the store admin can decide. Ask the admin to review it.</div>`;
+  if (c) {
+    if (c.status === "pending") {
+      const mins = c.requested_at && o.placed_at ? Math.max(0, Math.round((new Date(c.requested_at) - new Date(o.placed_at)) / 60000)) : null;
+      h += `<div class="callout block"><b>🛑 Customer asked to cancel this order</b>${mins != null ? `Asked ${mins} min after ordering. ` : ""}${c.reason ? `Reason: “${esc(c.reason)}”. ` : ""}<br><b style="display:inline">Picking is paused</b> until the store admin confirms or denies it.${decideBtns("cancel", "Approve cancel")}</div>`;
+    } else if (c.status === "denied") {
+      h += `<div class="callout call"><b>Cancellation request was denied</b>Carry on with the order.${c.note ? ` Note: ${esc(c.note)}` : ""}</div>`;
+    } else if (c.status === "approved") {
+      h += `<div class="callout skip"><b>Cancellation approved</b>This order was cancelled.${c.note ? ` ${esc(c.note)}` : ""}</div>`;
+    }
+  }
+  if (r) {
+    if (r.status === "pending") {
+      h += `<div class="callout block"><b>💸 Customer asked for a refund</b>Order total ${money(o.total)}.${r.reason ? ` Reason: “${esc(r.reason)}”.` : ""}${decideBtns("refund", "Approve refund")}</div>`;
+    } else if (r.status === "denied") {
+      h += `<div class="callout skip"><b>Refund request was denied</b>${r.note ? esc(r.note) : ""}</div>`;
+    } else if (r.status === "approved") {
+      h += `<div class="callout substitute"><b>Refund approved${r.approved_amount != null ? ` — ${money(r.approved_amount)}` : ""}</b>${r.note ? esc(r.note) : ""}</div>`;
+    }
+  }
+  return h;
+}
+function decide(id, kind, decision) {
+  const o = findOrder(id); if (!o) return;
+  if (!IS_ADMIN) { toast("Only the store admin can decide"); return; }
+  const isC = kind === "cancel";
+  if (decision === "approve" && isC) {
+    showModal(`<h3>Cancel ${esc(o.order_code)}?</h3>
+      <p>The customer's card hold is released (or the charge refunded, if it was already taken) and the items go back in stock. This can't be undone.</p>
+      <label class="lbl">Message to the customer (optional)</label><input id="decNote" class="field" placeholder="e.g. No problem — cancelled!">
+      <button class="btn green" onclick="submitDecision(${id},'cancel','approve')">Yes, cancel the order</button>
+      <button class="btn secondary" onclick="closeModal()">Back</button>`);
+  } else if (decision === "approve") {
+    const max = o.refundable != null ? o.refundable : o.total;
+    showModal(`<h3>Refund ${esc(o.order_code)}</h3>
+      <p>The customer paid ${money(o.total)}. Enter how much to send back (up to ${money(max)}).</p>
+      <input id="decAmt" class="field" type="number" inputmode="decimal" step="0.01" min="0" style="margin-bottom:0" value="${max != null ? Number(max).toFixed(2) : ""}">
+      <label class="lbl">Message to the customer (optional)</label><input id="decNote" class="field" placeholder="e.g. Sorry about that — refund on its way">
+      <button class="btn green" onclick="submitDecision(${id},'refund','approve')">Send the refund</button>
+      <button class="btn secondary" onclick="closeModal()">Back</button>`);
+  } else {
+    showModal(`<h3>Deny this ${isC ? "cancellation" : "refund"} request?</h3>
+      <p>${isC ? "The order carries on as normal and picking can resume." : "No money is sent. The customer will see it wasn't approved."}</p>
+      <label class="lbl">Message to the customer (optional)</label><input id="decNote" class="field" placeholder="${isC ? "e.g. Sorry, your order is already being prepared" : "e.g. Please call us so we can sort this out"}">
+      <button class="btn" onclick="submitDecision(${id},'${kind}','deny')">Deny request</button>
+      <button class="btn secondary" onclick="closeModal()">Back</button>`);
+  }
+}
+async function submitDecision(id, kind, decision) {
+  const note = ($("decNote") || {}).value || "";
+  const amt = $("decAmt");
+  const body = { id, kind, decision, note };
+  if (amt) body.amount = amt.value;
+  closeModal();
+  try {
+    await api("staff-request-decision", { method: "POST", body: JSON.stringify(body) });
+    toast(decision === "deny" ? "Request denied" : kind === "cancel" ? "Order cancelled ✓" : "Refund sent ✓");
+    await refresh();
+    if (kind === "cancel" && decision === "approve") closeSheet(); else if (openId != null) renderSheet();
+  } catch (e) { toast(e.message); }
+}
+function render() {
+  const todo = ORDERS.filter((o) => o.status === "New" || o.status === "Preparing").length;
+  const ready = ORDERS.filter((o) => o.status === "Ready for Pickup").length;
+  $("n-todo").textContent = todo; $("n-ready").textContent = ready;
+  const reqCount = pendingRequests().length;
+  $("n-req").textContent = reqCount; $("n-req").style.display = reqCount ? "inline-block" : "none";
+  if (tab === "req") { renderRequests(); return; }
+  const items = listFor(tab);
+  if (!items.length) {
+    const msg = { todo: ["🎉", "Nothing to pick right now.<br>New orders will pop up here."], ready: ["📦", "No orders waiting for pickup."], done: ["🧾", "No completed orders in the last 2 days."] }[tab];
+    $("list").innerHTML = `<div class="empty"><div class="big">${msg[0]}</div>${msg[1]}</div>`;
+    return;
+  }
+  $("list").innerHTML = items.map(cardHtml).join("");
+}
+function cardHtml(o) {
+  const d = dueInfo(o);
+  const total = o.items.length;
+  const resolved = o.items.filter((i) => i.pick_status !== "pending").length;
+  const pct = total ? Math.round((resolved / total) * 100) : 0;
+  const hold = onHold(o);
+  const refundAsk = o.refund_request && o.refund_request.status === "pending";
+  return `<button class="card ${d.cls} ${hold ? "hold" : ""} ${o.status === "New" && !hold ? "isnew" : ""}" onclick="openOrder(${o.id})">
+    <div class="bar"></div>
+    <div class="cbody">
+      <div class="row1"><span class="code">${esc(o.order_code)}</span>${o.status === "New" ? '<span class="pill new">NEW</span>' : ""}${o.asap ? '<span class="pill">ASAP</span>' : ""}${hold ? '<span class="pill red">CANCEL REQUESTED</span>' : ""}${refundAsk ? '<span class="pill red">REFUND REQUESTED</span>' : ""}</div>
+      <div class="cust">${esc(o.customer_name || "Customer")}</div>
+      ${hold ? '<div class="holdline">⏸ Picking paused — waiting for the admin</div>' : ""}
+      <div class="due">${esc(d.label)}</div>
+      <div class="meta"><span>${resolved}/${total} items ${o.status === "Preparing" ? "· picking" : ""}</span><span class="pref ${esc(o.substitution_pref)}">${prefLabel(o.substitution_pref)}</span></div>
+      ${tab !== "done" ? `<div class="prog"><i style="width:${pct}%"></i></div>` : ""}
+    </div></button>`;
+}
+function updateBadges() {
+  const newCount = ORDERS.filter((o) => o.status === "New").length + pendingRequests().filter((r) => r.kind === "cancel").length;
+  document.title = (newCount ? `(${newCount}) ` : "") + "GIF — Staff";
+  if (navigator.setAppBadge) { newCount ? navigator.setAppBadge(newCount) : navigator.clearAppBadge(); }
+  updateAlertBanner();
+}
+
+/* ---------------- alerts ---------------- */
+function onNewOrders(list) {
+  const o = list[0];
+  toast(list.length > 1 ? `${list.length} new orders!` : `New order ${o.order_code} — ${o.customer_name || "Customer"}`);
+  if (soundOn) { chime(); lastChime = Date.now(); }
+  if (navigator.vibrate) navigator.vibrate([250, 120, 250, 120, 250]);
+  if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+    try { new Notification(`New order ${o.order_code}`, { body: `${o.customer_name || "Customer"} · pickup ${fmtDue(o.due_at)}`, tag: "gif-new-order" }); } catch (e) { /* not supported */ }
+  }
+}
+function onNewRequests(list) {
+  const x = list[0], o = x.order;
+  toast(`${x.kind === "cancel" ? "Cancellation request" : "Refund request"} — ${o.order_code}`);
+  if (soundOn) { chime(); lastChime = Date.now(); }
+  if (navigator.vibrate) navigator.vibrate([400, 150, 400]);
+  if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+    try { new Notification(`${x.kind === "cancel" ? "Cancellation" : "Refund"} request — ${o.order_code}`, { body: `${o.customer_name || "Customer"} · needs an admin decision`, tag: "gif-request" }); } catch (e) { /* not supported */ }
+  }
+}
+function alarmCheck() {
+  updateAlertBanner();
+  const needing = ORDERS.filter((o) => o.status === "New").length + pendingRequests().filter((r) => r.kind === "cancel").length;
+  if (!needing || !soundOn || Date.now() < silencedUntil) return;
+  if (Date.now() - lastChime >= ALARM_REPEAT_MS) {
+    chime(); lastChime = Date.now();
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  }
+}
+function updateAlertBanner() {
+  const newOrders = ORDERS.filter((o) => o.status === "New").length;
+  const cancels = pendingRequests().filter((r) => r.kind === "cancel").length;
+  const silenced = Date.now() < silencedUntil;
+  const parts = [];
+  if (cancels) parts.push(`${cancels} cancellation request${cancels === 1 ? "" : "s"} — ${IS_ADMIN ? "decide now" : "waiting for admin"}`);
+  if (newOrders) parts.push(`${newOrders} new order${newOrders === 1 ? "" : "s"} waiting`);
+  $("alertBanner").hidden = !parts.length;
+  if (parts.length) $("alertText").textContent = parts.join(" · ") + (silenced ? " (silenced)" : "");
+  $("soundBanner").hidden = !(soundOn && audioCtx && audioCtx.state === "suspended") && !(soundOn && !audioCtx);
+}
+function silence() { silencedUntil = Date.now() + 10 * 60000; toast("Silenced for 10 minutes"); updateAlertBanner(); }
+
+function unlockAudio(fromBanner) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    if (fromBanner) { chime(); toast("Sound is on"); }
+  } catch (e) { /* no audio support */ }
+  updateAlertBanner();
+}
+function chime() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const t0 = audioCtx.currentTime;
+    [[659.25, 0], [783.99, 0.16], [1046.5, 0.32], [783.99, 0.62], [1046.5, 0.78]].forEach(([f, dt]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0 + dt);
+      g.gain.exponentialRampToValueAtTime(0.35, t0 + dt + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dt + 0.3);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t0 + dt); o.stop(t0 + dt + 0.32);
+    });
+  } catch (e) { /* ignore */ }
+}
+function toggleSound() {
+  soundOn = !soundOn; localStorage.setItem("gif_sound", soundOn ? "1" : "0");
+  if (soundOn) { unlockAudio(true); } else { toast("Sound alerts off"); }
+  updateSoundUi();
+}
+function updateSoundUi() { $("soundBtn").textContent = soundOn ? "🔔" : "🔕"; updateAlertBanner(); }
+
+async function requestWake() {
+  try { if ("wakeLock" in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request("screen"); wakeLock.addEventListener("release", () => { wakeLock = null; }); } } catch (e) { /* not allowed */ }
+}
+function releaseWake() { try { if (wakeLock) wakeLock.release(); } catch (e) {} wakeLock = null; }
+
+/* ---------------- menu ---------------- */
+function openMenu() {
+  const canNotify = "Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied";
+  showModal(`
+    <h3>Settings</h3>
+    <div class="menu-row"><span>Sound alerts</span><button class="switch ${soundOn ? "on" : ""}" onclick="toggleSound();openMenu()"></button></div>
+    <div class="menu-row"><span>Keep screen on</span><button class="switch ${keepAwake ? "on" : ""}" onclick="toggleAwake()"></button></div>
+    ${canNotify ? `<div class="menu-row"><span>Pop-up notifications</span><button class="btn small secondary" onclick="enableNotify()">Enable</button></div>` : ""}
+    <div class="menu-row"><span>Test the alert sound</span><button class="btn small secondary" onclick="unlockAudio(true)">Play</button></div>
+    <p style="margin-top:14px;font-size:.82rem">For the loudest, most reliable alerts, leave GIF open on a plugged-in tablet or phone at the counter with the sound up.</p>
+    <button class="btn secondary" onclick="closeModal()">Close</button>
+    <button class="btn secondary" style="margin-top:8px" onclick="closeModal();signOut()">Sign out</button>`);
+}
+function toggleAwake() {
+  keepAwake = !keepAwake; localStorage.setItem("gif_awake", keepAwake ? "1" : "0");
+  keepAwake ? requestWake() : releaseWake(); openMenu();
+}
+async function enableNotify() {
+  try { await Notification.requestPermission(); } catch (e) {}
+  openMenu();
+}
+
+/* ---------------- order sheet ---------------- */
+function findOrder(id) { return ORDERS.find((o) => o.id === id) || DONE.find((o) => o.id === id) || REQUESTS.find((o) => o.id === id); }
+function openOrder(id) { openId = id; weighing = null; renderSheet(); $("sheet").hidden = false; $("sheet").scrollTop = 0; document.body.style.overflow = "hidden"; }
+function closeSheet(silent) { openId = null; weighing = null; $("sheet").hidden = true; document.body.style.overflow = ""; if (!silent) render(); }
+function applyUpdated(order) {
+  const i = ORDERS.findIndex((o) => o.id === order.id);
+  if (order.status === "Completed") { if (i >= 0) ORDERS.splice(i, 1); DONE = [order, ...DONE.filter((o) => o.id !== order.id)]; }
+  else if (i >= 0) ORDERS[i] = order; else ORDERS.push(order);
+  updateBadges();
+}
+function textLink(o, body) {
+  const phone = (o.customer_phone || "").replace(/[^\d+]/g, "");
+  return phone ? `sms:${phone}?&body=${encodeURIComponent(body)}` : "#";
+}
+function renderSheet() {
+  const o = findOrder(openId);
+  if (!o) { closeSheet(); return; }
+  const d = dueInfo(o);
+  const phone = (o.customer_phone || "").replace(/[^\d+]/g, "");
+  const first = (o.customer_name || "there").split(" ")[0];
+  const pending = o.items.filter((i) => i.pick_status === "pending").length;
+  const canNotes = o.status !== "Completed" && o.status !== "Cancelled";
+  const held = onHold(o);
+  const editable = canNotes && !held;   // no picking while a cancellation request is waiting
+  const prefHint = {
+    substitute: ["Customer said: OK to substitute a similar item", "If something's out, pick a close substitute. Text them if it's very different."],
+    call: ["Customer said: call or text me first", "If something's out, contact them before swapping or skipping."],
+    skip: ["Customer said: skip it if it's out", "If something's out, just mark it unavailable."],
+  }[o.substitution_pref] || [];
+
+  const itemsHtml = o.items.map((it) => itemHtml(o, it, editable)).join("");
+  const showTotal = o.adjusted_total != null && (o.items.some((i) => i.pick_status !== "pending") || o.adjusted_total !== o.total);
+
+  let action = "";
+  if (o.status === "New") action = `<button class="btn" onclick="setStatus(${o.id},'Preparing')">Start picking</button>`;
+  else if (o.status === "Preparing") action = `<button class="btn ${pending ? "secondary" : "green"}" onclick="setStatus(${o.id},'Ready for Pickup')">${pending ? `${pending} item${pending === 1 ? "" : "s"} left to pick` : "✓ All set — mark Ready for Pickup"}</button>`;
+  else if (o.status === "Ready for Pickup") action = `<div class="two"><button class="btn secondary" onclick="setStatus(${o.id},'Preparing')">Back to picking</button><button class="btn green" onclick="setStatus(${o.id},'Completed')">Handed to customer ✓</button></div>`;
+
+  $("sheet").innerHTML = `<div class="inner">
+    <header>
+      <button class="back" onclick="closeSheet()">←</button>
+      <div class="sh-title"><b>${esc(o.order_code)} · ${esc(o.customer_name || "Customer")}</b><span>${esc(d.label)}</span></div>
+    </header>
+    ${phone ? `<div class="contact"><a href="tel:${phone}">📞 Call</a><a href="${textLink(o, `Hi ${first}, it's Makka Halal Meat about order ${o.order_code}.`)}">💬 Text</a></div>` : ""}
+    ${requestBlocks(o)}
+    ${prefHint.length && !held ? `<div class="callout ${esc(o.substitution_pref)}"><b>${esc(prefHint[0])}</b>${esc(prefHint[1])}</div>` : ""}
+    <div class="timeline">Placed ${esc(fmtTime(o.created_at))} · ${o.asap ? "ASAP" : "Pickup " + esc(fmtDue(o.due_at))}</div>
+    <div style="height:8px"></div>
+    ${itemsHtml}
+    ${held ? `<div class="lockline">🔒 Picking is paused until the store admin confirms or denies the cancellation request.</div>` : ""}
+    ${canNotes ? `<div class="item"><b style="font-size:.9rem">Notes for the team</b><textarea id="staffNotes" class="note-in" rows="2" placeholder="e.g. customer called, will arrive late" onblur="saveNotes(${o.id})">${esc(o.staff_notes)}</textarea></div>` : ""}
+  </div>
+  <div class="footer"><div class="in">
+    ${showTotal ? `<div class="totalrow"><span>Updated total <small>(was ${money(o.total)})</small></span><b>${money(o.adjusted_total)}</b></div>` : ""}
+    ${held ? `<button class="btn secondary" disabled>⏸ Picking paused — cancellation request pending</button>` : (editable ? action : `<button class="btn secondary" onclick="closeSheet()">Close</button>`)}
+  </div></div>`;
+}
+function fmtQ(it, q) { return it.weighted ? `${Number(q)} lb` : `${Number(q)}`; }
+function itemHtml(o, it, editable) {
+  const pic = it.image ? `background-image:url('${esc(it.image)}')` : "";
+  let state = "", actions = "";
+  if (it.pick_status === "picked") {
+    state = `<div class="istate picked">✓ Picked ${it.weighted ? `<u onclick="startWeigh(${o.id},${it.index})">${fmtQ(it, it.picked_qty != null ? it.picked_qty : it.qty)}</u>` : fmtQ(it, it.picked_qty != null ? it.picked_qty : it.qty)}</div>`;
+  } else if (it.pick_status === "unavailable") {
+    state = `<div class="istate unavailable">✕ Unavailable</div>`;
+  } else if (it.pick_status === "substituted") {
+    const s = it.substitute || {};
+    state = `<div class="istate substituted">⇄ Substituted with ${esc(s.name)} · ${s.qty}${/lb/i.test(s.unit || "") ? " lb" : ""}</div>`;
+  }
+  const w = weighing && weighing.id === o.id && weighing.idx === it.index;
+  if (editable) {
+    if (w) {
+      actions = `<div class="weigh"><input id="wt" type="number" inputmode="decimal" step="0.01" min="0" value="${it.picked_qty != null ? it.picked_qty : it.qty}" onkeydown="if(event.key==='Enter')confirmPick(${o.id},${it.index})"><span>lb</span><button class="btn small green" onclick="confirmPick(${o.id},${it.index})">Save</button><button class="btn small secondary" onclick="weighing=null;renderSheet()">✕</button></div>`;
+    } else if (it.pick_status === "pending") {
+      actions = `<div class="iactions"><button class="a-pick" onclick="pickItem(${o.id},${it.index})">✓ Picked</button><button class="a-out" onclick="askUnavailable(${o.id},${it.index})">Unavailable</button><button class="a-sub" onclick="openSub(${o.id},${it.index})">Substitute</button></div>`;
+    } else {
+      actions = `<button class="undo" onclick="itemAction(${o.id},${it.index},'reset')">Undo</button>`;
+    }
+  }
+  return `<div class="item ${it.pick_status}">
+    <div class="irow"><div class="ipic" style="${pic}">${it.image ? "" : esc(it.emoji)}</div>
+      <div style="flex:1;min-width:0"><div class="iname">${esc(it.name)}</div><div class="iqty">Ordered: ${fmtQ(it, it.qty)}</div></div></div>
+    ${state}${actions}</div>`;
+}
+
+/* ---------------- item actions ---------------- */
+async function itemAction(id, idx, action, extra = {}) {
+  try {
+    const data = await api("staff-update-order", { method: "POST", body: JSON.stringify({ id, op: "item", index: idx, action, ...extra }) });
+    applyUpdated(data.order); weighing = null; renderSheet(); render();
+  } catch (e) { toast(e.message); }
+}
+function pickItem(id, idx) {
+  const o = findOrder(id); const it = o.items[idx];
+  if (onHold(o)) { toast("Picking is paused — cancellation request pending"); return; }
+  if (it.weighted) { weighing = { id, idx }; renderSheet(); const el = $("wt"); if (el) { el.focus(); el.select(); } }
+  else itemAction(id, idx, "picked");
+}
+function startWeigh(id, idx) { weighing = { id, idx }; renderSheet(); const el = $("wt"); if (el) { el.focus(); el.select(); } }
+function confirmPick(id, idx) {
+  const v = parseFloat($("wt").value);
+  if (!(v > 0)) { toast("Enter the weight"); return; }
+  itemAction(id, idx, "picked", { picked_qty: v });
+}
+function askUnavailable(id, idx) {
+  const o = findOrder(id); const it = o.items[idx];
+  const first = (o.customer_name || "there").split(" ")[0];
+  const pref = o.substitution_pref;
+  const hint = pref === "call" ? "They asked to be contacted first — you can text them now." : pref === "substitute" ? "They're OK with a substitute — consider picking one." : "They said to skip it if it's out.";
+  showModal(`
+    <h3>${esc(it.name)} — not available?</h3>
+    <p>${esc(hint)}</p>
+    ${pref === "call" && o.customer_phone ? `<a class="btn secondary" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px" href="${textLink(o, `Hi ${first}, it's Makka Halal Meat about order ${o.order_code}. We're out of ${it.name}. Would you like a substitute, or should we skip it?`)}">💬 Text ${esc(first)} about it</a>` : ""}
+    <button class="btn" onclick="confirmUnavailable(${id},${idx},false)">Mark unavailable</button>
+    <button class="btn secondary" onclick="confirmUnavailable(${id},${idx},true)">Unavailable + mark sold out in the app</button>
+    <button class="btn secondary" onclick="closeModal()">Cancel</button>`);
+}
+function confirmUnavailable(id, idx, soldOut) { closeModal(); itemAction(id, idx, "unavailable", { mark_sold_out: soldOut }); }
+async function setStatus(id, status) {
+  if (onHold(findOrder(id))) { toast("Picking is paused — cancellation request pending"); return; }
+  try {
+    const data = await api("staff-update-order", { method: "POST", body: JSON.stringify({ id, op: "status", status }) });
+    applyUpdated(data.order);
+    if (status === "Completed") { toast("Order complete ✓"); closeSheet(); }
+    else if (status === "Ready for Pickup") { toast("Marked ready ✓"); closeSheet(); }
+    else { renderSheet(); render(); }
+  } catch (e) { toast(e.message); }
+}
+async function saveNotes(id) {
+  const el = $("staffNotes"); if (!el) return;
+  const o = findOrder(id); if (o && o.staff_notes === el.value) return;
+  try { const data = await api("staff-update-order", { method: "POST", body: JSON.stringify({ id, op: "notes", staff_notes: el.value }) }); applyUpdated(data.order); toast("Note saved"); }
+  catch (e) { toast(e.message); }
+}
+
+/* ---------------- substitute picker ---------------- */
+async function ensureCatalog() {
+  if (CATALOG) return CATALOG;
+  CATALOG = await api("staff-catalog");
+  return CATALOG;
+}
+async function openSub(id, idx) {
+  subCtx = { id, idx, product: null };
+  const o = findOrder(id); const it = o.items[idx];
+  showModal(`<h3>Substitute for ${esc(it.name)}</h3><p>Search for a similar item to swap in.</p>
+    <input id="subQ" class="field" style="margin-bottom:0" placeholder="Search items…" oninput="renderSub(this.value)" autocomplete="off">
+    <div class="subres" id="subRes"><p style="margin-top:14px">Loading items…</p></div>
+    <button class="btn secondary" onclick="closeModal()">Cancel</button>`);
+  try { await ensureCatalog(); renderSub(""); const q = $("subQ"); if (q) q.focus(); }
+  catch (e) { const r = $("subRes"); if (r) r.innerHTML = `<p>${esc(e.message)}</p>`; }
+}
+function renderSub(q) {
+  const el = $("subRes"); if (!el || !CATALOG) return;
+  const o = findOrder(subCtx.id); const orig = o.items[subCtx.idx];
+  const origP = CATALOG.find((p) => p.id === orig.id) || {};
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let list = CATALOG.filter((p) => p.id !== orig.id);
+  if (words.length) list = list.filter((p) => { const hay = (p.name + " " + (p.category || "")).toLowerCase(); return words.every((w) => hay.includes(w)); });
+  else list = list.filter((p) => origP.department && p.department === origP.department); // no search yet: show the same department
+  // Best matches first: names that start with what was typed, then items from the same category/department, out-of-stock last.
+  const rank = (p) => {
+    const n = p.name.toLowerCase();
+    let r = 0;
+    if (words.length) r += n.startsWith(words[0]) ? 0 : (n.split(/[\s\-\/()]+/).some((w) => w.startsWith(words[0])) ? 1 : 2);
+    if (origP.category && p.category === origP.category) r -= 0.6;
+    else if (origP.department && p.department === origP.department) r -= 0.4;
+    if (p.stock != null && p.stock <= 0) r += 5;
+    return r;
+  };
+  list.sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
+  list = list.slice(0, 40);
+  el.innerHTML = list.length
+    ? list.map((p) => { const out = p.stock != null && p.stock <= 0; return `<button class="subrow" ${out ? "disabled" : ""} onclick="chooseSub(${p.id})"><span>${esc(p.emoji || "🛒")}</span><span class="n">${esc(p.name)}${out ? " (out of stock)" : ""}</span><span class="p">${money(p.price)}${esc(p.unit && p.unit !== "each" ? " " + p.unit : "")}</span></button>`; }).join("")
+    : `<p style="margin-top:14px">No matches.</p>`;
+}
+function chooseSub(pid) {
+  const p = CATALOG.find((x) => x.id === pid);
+  const o = findOrder(subCtx.id); const orig = o.items[subCtx.idx];
+  subCtx.product = p;
+  const isLb = /lb/i.test(p.unit || "");
+  showModal(`<h3>${esc(p.emoji || "")} ${esc(p.name)}</h3>
+    <p>${money(p.price)} ${esc(p.unit || "each")} · replacing ${esc(orig.name)} (ordered ${fmtQ(orig, orig.qty)})</p>
+    <div class="weigh" style="margin-top:0"><input id="subQty" type="number" inputmode="decimal" step="0.01" min="0" value="${orig.qty}"><span>${isLb ? "lb" : "qty"}</span></div>
+    <label class="chk"><input type="checkbox" id="subSold"> Also mark ${esc(orig.name)} sold out in the app</label>
+    <button class="btn green" onclick="confirmSub()">Use this substitute</button>
+    <button class="btn secondary" onclick="openSub(${subCtx.id},${subCtx.idx})">← Back to search</button>`);
+}
+function confirmSub() {
+  const qty = parseFloat($("subQty").value);
+  if (!(qty > 0)) { toast("Enter an amount"); return; }
+  const p = subCtx.product; const sold = $("subSold").checked;
+  closeModal();
+  itemAction(subCtx.id, subCtx.idx, "substitute", { substitute: { product_id: p.id, name: p.name, qty, price: p.price, unit: p.unit || "" }, mark_sold_out: sold });
+}
+
+/* ---------------- modal + toast ---------------- */
+function showModal(html) { $("mbox").innerHTML = html; $("modal").hidden = false; }
+function closeModal() { $("modal").hidden = true; }
+let toastTimer;
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 3200); }
+
+/* ---------------- boot ---------------- */
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+if (TOKEN) { startApp(); }
+</script>
+</body>
+</html>

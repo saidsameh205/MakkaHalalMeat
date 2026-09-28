@@ -1,10 +1,14 @@
-const { json, requireAdmin, supabaseFetch } = require('./_util');
-const { restoreStock } = require('./create-checkout-session');
+const { json, requireAdmin, supabaseFetch, restoreOrderStock } = require('./_util');
 
-const ALLOWED_STATUSES = ['New', 'Preparing', 'Ready for Pickup', 'Completed', 'Cancelled', 'Paid - Preparing'];
+const ALLOWED_STATUSES = [
+  'Awaiting Payment', 'New', 'Preparing', 'Ready for Pickup', 'Completed', 'Cancelled', 'Abandoned',
+  'Paid - Preparing', // legacy status from earlier versions
+];
 
-// Accepts any combination of status, pickup_time and staff_notes for one
-// order, so admin.html can save whichever fields the staff member changed.
+// Owner-only (admin.html). Accepts any combination of status, pickup_time
+// and staff_notes for one order, so the admin page can save whichever
+// fields were changed. (Workers use the separate staff-update-order
+// function, which has narrower permissions.)
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
   const auth = requireAdmin(event);
@@ -28,19 +32,13 @@ exports.handler = async (event) => {
     }
     if (Object.keys(patch).length === 1) throw new Error('Nothing to update');
 
-    // If staff are cancelling an order this way (rather than via the
-    // Cancel-authorization button), give back its reserved stock too —
-    // but only once, so re-saving an already-cancelled order is harmless.
-    if (patch.status === 'Cancelled') {
+    // Cancelling (or abandoning) an order gives back its reserved stock —
+    // but only once, so re-saving an already-released order is harmless.
+    if (patch.status === 'Cancelled' || patch.status === 'Abandoned') {
       const rows = await supabaseFetch(`orders?id=eq.${id}&select=items,status`);
       const order = rows && rows[0];
-      if (order && order.status !== 'Cancelled') {
-        for (const item of order.items || []) {
-          if (item && item.id && item.qty) {
-            try { await restoreStock(Number(item.id), Number(item.qty)); }
-            catch (e2) { console.error('update-order-status stock restore failed', item, e2); }
-          }
-        }
+      if (order && order.status !== 'Cancelled' && order.status !== 'Abandoned') {
+        await restoreOrderStock(order.items);
       }
     }
 

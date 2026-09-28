@@ -1,5 +1,6 @@
-const CACHE = 'makka-halal-v1';
-const ASSETS = ['./', './index.html', './manifest.json', './hero-banner.png', './banner-sign.jpg', './icon-180.png', './icon-192.png', './icon-512.png'];
+const CACHE = 'makka-halal-v4';
+const ASSETS = ['./', './index.html', './manifest.json', './hero-banner.png', './banner-sign.jpg', './icon-180.png', './icon-192.png', './icon-512.png',
+  './gif.html', './gif-manifest.json', './gif-icon-180.png', './gif-icon-192.png', './gif-icon-512.png'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

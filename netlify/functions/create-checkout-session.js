@@ -1,17 +1,19 @@
 const Stripe = require('stripe');
-const { json, supabaseFetch } = require('./_util');
+const { json, supabaseFetch, restoreStock, round2, TAX_RATE } = require('./_util');
 
-// Runs with no admin token, because any customer needs to start checkout —
-// but it never trusts the browser's math: it validates the amount shape,
-// and the *real* per-item prices are looked up server-side from Supabase
-// before anything is written to the orders table, so a tampered client
-// total can't be used to under-charge or spoof an order record.
+const SUBSTITUTION_CHOICES = ['substitute', 'call', 'skip'];
+
+// Runs with no token, because any customer needs to start checkout — but
+// it never trusts the browser's math: the *real* per-item prices are looked
+// up server-side from Supabase before anything is written, so a tampered
+// client total can't under-charge or spoof an order.
 //
 // It also reserves inventory up front: stock is decremented the moment an
 // order is placed (not when payment is captured later), using an
 // optimistic-concurrency check so two customers can't both buy the last
-// item. If a reservation fails partway through, everything already
-// reserved for this order is rolled back.
+// item. If anything fails partway, everything already reserved is rolled
+// back. The order starts as "Awaiting Payment" and only becomes "New"
+// (visible to the GIF staff app) once Stripe confirms the payment.
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
 
@@ -23,35 +25,55 @@ exports.handler = async (event) => {
     if (!items.length) throw new Error('Your cart is empty');
 
     const ids = items.map((i) => Number(i.id)).filter(Number.isFinite);
-    const qs = `products?id=in.(${ids.join(',')})&select=id,name,price,active,stock`;
+    const qs = `products?id=in.(${ids.join(',')})&select=id,name,price,unit,image,emoji,active,stock`;
     const catalog = await supabaseFetch(qs);
     const byId = Object.fromEntries(catalog.map((p) => [p.id, p]));
 
     let subtotal = 0;
     const lineDescriptions = [];
-    const toReserve = []; // items whose stock we still need to decrement
+    const orderItems = []; // what we store on the order: a snapshot, so later price/name edits never rewrite history
+    const toReserve = [];
 
     for (const item of items) {
       const p = byId[Number(item.id)];
-      const qty = Math.max(1, Math.min(50, Number(item.qty) || 1));
+      const qty = Math.max(0.25, Math.min(50, Number(item.qty) || 1));
       if (!p || !p.active || p.price == null) continue; // skip unknown/priceless items rather than trusting the client
       if (p.stock != null && qty > p.stock) {
         throw new Error(`Only ${p.stock} of "${p.name}" left in stock — please adjust your cart.`);
       }
       subtotal += p.price * qty;
       lineDescriptions.push(`${qty} x ${p.name}`);
+      orderItems.push({
+        id: p.id,
+        qty,
+        name: p.name,
+        price: p.price,
+        unit: p.unit || '',
+        image: p.image || '',
+        emoji: p.emoji || '',
+        pick_status: 'pending',
+      });
       if (p.stock != null) toReserve.push({ id: p.id, qty, currentStock: p.stock });
     }
     if (subtotal <= 0) throw new Error('No valid priced items in cart');
 
-    // Reserve stock one item at a time with an optimistic-concurrency
-    // check: the update only applies if stock still matches what we just
-    // read, so a simultaneous purchase can't oversell the same item.
+    // Optional pickup time the customer asked for (blank = as soon as possible).
+    let requestedPickup = null;
+    if (body.requested_pickup) {
+      const t = new Date(body.requested_pickup);
+      const minsAhead = (t.getTime() - Date.now()) / 60000;
+      if (!Number.isNaN(t.getTime()) && minsAhead > -5 && minsAhead < 60 * 24 * 4) requestedPickup = t.toISOString();
+    }
+    const substitutionPref = SUBSTITUTION_CHOICES.includes(body.substitution_pref) ? body.substitution_pref : 'call';
+
+    // Reserve stock one item at a time with an optimistic-concurrency check:
+    // the update only applies if stock still matches what we just read, so a
+    // simultaneous purchase can't oversell the same item.
     for (const r of toReserve) {
       const rows = await supabaseFetch(`products?id=eq.${r.id}&stock=eq.${r.currentStock}`, {
         method: 'PATCH',
         headers: { Prefer: 'return=representation' },
-        body: JSON.stringify({ stock: r.currentStock - r.qty }),
+        body: JSON.stringify({ stock: round2(Number(r.currentStock) - r.qty) }),
       });
       if (!rows || !rows.length) {
         throw new Error('Someone just bought the last of one of your items — please refresh and try again.');
@@ -59,9 +81,9 @@ exports.handler = async (event) => {
       reserved.push({ id: r.id, qty: r.qty });
     }
 
-    const foodTaxable = subtotal; // simple flat estimate; adjust categories as needed
-    const tax = Math.round(foodTaxable * 0.03 * 100) / 100;
-    const total = Math.round((subtotal + tax) * 100) / 100;
+    subtotal = round2(subtotal);
+    const tax = round2(subtotal * TAX_RATE);
+    const total = round2(subtotal + tax);
     const cents = Math.round(total * 100);
 
     const orderCode = 'MHM-' + Date.now().toString(36).toUpperCase();
@@ -73,6 +95,9 @@ exports.handler = async (event) => {
       payment_method_types: ['card'],
       customer_email: body.email || undefined,
       client_reference_id: orderCode,
+      // Unpaid checkouts close themselves after ~31 minutes (Stripe's minimum
+      // is 30), so abandoned carts don't hold inventory for long.
+      expires_at: Math.floor(Date.now() / 1000) + 31 * 60,
       line_items: [
         {
           price_data: {
@@ -96,12 +121,15 @@ exports.handler = async (event) => {
         order_code: orderCode,
         customer_name: String(body.name || '').slice(0, 200),
         customer_phone: String(body.phone || '').slice(0, 40),
-        items,
+        items: orderItems,
         subtotal,
         tax,
         total,
         stripe_session_id: session.id,
-        status: 'New',
+        status: 'Awaiting Payment',
+        payment_status: 'unpaid',
+        requested_pickup: requestedPickup,
+        substitution_pref: substitutionPref,
         notes: lineDescriptions.join(', ').slice(0, 2000),
       }),
     });
@@ -120,16 +148,3 @@ exports.handler = async (event) => {
     return json(500, { error: err.message || 'Unable to start payment' });
   }
 };
-
-async function restoreStock(id, qty) {
-  const rows = await supabaseFetch(`products?id=eq.${id}&select=stock`);
-  const current = rows && rows[0] ? rows[0].stock : null;
-  if (current == null) return; // stock is untracked for this item, nothing to restore
-  await supabaseFetch(`products?id=eq.${id}`, {
-    method: 'PATCH',
-    headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({ stock: current + qty }),
-  });
-}
-
-module.exports.restoreStock = restoreStock;
