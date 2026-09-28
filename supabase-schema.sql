@@ -111,6 +111,7 @@ create table if not exists public.orders (
   refund_decision_note text,
   refund_approved_amount numeric(10,2),
   refunded_amount numeric(10,2),
+  events jsonb not null default '[]'::jsonb,   -- activity log: who did what, and when
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -141,6 +142,30 @@ alter table public.orders add column if not exists refund_decided_at timestamptz
 alter table public.orders add column if not exists refund_decision_note text;
 alter table public.orders add column if not exists refund_approved_amount numeric(10,2);
 alter table public.orders add column if not exists refunded_amount numeric(10,2);
+alter table public.orders add column if not exists events jsonb not null default '[]'::jsonb;
+
+-- ---------- TEAM (personal PINs for the GIF staff app) ----------
+-- One row per associate. PINs are stored only as a salted hash, so nobody can
+-- read them back — the admin can only reset one. Nothing here is readable by
+-- the public storefront key.
+create table if not exists public.staff (
+  id bigint generated always as identity primary key,
+  name text not null,
+  name_key text not null,                       -- lower-case name, used to find them at sign-in
+  pin_hash text not null,
+  active boolean not null default true,         -- turn off to lock someone out instantly
+  can_approve boolean not null default false,   -- may approve/deny cancellations & refunds in GIF
+  failed_attempts int not null default 0,
+  locked_until timestamptz,
+  last_login_at timestamptz,
+  sessions_valid_after timestamptz,             -- sessions issued before this are refused (set when someone is switched off or their PIN is reset)
+  created_at timestamptz not null default now()
+);
+alter table public.staff add column if not exists sessions_valid_after timestamptz;
+create unique index if not exists idx_staff_name_key on public.staff (name_key);
+alter table public.staff enable row level security;   -- no policies: only the server can touch it
+grant all privileges on public.staff to service_role;
+grant usage, select on all sequences in schema public to service_role;
 
 -- ---------- PRODUCT PHOTO STORAGE ----------
 -- A public bucket so admin.html can upload real photos instead of typing

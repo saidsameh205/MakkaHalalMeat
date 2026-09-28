@@ -11,7 +11,7 @@ const DONE = ['Completed'];
 // "Awaiting Payment" (or abandoned) never reach the store.
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return json(405, { error: 'Method Not Allowed' });
-  const auth = requireStaff(event);
+  const auth = await requireStaff(event);
   if (!auth.ok) return auth.response;
 
   try {
@@ -51,7 +51,7 @@ exports.handler = async (event) => {
       requests = await shapeOrders(keep);
     }
 
-    return json(200, { server_time: new Date().toISOString(), view, is_admin: !!auth.isAdmin, orders, requests });
+    return json(200, { server_time: new Date().toISOString(), view, is_admin: !!auth.isAdmin, staff_name: auth.staffName || '', orders, requests });
   } catch (e) {
     console.error('staff-orders', e);
     return json(500, { error: 'Unable to load orders' });

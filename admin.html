@@ -49,6 +49,7 @@
 <div id="app" style="display:none;">
   <header>
     <h1>Makka Halal Meat — Staff Admin</h1>
+    <a href="gif.html" target="_blank" style="color:#fff;font-size:.85rem;margin-left:auto;margin-right:12px;text-decoration:underline;">Open GIF staff app ↗</a>
     <button class="btn ghost" style="background:rgba(255,255,255,.15); color:#fff; border-color:rgba(255,255,255,.4);" onclick="signOut()">Sign out</button>
   </header>
   <main>
@@ -56,6 +57,7 @@
       <div class="tab active" data-tab="orders" onclick="showTab('orders')">Orders</div>
       <div class="tab" data-tab="products" onclick="showTab('products')">Products</div>
       <div class="tab" data-tab="deals" onclick="showTab('deals')">Deals</div>
+      <div class="tab" data-tab="team" onclick="showTab('team')">Team</div>
       <div class="tab" data-tab="settings" onclick="showTab('settings')">Site settings</div>
     </div>
 
@@ -101,6 +103,33 @@
       </table>
     </section>
 
+    <section class="panel" id="panel-team">
+      <div class="card" id="pinBox" hidden style="border:2px solid var(--accent);">
+        <div id="pinFor" style="font-weight:700;"></div>
+        <div id="pinBig" style="font-size:2.4rem;font-weight:800;letter-spacing:.25em;margin:8px 0;"></div>
+        <div class="msg">Write this down or tell them now. For security it is <b>never shown again</b> (you can always reset it for a new one).</div>
+        <button class="btn small" style="margin-top:10px;" onclick="document.getElementById('pinBox').hidden=true">Done</button>
+      </div>
+      <div class="card">
+        <b>Add an associate</b>
+        <div class="toolbar" style="margin-top:10px;">
+          <input id="newName" placeholder="Name (e.g. Amina)" style="min-width:150px;">
+          <input id="newPin" placeholder="PIN (optional)" inputmode="numeric" style="width:130px;">
+          <label style="font-size:.85rem;"><input type="checkbox" id="newApprove" style="width:auto;"> Can approve cancellations &amp; refunds</label>
+          <button class="btn" onclick="addStaff()">Add &amp; create PIN</button>
+        </div>
+        <div class="msg">Leave the PIN blank to get a random 6-digit one (recommended). Each person signs in to GIF with their <b>name + PIN</b>.
+          Names must be different from each other. Leave "can approve" off unless it's a manager you trust with refunds.</div>
+      </div>
+      <div class="toolbar"><button class="btn small" onclick="loadTeam()">Refresh</button><span class="msg" id="teamMsg"></span></div>
+      <table>
+        <thead><tr><th>Name</th><th>Access</th><th>Can approve</th><th>Last sign-in</th><th></th></tr></thead>
+        <tbody id="teamBody"></tbody>
+      </table>
+      <p class="msg">Turning someone off (or resetting their PIN) signs them out of GIF <b>immediately</b>, even mid-shift.
+        Everything they did on orders stays in each order's activity log.</p>
+    </section>
+
     <section class="panel" id="panel-settings">
       <div class="card" id="settingsForm"></div>
       <button class="btn" onclick="saveSettings()">Save settings</button>
@@ -132,7 +161,7 @@ async function signIn() {
     sessionStorage.setItem("mhm_admin_token", TOKEN);
     document.getElementById("gate").style.display = "none";
     document.getElementById("app").style.display = "block";
-    loadOrders(); loadProducts(); loadSettings(); loadDeals();
+    loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam();
   } catch (e) {
     document.getElementById("gateMsg").textContent = "Incorrect token, or ADMIN_TOKEN isn't set in Netlify yet.";
   }
@@ -142,7 +171,7 @@ function signOut() { sessionStorage.removeItem("mhm_admin_token"); location.relo
 if (TOKEN) {
   document.getElementById("gate").style.display = "none";
   document.getElementById("app").style.display = "block";
-  loadOrders(); loadProducts(); loadSettings(); loadDeals();
+  loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam();
 }
 
 function showTab(name) {
@@ -155,30 +184,48 @@ async function loadOrders() {
   document.getElementById("ordersMsg").textContent = "Loading…";
   try {
     const orders = await api("admin-orders");
+    window._orders = orders;
     document.getElementById("ordersBody").innerHTML = orders.map(orderRow).join("");
     document.getElementById("ordersMsg").textContent = `${orders.length} orders`;
   } catch (e) { document.getElementById("ordersMsg").textContent = e.message; }
 }
+const ORDER_STATUSES = ["Awaiting Payment", "New", "Preparing", "Ready for Pickup", "Completed", "Cancelled", "Abandoned"];
+const PREF_LABEL = { substitute: "OK to substitute", call: "Call/text first", skip: "Skip if out" };
+const fmtET = (iso) => new Date(iso).toLocaleString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
 function orderRow(o) {
-  const statuses = ["New", "Preparing", "Ready for Pickup", "Completed", "Cancelled", "Paid - Preparing"];
-  const badgeClass = o.status === "Completed" || o.status.startsWith("Paid") ? "paid" : "new";
+  const statuses = ORDER_STATUSES.includes(o.status) ? ORDER_STATUSES : [...ORDER_STATUSES, o.status];
+  const badgeClass = o.status === "Completed" || o.status === "Ready for Pickup" ? "paid" : "new";
   const pickupVal = o.pickup_time ? new Date(o.pickup_time).toISOString().slice(0,16) : "";
+  const payLabel = { unpaid: "Unpaid", authorized: "Card held", captured: "Paid", cancelled: "Hold released", refunded: "Refunded", partially_refunded: "Part refunded" }[o.payment_status] || "";
+  const picked = (o.items || []).filter((i) => i && i.pick_status && i.pick_status !== "pending");
+  const changes = (o.items || []).filter((i) => i && (i.pick_status === "unavailable" || i.pick_status === "substituted"))
+    .map((i) => i.pick_status === "unavailable" ? `✕ ${i.name || "item"} unavailable` : `⇄ ${i.name || "item"} → ${i.substitute ? i.substitute.name : "substitute"}`).join("<br>");
+  const amountToCapture = o.adjusted_total != null ? o.adjusted_total : o.total;
+  const canAct = o.stripe_session_id && o.payment_status !== "captured" && o.payment_status !== "cancelled" && o.status !== "Cancelled" && o.status !== "Abandoned";
   return `<tr data-order-id="${o.id}">
     <td>${o.order_code}<div class="msg">${new Date(o.created_at).toLocaleString()}</div></td>
-    <td>${o.customer_name || ""}<div class="msg">${o.customer_phone || ""}</div></td>
-    <td>$${Number(o.total || 0).toFixed(2)}</td>
+    <td>${o.customer_name || ""}<div class="msg">${o.customer_phone || ""}</div>
+      <div class="msg">Wants: ${o.requested_pickup ? fmtET(o.requested_pickup) : "ASAP"}</div>
+      <div class="msg">If out: ${PREF_LABEL[o.substitution_pref] || "—"}</div>
+      ${o.cancel_request_status ? `<div class="msg" style="color:${o.cancel_request_status === "pending" ? "#b3262d" : "#555"};font-weight:700;">Cancel request: ${o.cancel_request_status}${o.cancel_request_status === "pending" ? " — decide in GIF" : ""}</div>` : ""}
+      ${o.refund_request_status ? `<div class="msg" style="color:${o.refund_request_status === "pending" ? "#b3262d" : "#555"};font-weight:700;">Refund request: ${o.refund_request_status}${o.refund_request_status === "pending" ? " — decide in GIF" : ""}</div>` : ""}</td>
+    <td>$${Number(o.total || 0).toFixed(2)}
+      ${o.adjusted_total != null && Number(o.adjusted_total) !== Number(o.total) ? `<div class="msg"><b>Now $${Number(o.adjusted_total).toFixed(2)}</b></div>` : ""}
+      ${payLabel ? `<div class="badge ${o.payment_status === "captured" ? "paid" : "new"}" style="margin-top:4px;">${payLabel}</div>` : ""}</td>
     <td>
       <select onchange="updateStatus(${o.id}, this.value)">
         ${statuses.map((s) => `<option ${s === o.status ? "selected" : ""}>${s}</option>`).join("")}
       </select>
-      <div class="badge ${badgeClass}" style="margin-top:4px;">${o.status}</div>
+      ${picked.length ? `<div class="msg">${picked.length}/${(o.items || []).length} items handled in GIF</div>` : ""}
+      ${o.events && o.events.length ? `<div class="msg">Last: <b>${escH(o.events[o.events.length - 1].by)}</b> — ${escH(o.events[o.events.length - 1].what)} <a href="#" onclick="showActivity(${o.id});return false;">all activity</a></div>` : ""}
+      ${changes ? `<div class="msg" style="color:#8a5b00;">${changes}</div>` : ""}
     </td>
     <td><input type="datetime-local" data-field="pickup_time" value="${pickupVal}"></td>
     <td><input data-field="staff_notes" value="${escAttr(o.staff_notes || "")}" placeholder="e.g. called, ready early"></td>
     <td class="row-actions">
       <button class="btn small" onclick="saveOrderDetails(${o.id})">Save</button>
-      ${o.stripe_session_id ? `
-        <button class="btn small" onclick="capturePayment('${o.stripe_session_id}', ${o.total})">Capture</button>
+      ${canAct ? `
+        <button class="btn small" onclick="capturePayment('${o.stripe_session_id}', ${amountToCapture})">Capture</button>
         <button class="btn small ghost" onclick="cancelAuth('${o.stripe_session_id}')">Cancel</button>` : ""}
     </td>
   </tr>`;
@@ -195,7 +242,7 @@ async function updateStatus(id, status) {
   catch (e) { alert(e.message); }
 }
 async function capturePayment(sessionId, total) {
-  const finalAmount = prompt("Final amount to charge (after weighing):", Number(total).toFixed(2));
+  const finalAmount = prompt("Final amount to charge (prefilled with the updated total after picking):", Number(total).toFixed(2));
   if (!finalAmount) return;
   try {
     await api("capture-final-payment", { method: "POST", body: JSON.stringify({ sessionId, finalAmount: Number(finalAmount) }) });
@@ -351,6 +398,79 @@ async function addDealRow() {
     const created = await api("admin-discounts", { method: "POST", body: JSON.stringify({ title, active: true }) });
     window._deals = [created, ...(window._deals || [])]; renderDealsRows(window._deals);
   } catch (e) { alert(e.message); }
+}
+
+/* ---------------- Team ---------------- */
+const escH = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let TEAM = [];
+async function loadTeam() {
+  document.getElementById("teamMsg").textContent = "Loading…";
+  try { TEAM = await api("admin-staff"); renderTeam(); document.getElementById("teamMsg").textContent = `${TEAM.length} ${TEAM.length === 1 ? "person" : "people"}`; }
+  catch (e) { document.getElementById("teamMsg").textContent = e.message; }
+}
+function renderTeam() {
+  document.getElementById("teamBody").innerHTML = TEAM.length ? TEAM.map((p) => {
+    const locked = p.locked_until && new Date(p.locked_until) > new Date();
+    const last = p.last_login_at ? new Date(p.last_login_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" }) : "Never";
+    return `<tr>
+      <td><b>${escH(p.name)}</b></td>
+      <td>${p.active ? '<span class="badge paid">On</span>' : '<span class="badge">Off</span>'}${locked ? ' <span class="badge new">Locked</span>' : ""}</td>
+      <td><input type="checkbox" style="width:auto;" ${p.can_approve ? "checked" : ""} onchange="setApprove(${p.id}, this.checked)"></td>
+      <td>${escH(last)}</td>
+      <td class="row-actions">
+        <button class="btn small" onclick="resetPin(${p.id})">Reset PIN</button>
+        <button class="btn small ghost" onclick="setActive(${p.id}, ${!p.active})">${p.active ? "Turn off" : "Turn on"}</button>
+        ${locked ? `<button class="btn small ghost" onclick="unlockStaff(${p.id})">Unlock</button>` : ""}
+        <button class="btn small ghost" onclick="removeStaff(${p.id})">Remove</button>
+      </td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="msg">No one added yet. Add your first associate above.</td></tr>`;
+}
+function showPin(name, pin, verb) {
+  document.getElementById("pinFor").textContent = `${verb} for ${name}:`;
+  document.getElementById("pinBig").textContent = pin;
+  document.getElementById("pinBox").hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+async function addStaff() {
+  const name = document.getElementById("newName").value.trim();
+  const pin = document.getElementById("newPin").value.trim();
+  if (!name) { alert("Enter a name first."); return; }
+  try {
+    const r = await api("admin-staff", { method: "POST", body: JSON.stringify({ name, pin, can_approve: document.getElementById("newApprove").checked }) });
+    showPin(r.staff.name, r.pin, "PIN");
+    document.getElementById("newName").value = ""; document.getElementById("newPin").value = ""; document.getElementById("newApprove").checked = false;
+    loadTeam();
+  } catch (e) { alert(e.message); }
+}
+async function resetPin(id) {
+  const name = (TEAM.find((p) => p.id === id) || {}).name || "this person";
+  if (!confirm(`Give ${name} a new PIN? Their old PIN stops working and they're signed out of GIF right away.`)) return;
+  try { const r = await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, reset_pin: true }) }); showPin(name, r.pin, "New PIN"); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+async function setActive(id, active) {
+  try { await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, active }) }); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+async function setApprove(id, can_approve) {
+  if (can_approve && !confirm("Let this person approve or deny customer cancellations and refunds (which moves real money)?")) { loadTeam(); return; }
+  try { await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, can_approve }) }); loadTeam(); }
+  catch (e) { alert(e.message); loadTeam(); }
+}
+async function unlockStaff(id) {
+  try { await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, unlock: true }) }); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+async function removeStaff(id) {
+  const name = (TEAM.find((p) => p.id === id) || {}).name || "this person";
+  if (!confirm(`Remove ${name} from the team? They're signed out immediately. Their past activity stays on orders.`)) return;
+  try { await api("admin-staff", { method: "DELETE", body: JSON.stringify({ id }) }); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+function showActivity(id) {
+  const o = (window._orders || []).find((x) => x.id === id);
+  const ev = (o && o.events) || [];
+  alert(ev.length ? ev.map((e) => `${new Date(e.at).toLocaleString([], { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })} — ${e.by}: ${e.what}`).join("\n") : "No staff activity recorded yet.");
 }
 
 /* ---------------- Settings ---------------- */

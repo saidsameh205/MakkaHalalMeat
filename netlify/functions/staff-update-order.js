@@ -1,4 +1,4 @@
-const { json, requireStaff, supabaseFetch, computeAdjusted } = require('./_util');
+const { json, requireStaff, supabaseFetch, computeAdjusted, appendEvent } = require('./_util');
 const { shapeOrders, ORDER_COLUMNS } = require('./_staff');
 
 const EDITABLE = ['New', 'Preparing', 'Ready for Pickup', 'Paid - Preparing'];
@@ -21,7 +21,7 @@ function assertNotOnHold(order) {
 }
 
 async function loadOrder(id) {
-  const rows = await supabaseFetch(`orders?id=eq.${id}&select=id,items,status,updated_at,cancel_request_status`);
+  const rows = await supabaseFetch(`orders?id=eq.${id}&select=id,items,status,updated_at,cancel_request_status,events`);
   return rows && rows[0];
 }
 
@@ -45,7 +45,7 @@ async function patchWithRetry(id, buildPatch) {
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
-  const auth = requireStaff(event);
+  const auth = await requireStaff(event);
   if (!auth.ok) return auth.response;
 
   try {
@@ -112,6 +112,13 @@ exports.handler = async (event) => {
         const patch = { items, ...computeAdjusted(items) };
         // Touching an item means picking has started.
         if (order.status === 'New') patch.status = 'Preparing';
+        const lb = /lb/i.test(item.unit || '') ? ' lb' : '';
+        const what =
+          action === 'picked' ? `Picked ${item.name} ${item.picked_qty}${lb}`
+          : action === 'unavailable' ? `Marked ${item.name} unavailable`
+          : action === 'substitute' ? `Substituted ${item.name} → ${item.substitute.name}`
+          : `Undid ${item.name}`;
+        patch.events = appendEvent(order.events, auth.staffName, what);
         return patch;
       });
 
@@ -147,10 +154,11 @@ exports.handler = async (event) => {
         if (status === 'Completed' && order.status !== 'Ready for Pickup') {
           throw Object.assign(new Error('Mark the order Ready for Pickup first.'), { status: 400 });
         }
-        return { status, ...computeAdjusted(items) };
+        const what = status === 'Preparing' ? 'Started picking' : status === 'Ready for Pickup' ? 'Marked ready for pickup' : status === 'Completed' ? 'Handed to customer' : `Set ${status}`;
+        return { status, ...computeAdjusted(items), events: appendEvent(order.events, auth.staffName, what) };
       });
     } else if (op === 'notes') {
-      result = await patchWithRetry(id, () => ({ staff_notes: String(b.staff_notes || '').slice(0, 1000) }));
+      result = await patchWithRetry(id, (order) => ({ staff_notes: String(b.staff_notes || '').slice(0, 1000), events: appendEvent(order.events, auth.staffName, 'Updated the team notes') }));
     } else {
       throw Object.assign(new Error('Unknown operation'), { status: 400 });
     }

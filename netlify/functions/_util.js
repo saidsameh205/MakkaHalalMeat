@@ -52,22 +52,110 @@ function requireAdmin(event) {
   return { ok: true };
 }
 
-// Used by the GIF staff app. Workers sign in with STAFF_TOKEN, which only
-// unlocks the staff-* functions (picking orders) — it can't edit products,
-// prices, settings or payments, because those check requireAdmin above.
-// The owner's ADMIN_TOKEN is also accepted so the owner can sign into GIF
-// too (and so GIF still works before STAFF_TOKEN has been set up).
-function requireStaff(event) {
+// ---------- personal staff sessions (GIF sign-in with name + PIN) ----------
+const SESSION_HOURS = 16;          // one long shift; sign in again next day
+const b64url = (buf) => Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64url = (str) => Buffer.from(String(str).replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+
+// Sessions are signed with a key derived from ADMIN_TOKEN, so there is no
+// extra secret to set up. (Changing ADMIN_TOKEN signs everyone out.)
+function sessionKey() {
+  const a = process.env.ADMIN_TOKEN;
+  if (!a) return null;
+  return crypto.createHmac('sha256', a).update('gif-session-v1').digest();
+}
+function signSession(payload) {
+  const key = sessionKey();
+  if (!key) throw new Error('Server is missing the ADMIN_TOKEN environment variable.');
+  const body = b64url(JSON.stringify(payload));
+  const sig = b64url(crypto.createHmac('sha256', key).update(body).digest());
+  return `gif1.${body}.${sig}`;
+}
+// -> payload | { expired: true } | null (not a valid session token)
+function verifySession(token) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3 || parts[0] !== 'gif1') return null;
+  const key = sessionKey();
+  if (!key) return null;
+  const expected = b64url(crypto.createHmac('sha256', key).update(parts[1]).digest());
+  if (!safeEqual(parts[2], expected)) return null;
+  let payload;
+  try { payload = JSON.parse(unb64url(parts[1]).toString('utf8')); } catch (e) { return null; }
+  if (!payload || !payload.sid || !payload.exp) return null;
+  if (Date.now() > payload.exp) return { expired: true };
+  return payload;
+}
+
+// PINs are stored only as a salted scrypt hash — nobody (including the admin)
+// can look a PIN up again; they can only reset it.
+function hashPin(pin) {
+  const salt = crypto.randomBytes(16);
+  const hash = crypto.scryptSync(String(pin), salt, 32);
+  return `s1$${salt.toString('base64')}$${hash.toString('base64')}`;
+}
+function checkPin(pin, stored) {
+  const [v, salt, hash] = String(stored || '').split('$');
+  const want = v === 's1' && salt && hash ? Buffer.from(hash, 'base64') : Buffer.alloc(32);
+  const got = crypto.scryptSync(String(pin || ''), v === 's1' && salt ? Buffer.from(salt, 'base64') : Buffer.alloc(16), 32);
+  return v === 's1' && crypto.timingSafeEqual(got, want);
+}
+function generatePin() { return String(crypto.randomInt(0, 1000000)).padStart(6, '0'); }
+// Rejects PINs that are obvious to guess (1111, 1234, 654321 ...).
+function isWeakPin(pin) {
+  if (/^(\d)\1+$/.test(pin)) return true;
+  const d = pin.split('').map(Number);
+  const step = d[1] - d[0];
+  return (step === 1 || step === -1) && d.every((n, i) => i === 0 || n - d[i - 1] === step);
+}
+
+// Used by the GIF staff app. A caller may present:
+//   - a personal session token (from staff-login: name + PIN)  -> that person
+//   - the shared STAFF_TOKEN                                     -> "Shared staff code"
+//   - the owner's ADMIN_TOKEN                                    -> admin
+// Personal sessions are re-checked against the team list on EVERY request, so
+// turning someone off (or removing them) locks them out immediately.
+// Only staff-* functions use this; products, prices, settings and payments
+// use requireAdmin, which a worker's session can never satisfy.
+async function requireStaff(event) {
+  const provided = header(event, 'x-staff-token') || header(event, 'x-admin-token');
+  const unauthorized = (msg) => ({ ok: false, response: json(401, { error: msg || 'Unauthorized' }) });
+  if (!provided) return unauthorized();
+
+  if (provided.startsWith('gif1.')) {
+    const session = verifySession(provided);
+    if (!session) return unauthorized();
+    if (session.expired) return unauthorized('Your session ended — please sign in again.');
+    let row = null;
+    try {
+      const rows = await supabaseFetch(`staff?id=eq.${encodeURIComponent(session.sid)}&select=id,name,active,can_approve,sessions_valid_after`);
+      row = rows && rows[0];
+    } catch (e) {
+      console.error('requireStaff: team lookup failed', e);
+      return { ok: false, response: json(500, { error: 'Unable to check your sign-in right now.' }) };
+    }
+    if (!row || !row.active) return unauthorized('Your access has been turned off. Ask the store admin.');
+    // Turning someone off, or resetting their PIN, ends every session issued before that moment.
+    if (row.sessions_valid_after && (session.iat || 0) < new Date(row.sessions_valid_after).getTime()) {
+      return unauthorized('Your session ended — please sign in again.');
+    }
+    return { ok: true, isAdmin: !!row.can_approve, staffId: row.id, staffName: row.name };
+  }
+
   const staffToken = process.env.STAFF_TOKEN;
   const adminToken = process.env.ADMIN_TOKEN;
   if (!staffToken && !adminToken) {
     return { ok: false, response: json(500, { error: 'Server is missing the STAFF_TOKEN environment variable.' }) };
   }
-  const provided = header(event, 'x-staff-token') || header(event, 'x-admin-token');
-  const okStaff = staffToken ? safeEqual(provided, staffToken) : false;
-  const okAdmin = adminToken ? safeEqual(provided, adminToken) : false;
-  if (!okStaff && !okAdmin) return { ok: false, response: json(401, { error: 'Unauthorized' }) };
-  return { ok: true, isAdmin: okAdmin };
+  if (adminToken && safeEqual(provided, adminToken)) return { ok: true, isAdmin: true, staffName: 'Admin' };
+  if (staffToken && safeEqual(provided, staffToken)) return { ok: true, isAdmin: false, staffName: 'Shared staff code' };
+  return unauthorized();
+}
+
+// Adds one line to an order's activity log (who did what), keeping the last 80.
+function appendEvent(events, by, what) {
+  const list = Array.isArray(events) ? events.slice(-79) : [];
+  list.push({ at: new Date().toISOString(), by: by || 'Staff', what: String(what).slice(0, 160) });
+  return list;
 }
 
 function supabaseConfig() {
@@ -176,6 +264,14 @@ function cancelSecondsLeft(order, nowMs = Date.now()) {
 }
 
 module.exports = {
+  SESSION_HOURS,
+  signSession,
+  verifySession,
+  hashPin,
+  checkPin,
+  generatePin,
+  isWeakPin,
+  appendEvent,
   cancelSecondsLeft,
   CANCEL_WINDOW_MINUTES,
   CANCEL_GRACE_SECONDS,

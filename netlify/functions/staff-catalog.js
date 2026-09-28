@@ -4,7 +4,7 @@ const { json, requireStaff, supabaseFetch } = require('./_util');
 // substitute when something is unavailable.
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return json(405, { error: 'Method Not Allowed' });
-  const auth = requireStaff(event);
+  const auth = await requireStaff(event);
   if (!auth.ok) return auth.response;
 
   try {

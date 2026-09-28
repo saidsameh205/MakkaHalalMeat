@@ -1,5 +1,5 @@
 const Stripe = require('stripe');
-const { json, requireStaff, supabaseFetch, restoreOrderStock, round2 } = require('./_util');
+const { json, requireStaff, supabaseFetch, restoreOrderStock, round2, appendEvent } = require('./_util');
 const { shapeOrders, ORDER_COLUMNS } = require('./_staff');
 
 function httpError(status, message) {
@@ -26,7 +26,7 @@ async function paymentIntentFor(stripe, order, expandCharge) {
 //    refund the customer twice.
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
-  const auth = requireStaff(event);
+  const auth = await requireStaff(event);
   if (!auth.ok) return auth.response;
   if (!auth.isAdmin) {
     return json(403, { error: 'Only the store admin can approve or deny cancellations and refunds.' });
@@ -43,7 +43,7 @@ exports.handler = async (event) => {
     if (decision !== 'approve' && decision !== 'deny') throw httpError(400, 'Decision must be approve or deny');
 
     const rows = await supabaseFetch(
-      `orders?id=eq.${id}&select=id,status,items,stripe_session_id,total,cancel_request_status,refund_request_status,refunded_amount`
+      `orders?id=eq.${id}&select=id,status,items,stripe_session_id,total,cancel_request_status,refund_request_status,refunded_amount,events`
     );
     const order = rows && rows[0];
     if (!order) throw httpError(404, 'Order not found');
@@ -55,11 +55,16 @@ exports.handler = async (event) => {
     const decidedField = kind === 'cancel' ? 'cancel_decided_at' : 'refund_decided_at';
     const noteField = kind === 'cancel' ? 'cancel_decision_note' : 'refund_decision_note';
 
+    const describe = (patch) => {
+      const what = kind === 'cancel' ? 'cancellation' : 'refund';
+      if (patch[stateField] === 'denied') return `Denied the ${what} request`;
+      return kind === 'cancel' ? 'Approved the cancellation' : `Approved a refund of $${Number(patch.refund_approved_amount).toFixed(2)}`;
+    };
     const commit = async (patch) => {
       const saved = await supabaseFetch(claim, {
         method: 'PATCH',
         headers: { Prefer: 'return=representation' },
-        body: JSON.stringify({ ...patch, [decidedField]: nowIso, [noteField]: note, updated_at: nowIso }),
+        body: JSON.stringify({ ...patch, [decidedField]: nowIso, [noteField]: note, updated_at: nowIso, events: appendEvent(order.events, auth.staffName, describe(patch)) }),
       });
       if (!saved || !saved.length) throw httpError(409, 'This request was just decided by someone else.');
       return saved[0];

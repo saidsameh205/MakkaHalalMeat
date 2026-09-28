@@ -38,6 +38,8 @@
   .btn.green{background:var(--green); color:#062414;}
   .btn.small{width:auto; padding:10px 14px; min-height:44px; font-size:.9rem; border-radius:12px;}
   .btn:disabled{opacity:.45;}
+  .linkbtn{background:none; border:none; color:var(--muted); text-decoration:underline; margin-top:14px; font-size:.9rem; padding:8px;}
+  .ev{font-size:.82rem; color:var(--muted); margin-top:7px; line-height:1.35;} .ev b{color:var(--ink);}
   .err{color:var(--brand-l); font-size:.9rem; min-height:1.3em; margin-top:10px;}
 
   /* ---------- header ---------- */
@@ -163,8 +165,17 @@
   <div class="logo">GIF</div>
   <h1>Staff sign-in</h1>
   <p>Makka Halal Meat · order picking</p>
-  <input id="tokenInput" class="field" type="password" placeholder="Staff code" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
-  <button class="btn" id="loginBtn" onclick="signIn()">Start shift</button>
+  <div id="pinLogin">
+    <input id="nameInput" class="field" placeholder="Your name" autocomplete="username" autocapitalize="words" onkeydown="if(event.key==='Enter')$('pinInput').focus()">
+    <input id="pinInput" class="field" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="Your PIN" autocomplete="current-password" onkeydown="if(event.key==='Enter')signInPin()">
+    <button class="btn" id="pinBtn" onclick="signInPin()">Start shift</button>
+    <button class="linkbtn" onclick="showCodeLogin(true)">Owner or shared code? Use a code instead</button>
+  </div>
+  <div id="codeLogin" hidden>
+    <input id="tokenInput" class="field" type="password" placeholder="Code" autocomplete="off" onkeydown="if(event.key==='Enter')signIn()">
+    <button class="btn" id="loginBtn" onclick="signIn()">Start shift</button>
+    <button class="linkbtn" onclick="showCodeLogin(false)">← Back to name &amp; PIN</button>
+  </div>
   <div class="err" id="loginErr"></div>
 </div>
 
@@ -224,7 +235,8 @@ let openId = null;
 let weighing = null;      // { id, idx } while entering a picked weight
 let subCtx = null;        // { id, idx, product }
 let knownIds = null;      // ids we've already seen (null until first load)
-let IS_ADMIN = false;     // true only when signed in with the store admin code
+let IS_ADMIN = false;     // true only when signed in with the admin code (or as a manager with approve rights)
+let ME = "";             // who is signed in
 let REQUESTS = [];        // orders that have a cancellation / refund request
 let knownReqKeys = null;  // requests we've already alerted about
 let silencedUntil = 0;
@@ -247,12 +259,33 @@ async function api(path, opts = {}) {
     headers: { "Content-Type": "application/json", "x-staff-token": TOKEN, ...(opts.headers || {}) },
   });
   const data = await res.json().catch(() => ({}));
-  if (res.status === 401) { signOut("That code isn't right — please sign in again."); throw new Error("Unauthorized"); }
+  if (res.status === 401) { signOut(data.error && data.error !== "Unauthorized" ? data.error : "That code isn't right — please sign in again."); throw new Error("Unauthorized"); }
   if (!res.ok) throw new Error(data.error || "Something went wrong");
   return data;
 }
 
 /* ---------------- sign in / out ---------------- */
+function showCodeLogin(on) { $("pinLogin").hidden = on; $("codeLogin").hidden = !on; $("loginErr").textContent = ""; }
+async function publicApi(path, body) {
+  const res = await fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Something went wrong");
+  return data;
+}
+async function signInPin() {
+  const name = $("nameInput").value.trim(), pin = $("pinInput").value.trim();
+  if (!name || !pin) { $("loginErr").textContent = "Enter your name and PIN."; return; }
+  $("pinBtn").disabled = true; $("loginErr").textContent = "";
+  unlockAudio(false); // the tap on "Start shift" lets the browser allow sound
+  try {
+    const data = await publicApi("staff-login", { name, pin });
+    TOKEN = data.token;
+    localStorage.setItem("gif_token", TOKEN); localStorage.setItem("gif_name", data.name);
+    $("pinInput").value = "";
+    startApp();
+  } catch (e) { $("loginErr").textContent = e.message; $("pinInput").value = ""; }
+  $("pinBtn").disabled = false;
+}
 async function signIn() {
   TOKEN = $("tokenInput").value.trim();
   if (!TOKEN) { $("loginErr").textContent = "Enter your staff code."; return; }
@@ -303,7 +336,7 @@ async function refresh() {
     const isNewIds = fresh.filter((o) => o.status === "New" && knownIds && !knownIds.has(o.id));
     knownIds = new Set(fresh.map((o) => o.id));
     ORDERS = fresh;
-    IS_ADMIN = !!data.is_admin;
+    IS_ADMIN = !!data.is_admin; ME = data.staff_name || ME;
     REQUESTS = data.requests || [];
     const pend = pendingRequests();
     const newReqs = pend.filter((r) => knownReqKeys && !knownReqKeys.has(r.key));
@@ -609,6 +642,7 @@ function openMenu() {
   const canNotify = "Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied";
   showModal(`
     <h3>Settings</h3>
+    <p style="margin:0 0 6px">Signed in as <b style="color:var(--ink)">${esc(ME || "—")}</b>${IS_ADMIN ? " · can approve requests" : ""}</p>
     <div class="menu-row"><span>Sound alerts</span><button class="switch ${soundOn ? "on" : ""}" onclick="toggleSound();openMenu()"></button></div>
     <div class="menu-row"><span>Keep screen on</span><button class="switch ${keepAwake ? "on" : ""}" onclick="toggleAwake()"></button></div>
     ${canNotify ? `<div class="menu-row"><span>Pop-up notifications</span><button class="btn small secondary" onclick="enableNotify()">Enable</button></div>` : ""}
@@ -675,6 +709,7 @@ function renderSheet() {
     <div class="timeline">Placed ${esc(fmtTime(o.created_at))} · ${o.asap ? "ASAP" : "Pickup " + esc(fmtDue(o.due_at))}</div>
     <div style="height:8px"></div>
     ${itemsHtml}
+    ${o.events && o.events.length ? `<div class="item"><b style="font-size:.9rem">Activity</b>${o.events.slice(-8).reverse().map((e) => `<div class="ev">${esc(fmtTime(e.at))} · <b>${esc(e.by)}</b> ${esc(e.what)}</div>`).join("")}</div>` : ""}
     ${held ? `<div class="lockline">🔒 Picking is paused until the store admin confirms or denies the cancellation request.</div>` : ""}
     ${canNotes ? `<div class="item"><b style="font-size:.9rem">Notes for the team</b><textarea id="staffNotes" class="note-in" rows="2" placeholder="e.g. customer called, will arrive late" onblur="saveNotes(${o.id})">${esc(o.staff_notes)}</textarea></div>` : ""}
   </div>
@@ -829,6 +864,7 @@ function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add
 
 /* ---------------- boot ---------------- */
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+try { const n = localStorage.getItem("gif_name"); if (n) $("nameInput").value = n; } catch (e) {}
 if (TOKEN) { startApp(); }
 </script>
 </body>

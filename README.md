@@ -53,6 +53,29 @@ Orders are only handed to the store once payment is confirmed. Checkouts that ar
 abandoned are closed automatically after about 30 minutes and their reserved
 stock is released.
 
+## Team: a personal PIN for each associate
+
+Instead of one shared code, every associate signs in to GIF with their **own name + PIN**.
+
+- **Add people:** `admin.html` → **Team** tab → type a name → *Add & create PIN*.
+  A random 6-digit PIN is shown **once** — write it down or tell them. (You can type your
+  own 4–8 digit PIN instead; obvious ones like 1234 are refused.) PINs are stored only as a
+  salted hash, so nobody can look one up later — you can only **Reset PIN**.
+- **Sign in:** on the GIF screen, the associate types their name and PIN once per shift
+  (sessions last 16 hours). GIF remembers their name.
+- **Remove access instantly:** *Turn off* or *Remove* signs that person out of GIF **immediately**,
+  even mid-shift. *Reset PIN* also signs out any session that was already open.
+- **Lock-out:** 5 wrong PINs in a row locks that person for 15 minutes (the admin can *Unlock*).
+- **Activity log:** every action on an order (picked, unavailable, substituted, marked ready,
+  handed over, request approved/denied) is recorded with the person's name and time. It shows
+  under *Activity* on each order in GIF, and as "Last: …" plus *all activity* in `admin.html` → Orders.
+- **Approve rights:** tick *Can approve cancellations & refunds* only for a manager you trust.
+  Everyone else can pick orders but cannot decide requests, and can never touch products, prices,
+  settings or payments.
+- **Retire the shared code:** once everyone has a PIN, delete the `STAFF_TOKEN` variable in Netlify
+  (and redeploy). Your `ADMIN_TOKEN` keeps working as the owner's sign-in ("Use a code instead").
+- One-time database update: run **`supabase-update-team.sql`** in Supabase *before* uploading.
+
 ## Cancellations & refunds (all approved by the store admin)
 
 - **Cancel within 5 minutes:** on the customer's **Orders** tab, a "Request cancellation"
