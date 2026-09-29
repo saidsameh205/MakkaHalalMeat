@@ -84,6 +84,17 @@
   .promo-card p{ margin:0; font-size:.85rem; opacity:.92; max-width:26ch; }
   .promo-card .btn{ margin-top:8px; align-self:flex-start; background:#fff; color:var(--ink); }
 
+  .spotlight-scroller{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding:0 16px; scroll-padding:0 16px; }
+  .spotlight-scroller::-webkit-scrollbar{ display:none; }
+  .spotlight-slide{ flex:0 0 calc(100% - 32px); scroll-snap-align:start; position:relative; height:190px; border-radius:var(--radius-lg); overflow:hidden; background-size:cover; background-position:center; background-color:var(--panel2,#eee); box-shadow:var(--shadow-md); display:flex; align-items:flex-end; }
+  .spotlight-slide .overlay{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.68) 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:16px; color:#fff; }
+  .spotlight-slide .s-name{ font-size:1.1rem; font-weight:800; line-height:1.2; }
+  .spotlight-slide .s-price{ font-size:.9rem; opacity:.95; margin-top:2px; }
+  .spotlight-slide .s-add{ position:absolute; right:14px; bottom:14px; width:40px; height:40px; border-radius:50%; background:var(--brand); color:#fff; font-size:1.3rem; border:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm); }
+  .spotlight-dots{ display:flex; justify-content:center; gap:6px; padding:10px 0 2px; }
+  .spotlight-dot{ width:7px; height:7px; border-radius:50%; background:var(--line,#ddd); transition:all .2s; }
+  .spotlight-dot.active{ background:var(--brand); width:18px; border-radius:4px; }
+
   .quick-cats{ display:grid; grid-template-columns:repeat(6,1fr); gap:8px; padding:4px 16px 18px; }
   .quick-cat{ display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; }
   .quick-cat .tile{ width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:var(--shadow-sm); }
@@ -104,7 +115,7 @@
   .row-scroller::-webkit-scrollbar{display:none;}
   .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; padding:2px 16px 4px; }
 
-  .card{ background:var(--card-bg); border-radius:var(--radius-md); padding:10px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:6px; position:relative; transition:transform .15s ease, box-shadow .15s ease, background-color .35s ease; scroll-snap-align:start; flex:0 0 132px; }
+  .card{ background:var(--card-bg); border-radius:var(--radius-md); padding:10px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:6px; position:relative; transition:transform .15s ease, box-shadow .15s ease, background-color .35s ease; scroll-snap-align:start; flex:0 0 132px; cursor:pointer; }
   .grid .card{ flex-basis:auto; }
   .card:active{ transform:scale(.97); }
   .card-media{ height:88px; border-radius:10px; background:rgba(120,100,80,.12); display:flex; align-items:center; justify-content:center; font-size:2rem; background-size:cover; background-position:center; position:relative; overflow:hidden; }
@@ -149,6 +160,22 @@
   .cat-chip{ flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--bg); color:var(--fg); font-size:.8rem; font-weight:600; cursor:pointer; }
   .cat-chip.active{ background:var(--accent); color:var(--accent-text); border-color:transparent; }
   .deptpage-body{ max-width:640px; margin:0 auto; padding-bottom:10px; }
+  .product-detail{ max-width:640px; margin:0 auto; padding:0 16px 24px; }
+  .product-detail .pd-media{ width:100%; aspect-ratio:1/1; border-radius:var(--radius-lg); background-size:cover; background-position:center; background-color:var(--card-bg,#eee); display:flex; align-items:center; justify-content:center; font-size:5rem; margin-bottom:18px; position:relative; }
+  .product-detail .pd-fav{ position:absolute; top:12px; right:12px; background:rgba(255,255,255,.9); border:none; border-radius:50%; width:40px; height:40px; font-size:1.2rem; }
+  .product-detail .pd-badge{ position:absolute; top:12px; left:12px; background:var(--accent,#8C1A1E); color:var(--accent-text,#fff); font-size:.78rem; font-weight:700; padding:5px 10px; border-radius:999px; }
+  .product-detail h1{ font-size:1.35rem; margin:0 0 4px; }
+  .product-detail .pd-brand{ color:var(--muted); font-size:.9rem; margin-bottom:10px; }
+  .product-detail .pd-price{ font-size:1.6rem; font-weight:800; margin:6px 0 2px; }
+  .product-detail .pd-unit{ color:var(--muted); font-size:.95rem; }
+  .product-detail .pd-desc{ white-space:pre-wrap; line-height:1.5; color:var(--fg); margin:14px 0 0; font-size:.95rem; }
+  .product-detail .pd-meta{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  .product-detail .pd-chip{ background:var(--card-bg,#fff); border:1px solid rgba(0,0,0,.08); border-radius:999px; padding:6px 12px; font-size:.82rem; }
+  .product-detail .pd-action{ margin-top:20px; }
+  .product-detail .pd-action .btn{ width:100%; padding:14px; font-size:1rem; }
+  .product-detail .pd-stepper{ display:flex; align-items:center; justify-content:center; gap:18px; background:var(--card-bg,#fff); border-radius:var(--radius-lg); padding:10px; }
+  .product-detail .pd-stepper button{ width:42px; height:42px; border-radius:50%; border:none; background:var(--accent,#8C1A1E); color:var(--accent-text,#fff); font-size:1.3rem; }
+  .product-detail .pd-stepper span{ font-size:1.1rem; font-weight:700; min-width:60px; text-align:center; }
   .cat-section{ padding:16px 0 2px; scroll-margin-top:132px; }
   .cat-section h3{ padding:0 16px 8px; font-size:1rem; margin:0; color:var(--fg); }
 
@@ -192,7 +219,11 @@
   .modal .row{ display:flex; gap:10px; } .modal .row .btn{ flex:1; text-align:center; }
 
   .search-results{ padding:8px 16px 40px; }
-  .search-empty{ text-align:center; color:var(--muted); padding:60px 20px; }
+  .search-empty{ text-align:center; color:var(--muted); padding:60px 20px 16px; }
+  .search-browse .search-empty{ padding-top:36px; }
+  .search-chips{ display:flex; flex-wrap:wrap; gap:8px; padding:16px; }
+  .search-chip{ border:1px solid var(--line,#ddd); background:var(--panel,#fff); border-radius:999px; padding:8px 16px; font-size:.88rem; font-weight:600; color:inherit; }
+  .search-chip:active{ opacity:.7; }
 
   .toast{ position:fixed; bottom:calc(140px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%) translateY(16px); opacity:0; background:var(--ink); color:#fff; padding:11px 20px; border-radius:999px; font-size:.85rem; z-index:60; transition:.25s ease; pointer-events:none; box-shadow:0 8px 20px rgba(0,0,0,.25); max-width:90vw; text-align:center; }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
@@ -202,12 +233,23 @@
   .store-info-card{ margin:22px 16px 4px; background:#171310; color:#F3ECE2; border-radius:var(--radius-lg); padding:20px 22px; box-shadow:var(--shadow-md); }
   .store-info-card h2{ font-size:1.15rem; margin:0 0 12px; }
   .info-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:11px 0; border-top:1px solid rgba(255,255,255,.1); font-size:.88rem; }
+  .info-row .info-link{ color:inherit; font-weight:700; text-decoration:underline; text-align:right; }
+  .info-row .info-link:active{ opacity:.7; }
   .info-row:first-of-type{ border-top:none; }
   .info-row span{ color:rgba(243,236,226,.7); flex:0 0 auto; }
   .info-row strong{ text-align:right; font-weight:700; line-height:1.4; }
 
   .deals-list{ padding:14px 16px 40px; display:flex; flex-direction:column; gap:12px; }
-  .deal-card{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); border-left:5px solid var(--brand); }
+  .deal-card{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); border-left:5px solid var(--brand); overflow:hidden; }
+  #accountSection{ padding:14px 16px 0; }
+  .acct-card{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); }
+  .acct-card .name{ font-weight:800; font-size:1.05rem; }
+  .acct-card .sub{ color:var(--muted); font-size:.85rem; margin-top:2px; }
+  .acct-card .row{ display:flex; gap:10px; margin-top:12px; }
+  .acct-card .row .btn{ flex:1; padding:10px; font-size:.88rem; }
+  .acct-prompt{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); text-align:center; }
+  .acct-prompt .btn{ margin-top:10px; }
+  .deal-photo{ margin:-16px -16px 12px; height:140px; background-size:cover; background-position:center; border-radius:var(--radius-md) var(--radius-md) 0 0; }
   .deal-card h3{ margin:0 0 4px; font-size:1.02rem; }
   .deal-card p{ margin:0 0 10px; font-size:.86rem; color:var(--muted); }
   .deal-meta{ display:flex; flex-wrap:wrap; gap:8px; }
@@ -246,13 +288,18 @@
   <main id="homeView">
     <div class="store-banner"><img src="banner-sign.jpg" alt="Makka Halal Meat, Inc. — Goat, Lamb, Beef, Chicken — 404-297-0008"></div>
     <div class="promo-scroller" id="promoScroller"></div>
+    <section class="spotlight-section" id="spotlightSection" style="display:none;">
+      <div class="section-head" style="padding:16px 16px 6px;"><h2>✨ Featured today</h2></div>
+      <div class="spotlight-scroller" id="spotlightScroller"></div>
+      <div class="spotlight-dots" id="spotlightDots"></div>
+    </section>
     <div class="quick-cats" id="quickCats"></div>
     <div id="homePreviews"></div>
 
     <section class="store-info-card">
       <h2>Store information</h2>
-      <div class="info-row"><span>📍 Address</span><strong id="infoAddress"></strong></div>
-      <div class="info-row"><span>📞 Phone</span><strong id="infoPhone"></strong></div>
+      <div class="info-row"><span>📍 Address</span><a id="infoAddress" class="info-link" target="_blank" rel="noopener"></a></div>
+      <div class="info-row"><span>📞 Phone</span><a id="infoPhone" class="info-link"></a></div>
       <div class="info-row"><span>🛍️ Shopping</span><strong id="infoShopping"></strong></div>
       <div class="info-row"><span>📦 Order options</span><strong id="infoOrderOptions"></strong></div>
       <div class="info-row"><span>🕒 Hours</span><strong id="infoHours"></strong></div>
@@ -295,10 +342,59 @@
       <div class="topbar-row1">
         <button class="back-btn" onclick="switchView('home')">←</button>
         <div class="deptpage-title" style="font-size:1.05rem;">🧾 My Orders</div>
+        <button id="accountBtn" onclick="openAccountArea()" style="margin-left:auto;background:none;border:none;font-size:1.4rem;padding:6px;">👤</button>
       </div>
     </header>
+    <div id="accountSection"></div>
     <div class="deals-list" id="myOrdersList"></div>
   </main>
+
+  <div class="modal-backdrop" id="accountModal">
+    <div class="modal">
+      <h3 id="acctTitle">Sign in</h3>
+      <div id="acctSignupFields" style="display:none;">
+        <label class="flabel" for="acctName">Name</label>
+        <input id="acctName" class="field" placeholder="Your name">
+        <label class="flabel" for="acctPhone">Phone</label>
+        <input id="acctPhone" class="field" placeholder="(404) 555-0100" type="tel">
+      </div>
+      <div id="acctEmailWrap">
+        <label class="flabel" for="acctEmail">Email</label>
+        <input id="acctEmail" class="field" placeholder="you@example.com" type="email" autocomplete="email">
+      </div>
+      <div id="acctPasswordWrap">
+        <label class="flabel" for="acctPassword">Password</label>
+        <input id="acctPassword" class="field" placeholder="At least 8 characters" type="password" autocomplete="current-password">
+      </div>
+      <div id="acctMsg" style="font-size:.85rem;color:#b3262d;margin:2px 2px 12px;min-height:18px;"></div>
+      <button class="btn" id="acctSubmitBtn" onclick="submitAccountForm()">Sign in</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="toggleAccountMode()" id="acctToggleBtn">Don't have an account? Create one</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="openForgotModal()" id="acctForgotBtn">Forgot your password?</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="closeModalById('accountModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="forgotModal">
+    <div class="modal">
+      <h3>Reset your password</h3>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:.9rem;">Enter the email on your account and we'll send a link to set a new password.</p>
+      <label class="flabel" for="forgotEmail">Email</label>
+      <input id="forgotEmail" class="field" type="email" placeholder="you@example.com">
+      <div id="forgotMsg" style="font-size:.85rem;margin:2px 2px 12px;min-height:18px;"></div>
+      <button class="btn" onclick="submitForgotPassword()">Send reset link</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="closeModalById('forgotModal')">Back</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="resetModal">
+    <div class="modal">
+      <h3>Set a new password</h3>
+      <label class="flabel" for="resetPassword">New password</label>
+      <input id="resetPassword" class="field" type="password" placeholder="At least 8 characters" autocomplete="new-password">
+      <div id="resetMsg" style="font-size:.85rem;color:#b3262d;margin:2px 2px 12px;min-height:18px;"></div>
+      <button class="btn" onclick="submitResetPassword()">Set password</button>
+    </div>
+  </div>
 
   <!-- ===================== DEPARTMENT PAGE ===================== -->
   <main id="deptView" style="display:none;">
@@ -311,6 +407,17 @@
       <div class="cat-chips" id="deptPageChips"></div>
     </header>
     <div class="deptpage-body" id="deptPageBody"></div>
+  </main>
+
+  <main id="productView" style="display:none;">
+    <header class="deptpage-header">
+      <div class="deptpage-topline">
+        <button class="back-btn" onclick="closeProductPage()">←</button>
+        <div class="deptpage-title"><span>Item details</span></div>
+        <span class="deptpage-count"></span>
+      </div>
+    </header>
+    <div id="productBody" class="product-detail"></div>
   </main>
 
   <div class="cart-bar" id="cartBar" onclick="openCart()">
@@ -352,6 +459,12 @@
         <option value="substitute">Substitute a similar item</option>
         <option value="skip">Just skip it</option>
       </select>
+      <label class="flabel" for="promoInput">Promo code (optional)</label>
+      <div class="row" style="margin-bottom:0;">
+        <input id="promoInput" placeholder="e.g. WELCOME10" style="text-transform:uppercase; flex:1;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault();applyPromo();}">
+        <button class="btn ghost" type="button" style="flex:0 0 auto;" onclick="applyPromo()">Apply</button>
+      </div>
+      <div id="promoMsg" style="font-size:.85rem; margin:6px 2px 12px; min-height:18px;"></div>
       <div class="row">
         <button class="btn ghost" onclick="closeCheckoutModal()">Back</button>
         <button class="btn" id="payBtn" onclick="submitCheckout()">Continue to payment</button>
@@ -410,7 +523,7 @@ const DEPTS = [
   { id:"clothing",  label:"Clothing",             icon:"🧕", tile:"#7D6633" },
 ];
 const DEPT_MAP = Object.fromEntries(DEPTS.map(d=>[d.id,d]));
-const WEIGHT_CHIPS = [0.5, 1, 1.5, 2, 3, 5];
+const WEIGHT_CHIPS = [1, 1.5, 2, 3, 5];
 
 let PRODUCTS = [];
 let SETTINGS = {};
@@ -426,6 +539,25 @@ async function sb(path){
   if(!res.ok) throw new Error("Unable to load data");
   return res.json();
 }
+
+/* ---------------- lightweight visit tracking (for the owner's live count) ---------------- */
+function visitSessionId(){
+  let id = null;
+  try{ id = sessionStorage.getItem("mhm_session_id"); }catch(e){}
+  if(!id){
+    id = (crypto.randomUUID ? crypto.randomUUID() : "s-"+Date.now()+"-"+Math.random().toString(36).slice(2));
+    try{ sessionStorage.setItem("mhm_session_id", id); }catch(e){}
+  }
+  return id;
+}
+function pingVisit(){
+  fetch("/.netlify/functions/track-visit", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ session_id: visitSessionId() }),
+  }).catch(()=>{}); // never let a tracking hiccup interrupt shopping
+}
+pingVisit();
+setInterval(pingVisit, 25000);
 
 async function init(){
   renderSkeleton();
@@ -443,6 +575,7 @@ async function init(){
   renderDeptNav();
   renderQuickCats();
   renderPromos();
+  renderSpotlight();
   renderHomePreviews();
   renderDeals();
   restoreLocal();
@@ -451,8 +584,19 @@ async function init(){
 function applySettings(){
   if(SETTINGS.home_title) document.getElementById("storeName").textContent = SETTINGS.home_title;
   if(SETTINGS.store_hours) document.getElementById("storeHours").textContent = SETTINGS.store_hours;
-  document.getElementById("infoAddress").textContent = SETTINGS.store_address || "—";
-  document.getElementById("infoPhone").textContent = SETTINGS.store_phone || "—";
+  const address = SETTINGS.store_address || "";
+  const addrEl = document.getElementById("infoAddress");
+  addrEl.textContent = address || "—";
+  if (address) addrEl.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
+  else addrEl.removeAttribute("href");
+
+  const phone = SETTINGS.store_phone || "";
+  const phoneEl = document.getElementById("infoPhone");
+  phoneEl.textContent = phone || "—";
+  const digits = phone.replace(/[^0-9+]/g, "");
+  if (digits) phoneEl.href = "tel:" + digits;
+  else phoneEl.removeAttribute("href");
+
   document.getElementById("infoShopping").textContent = SETTINGS.store_shopping || "In-store & online";
   document.getElementById("infoOrderOptions").textContent = SETTINGS.store_order_options || "Store pickup";
   document.getElementById("infoHours").textContent = SETTINGS.store_hours || "—";
@@ -508,6 +652,61 @@ function renderPromos(){
   `;
 }
 
+/* ---------------- HOME: "Featured today" slideshow ---------------- */
+// The owner can pin specific items as "Featured" in admin.html; with none
+// pinned, it falls back to the same daily-rotating pick used by Search, so
+// the home page always has something fresh to show without extra setup.
+let spotlightTimer = null;
+function renderSpotlight(){
+  const section = document.getElementById("spotlightSection");
+  const pinned = PRODUCTS.filter(p => p.active !== false && p.featured);
+  const items = (pinned.length ? pinned : spotlightItems(6)).slice(0, 6);
+  if (!items.length){ section.style.display = "none"; return; }
+  section.style.display = "block";
+  const scroller = document.getElementById("spotlightScroller");
+  scroller.innerHTML = items.map(p => `
+    <div class="spotlight-slide" style="background-image:url('${p.image ? escapeAttr(p.image) : ""}')" onclick="quickAddFromSpotlight(${p.id})">
+      <div class="overlay">
+        <div class="s-name">${escapeHtml(p.name)}</div>
+        <div class="s-price">${p.price != null ? "$" + Number(p.price).toFixed(2) + (p.unit && p.unit !== "each" ? " " + escapeHtml(p.unit) : "") : "Ask in store"}</div>
+      </div>
+      ${p.price != null ? `<button class="s-add" onclick="event.stopPropagation();quickAddFromSpotlight(${p.id})" aria-label="Add">+</button>` : ""}
+    </div>`).join("");
+  document.getElementById("spotlightDots").innerHTML = items.map((_, i) => `<span class="spotlight-dot${i === 0 ? " active" : ""}"></span>`).join("");
+  scroller.scrollLeft = 0;
+  scroller.onscroll = debounce(() => updateSpotlightDots(scroller), 80);
+  startSpotlightAuto(items.length);
+}
+function updateSpotlightDots(scroller){
+  const idx = Math.round(scroller.scrollLeft / Math.max(1, scroller.clientWidth));
+  document.querySelectorAll(".spotlight-dot").forEach((d, i) => d.classList.toggle("active", i === idx));
+}
+function startSpotlightAuto(n){
+  if (spotlightTimer) clearInterval(spotlightTimer);
+  if (n <= 1) return;
+  let idx = 0;
+  spotlightTimer = setInterval(() => {
+    const scroller = document.getElementById("spotlightScroller");
+    // Skip a tick rather than jump while the tab is hidden or the person
+    // has scrolled away from Home — an animation nobody can see just burns
+    // battery, and jumping the instant they return would feel jarring.
+    if (!scroller || document.hidden || currentView !== "home") return;
+    idx = (idx + 1) % n;
+    scroller.scrollTo({ left: idx * scroller.clientWidth, behavior: "smooth" });
+  }, 4000);
+}
+function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function quickAddFromSpotlight(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p || p.price == null) return;
+  if (isWeighted(p)){ openWeightModal(id); return; }
+  const step = stepFor(p);
+  if (p.stock != null && (CART[id] || 0) + step > p.stock){ showToast(`Only ${p.stock} of ${p.name} in stock`); return; }
+  CART[id] = (CART[id] || 0) + step;
+  saveLocal(); refreshAllCardsFor(id); renderCartChrome();
+  showToast(`Added ${p.name}`);
+}
+
 /* ---------------- HOME: preview rows with "See all" ---------------- */
 function renderSkeleton(){
   document.getElementById("homePreviews").innerHTML = `<div class="grid">${'<div class="skeleton"></div>'.repeat(6)}</div>`;
@@ -542,10 +741,12 @@ function switchView(name){
   document.getElementById("searchView").style.display = name==="search" ? "block" : "none";
   document.getElementById("dealsView").style.display = name==="deals" ? "block" : "none";
   document.getElementById("ordersView").style.display = name==="orders" ? "block" : "none";
-  if(name==="orders") renderMyOrders();
+  if(name==="orders"){ renderAccountSection(); renderMyOrders(); }
+  if(name==="search" && !document.getElementById("searchInput2").value.trim()) renderSearchResults([], "", { browse: true });
   document.getElementById("deptView").style.display = name==="dept" ? "block" : "none";
+  document.getElementById("productView").style.display = name==="product" ? "block" : "none";
   document.querySelectorAll(".tab-btn").forEach(t => t.classList.toggle("active", t.dataset.tab===name));
-  if(name !== "dept"){ document.body.setAttribute("data-view", name==="home" ? "home" : "search"); }
+  if(name !== "dept" && name !== "product"){ document.body.setAttribute("data-view", name==="home" ? "home" : "search"); }
   window.scrollTo(0,0);
   if(name==="search") setTimeout(()=>{ const el=document.getElementById("searchInput2"); if(el) el.focus(); }, 50);
 }
@@ -573,6 +774,7 @@ function renderDeals(){
     const expiry = formatExpiry(d.expires_at);
     const soon = d.expires_at && daysUntil(d.expires_at) <= 3;
     return `<div class="deal-card">
+      ${d.image ? `<div class="deal-photo" style="background-image:url('${escapeAttr(d.image)}')"></div>` : ""}
       <h3>${escapeHtml(d.title)}</h3>
       ${d.description ? `<p>${escapeHtml(d.description)}</p>` : ""}
       <div class="deal-meta">
@@ -613,6 +815,85 @@ function openDeptPage(id, categoryFilter){
   }).join("");
 }
 
+/* ---------------- PRODUCT DETAIL PAGE ---------------- */
+// Remembers where the customer tapped in from (a department page keeps its
+// theme and category filter; search/home return to a neutral background),
+// so the back button feels like going back, not starting over.
+let productReturn = { view: "home" };
+function openProductPage(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return;
+  productReturn = currentView === "dept"
+    ? { view: "dept", deptId: currentDeptPage, bodyView: document.body.getAttribute("data-view"), bodyDept: document.body.getAttribute("data-dept") }
+    : { view: currentView, bodyView: document.body.getAttribute("data-view") };
+  // Borrow the department's color theme for the detail page too, so it doesn't
+  // feel like a jarring jump back to a neutral background and then forward again.
+  document.body.setAttribute("data-view", "dept");
+  document.body.setAttribute("data-dept", p.department);
+  switchView("product");
+  renderProductPage(id);
+}
+function closeProductPage(){
+  if(productReturn.view === "dept"){
+    document.body.setAttribute("data-view", productReturn.bodyView || "dept");
+    document.body.setAttribute("data-dept", productReturn.bodyDept || productReturn.deptId);
+    switchView("dept");
+  } else {
+    document.body.setAttribute("data-view", productReturn.bodyView || "home");
+    switchView(productReturn.view || "home");
+  }
+}
+function renderProductPage(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return;
+  const d = DEPT_MAP[p.department];
+  const media = p.image
+    ? `<div class="pd-media" style="background-image:url('${escapeAttr(p.image)}')"></div>`
+    : `<div class="pd-media">${p.emoji || "🛒"}</div>`;
+  const fav = FAVORITES[p.id] ? "❤️" : "🤍";
+  const outOfStock = p.stock != null && p.stock <= 0;
+  const lowStock = p.stock != null && p.stock > 0 && p.stock <= 5;
+  const chips = [
+    d ? `<span class="pd-chip">${d.icon} ${escapeHtml(d.label)}</span>` : "",
+    p.category ? `<span class="pd-chip">${escapeHtml(p.category)}</span>` : "",
+    lowStock ? `<span class="pd-chip">Only ${p.stock} left</span>` : "",
+  ].filter(Boolean).join("");
+
+  let actionHtml;
+  if(outOfStock){
+    actionHtml = `<div class="pd-action"><button class="btn ghost" disabled>Out of stock</button></div>`;
+  } else if(p.price == null){
+    actionHtml = `<div class="pd-action"><button class="btn ghost" disabled>Ask in store</button></div>`;
+  } else {
+    const qty = CART[p.id] || 0;
+    if(qty > 0){
+      const step = stepFor(p);
+      const editAttr = isWeighted(p) ? ` onclick="openWeightModal(${p.id})"` : "";
+      actionHtml = `<div class="pd-action"><div class="pd-stepper">
+        <button onclick="changeQty(${p.id},${-step}); renderProductPage(${p.id})">−</button>
+        <span${editAttr}>${fmtQty(p, qty)} in cart</span>
+        <button onclick="changeQty(${p.id},${step}); renderProductPage(${p.id})">+</button>
+      </div></div>`;
+    } else {
+      actionHtml = isWeighted(p)
+        ? `<div class="pd-action"><button class="btn" onclick="openWeightModal(${p.id})">Choose weight</button></div>`
+        : `<div class="pd-action"><button class="btn" onclick="bumpAdd(this,${p.id}); setTimeout(()=>renderProductPage(${p.id}),120)">Add to cart</button></div>`;
+    }
+  }
+
+  document.getElementById("productBody").dataset.pid = p.id;
+  document.getElementById("productBody").innerHTML = `
+    ${media}
+    <button class="pd-fav" onclick="toggleFav(${p.id}, this); this.textContent = FAVORITES[${p.id}] ? '❤️' : '🤍'">${fav}</button>
+    <h1>${escapeHtml(p.name)}</h1>
+    ${p.brand ? `<div class="pd-brand">${escapeHtml(p.brand)}</div>` : ""}
+    ${p.price != null ? `<div class="pd-price">$${Number(p.price).toFixed(2)} <span class="pd-unit">${escapeHtml(p.unit && p.unit !== "each" ? p.unit : "each")}</span></div>` : `<div class="pd-price">Ask in store</div>`}
+    <div class="pd-meta">${chips}</div>
+    ${p.description ? `<p class="pd-desc">${escapeHtml(p.description)}</p>` : ""}
+    ${actionHtml}
+  `;
+}
+
 /* ---------------- product cards ---------------- */
 function cardHtml(p){
   const media = p.image
@@ -630,7 +911,7 @@ function cardHtml(p){
   } else if(p.price != null){
     if(qty>0){
       const step = stepFor(p);
-      const editAttr = isWeighted(p) ? ` onclick="openWeightModal(${p.id})"` : "";
+      const editAttr = isWeighted(p) ? ` onclick="event.stopPropagation(); openWeightModal(${p.id})"` : "";
       control = `<div class="stepper">
         <button onclick="event.stopPropagation(); changeQty(${p.id},${-step})">−</button>
         <span class="qtytext"${editAttr}>${fmtQty(p,qty)}</span>
@@ -638,16 +919,16 @@ function cardHtml(p){
       </div>`;
     } else {
       control = isWeighted(p)
-        ? `<button class="add-btn" onclick="openWeightModal(${p.id})">+</button>`
-        : `<button class="add-btn" onclick="bumpAdd(this,${p.id})">+</button>`;
+        ? `<button class="add-btn" onclick="event.stopPropagation(); openWeightModal(${p.id})">+</button>`
+        : `<button class="add-btn" onclick="event.stopPropagation(); bumpAdd(this,${p.id})">+</button>`;
     }
   }
   const fav = FAVORITES[p.id] ? "❤️" : "🤍";
   const stockBadge = lowStock ? `<span class="badge">Only ${p.stock} left</span>` : "";
-  return `<div class="card" data-pid="${p.id}">
+  return `<div class="card" data-pid="${p.id}" onclick="openProductPage(${p.id})">
     ${media}
     ${stockBadge}
-    <button class="fav-btn" onclick="toggleFav(${p.id}, this)">${fav}</button>
+    <button class="fav-btn" onclick="event.stopPropagation(); toggleFav(${p.id}, this)">${fav}</button>
     <h3>${escapeHtml(p.name)}</h3>
     ${p.brand ? `<div class="brand">${escapeHtml(p.brand)}</div>` : ""}
     <div class="price-row">${priceHtml}${control}</div>
@@ -655,7 +936,9 @@ function cardHtml(p){
 }
 
 function bumpAdd(btn, id){
-  changeQty(id,1);
+  // Always called for a fresh add (qty was 0): starts weighted items at 1 lb and
+  // everything else at 1 unit — a sensible default the customer can fine-tune afterward.
+  changeQty(id, 1);
   btn.classList.add("added"); btn.textContent="✓";
 }
 
@@ -680,6 +963,7 @@ function refreshAllCardsFor(id){
     const p = PRODUCTS.find(x=>x.id===id);
     el.outerHTML = cardHtml(p);
   });
+  if(currentView === "product" && document.getElementById("productBody").dataset.pid == id) renderProductPage(id);
 }
 
 function toggleFav(id, btn){
@@ -700,13 +984,13 @@ function openWeightModal(id){
   const current = CART[id] || 0;
   const availableChips = p.stock!=null ? WEIGHT_CHIPS.filter(w=>w<=p.stock) : WEIGHT_CHIPS;
   document.getElementById("wmChips").innerHTML = availableChips.map(w =>
-    `<button class="wm-chip${current===w?' active':''}" onclick="pickWeightChip(${w}, this)">${w} lb</button>`
+    `<button class="wm-chip${current===w?' active':''}" data-w="${w}" onclick="pickWeightChip(${w}, this)">${w} lb</button>`
   ).join("");
   const customInput = document.getElementById("wmCustom");
   if(p.stock!=null) customInput.max = p.stock;
   customInput.value = (current && !WEIGHT_CHIPS.includes(current)) ? current : "";
-  updateWeightTotal(current || (availableChips[1] || availableChips[0] || 0));
-  if(!current) document.querySelectorAll(".wm-chip")[1]?.classList.add("active");
+  updateWeightTotal(current || (availableChips[0] || 0));
+  if(!current) document.querySelectorAll(".wm-chip")[0]?.classList.add("active");
   document.getElementById("wmRemoveBtn").style.display = current>0 ? "block" : "none";
   document.getElementById("weightModal").classList.add("open");
   customInput.oninput = () => {
@@ -728,7 +1012,7 @@ function updateWeightTotal(w){
 function confirmWeight(){
   const custom = parseFloat(document.getElementById("wmCustom").value);
   const activeChip = document.querySelector(".wm-chip.active");
-  let weight = custom > 0 ? custom : (activeChip ? Number(activeChip.textContent) : WEIGHT_CHIPS[1]);
+  let weight = custom > 0 ? custom : (activeChip ? Number(activeChip.dataset.w) : WEIGHT_CHIPS[0]);
   if(!weight || weight<=0){ showToast("Enter a weight greater than 0."); return; }
   const p = PRODUCTS.find(x=>x.id===weightModalProductId);
   if(p.stock != null && weight > p.stock){
@@ -752,24 +1036,122 @@ function removeFromWeightModal(){
 function closeWeightModal(){ document.getElementById("weightModal").classList.remove("open"); weightModalProductId=null; }
 
 /* ---------------- search ---------------- */
+// A small typo-tolerant search: exact and "starts with" matches rank
+// highest, then substring matches anywhere in the name/brand/category,
+// then near-misses (a couple of letters off, like "chiken" -> "chicken").
+// Nothing the customer types ever dead-ends into a blank page — a weak
+// or empty result set falls back to popular picks and related items.
+const POPULAR_TERMS = ["Lamb", "Chicken", "Goat", "Beef", "Rice", "Halal deli"];
+
+function editDistanceWithin(a, b, max){
+  // Cheap bounded Levenshtein: bails out early past `max`, so it stays fast
+  // even scanning the whole catalog on every keystroke.
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({length: b.length + 1}, (_, i) => i);
+  for (let i = 1; i <= a.length; i++){
+    const cur = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++){
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      const v = Math.min(cur[j-1] + 1, prev[j] + 1, prev[j-1] + cost);
+      cur.push(v);
+      if (v < rowMin) rowMin = v;
+    }
+    if (rowMin > max) return max + 1; // this row can only get worse — stop early
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function wordScore(word, query){
+  if (word === query) return 100;
+  if (word.startsWith(query)) return 90 - Math.min(20, word.length - query.length);
+  if (word.includes(query)) return 70;
+  const maxDist = query.length <= 4 ? 1 : query.length <= 7 ? 2 : 3;
+  const d = editDistanceWithin(word, query, maxDist);
+  if (d <= maxDist) return 55 - d * 12; // a typo still scores well enough to clear the results threshold below
+  return 0;
+}
+function matchScore(p, query){
+  const fields = [
+    [p.name || "", 1], [p.brand || "", 0.7], [p.category || "", 0.6], [p.subcategory || "", 0.5],
+  ];
+  let best = 0;
+  for (const [text, weight] of fields){
+    const words = text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    for (const w of words) best = Math.max(best, wordScore(w, query) * weight);
+    // also credit a match against the whole phrase, so "ground beef" scores on "beef ground" too
+    best = Math.max(best, wordScore(text.toLowerCase(), query) * weight * 0.9);
+  }
+  return best;
+}
+function searchProducts(query){
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const words = q.split(/\s+/).filter(Boolean);
+  const scored = PRODUCTS.filter(p => p.active !== false).map(p => {
+    const score = words.reduce((sum, w) => sum + matchScore(p, w), 0) / words.length;
+    return { p, score };
+  }).filter(x => x.score >= 38).sort((a,b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
+  return scored;
+}
+function spotlightItems(n){
+  // A stable "pick of the day" rather than truly random, so the same
+  // items don't reshuffle every time someone taps back into Search.
+  // Prefer items with a real price (one-tap to add) over "Ask in store" ones.
+  const priced = PRODUCTS.filter(p => p.active !== false && p.price != null && (p.image || p.emoji));
+  const pool = priced.length >= n ? priced : PRODUCTS.filter(p => p.active !== false && (p.image || p.emoji));
+  const seed = new Date().toISOString().slice(0,10).split("-").reduce((s,x)=>s+Number(x),0);
+  const shuffled = pool.map((p,i) => ({p, k: ((i+1)*2654435761 + seed*40503) % 2147483647}))
+    .sort((a,b) => a.k - b.k).map(x => x.p);
+  return shuffled.slice(0, n);
+}
 function showFavorites(){
   switchView("search");
   const ids = Object.keys(FAVORITES).map(Number);
   const items = PRODUCTS.filter(p => ids.includes(p.id));
-  renderSearchResults(items, "Saved items");
+  renderSearchResults(items.map(p=>({p})), "Saved items", { isFavorites: true });
+}
+function searchChipHtml(term){
+  return `<button class="search-chip" onclick="setSearchQuery('${escAttrJs(term)}')">${escapeHtml(term)}</button>`;
+}
+function setSearchQuery(term){
+  const el = document.getElementById(currentView === "search" ? "searchInput2" : "searchInput");
+  if (el) el.value = term;
+  onSearch(currentView === "search");
+}
+function browseHtml(){
+  const items = spotlightItems(10);
+  return `
+    <div class="search-browse">
+      <div class="search-chips">${POPULAR_TERMS.map(searchChipHtml).join("")}</div>
+      ${items.length ? `<div class="section-head" style="padding:16px 0 8px;"><h2>You might like</h2></div><div class="row-scroller">${items.map(cardHtml).join("")}</div>` : ""}
+    </div>`;
 }
 function onSearch(fromSecondary){
-  const q = (fromSecondary ? document.getElementById("searchInput2").value : document.getElementById("searchInput").value).trim().toLowerCase();
+  const q = (fromSecondary ? document.getElementById("searchInput2").value : document.getElementById("searchInput").value);
   if(!fromSecondary){ switchView("search"); document.getElementById("searchInput2").value = q; }
-  if(!q){ renderSearchResults([], ""); return; }
-  const items = PRODUCTS.filter(p => p.name.toLowerCase().includes(q) || (p.brand||"").toLowerCase().includes(q));
-  renderSearchResults(items, `Results for "${q}"`);
+  if(!q.trim()){ renderSearchResults([], "", { browse: true }); return; }
+  const results = searchProducts(q);
+  renderSearchResults(results, `Results for "${q.trim()}"`, { query: q.trim() });
 }
-function renderSearchResults(items, label){
+function renderSearchResults(scored, label, opts){
+  opts = opts || {};
   const wrap = document.getElementById("searchResults");
-  if(!label && !items.length){ wrap.innerHTML = `<div class="search-empty">Search for lamb, rice, chicken, halal deli…</div>`; return; }
-  if(!items.length){ wrap.innerHTML = `<div class="search-empty">No matches. Try a different word.</div>`; return; }
-  wrap.innerHTML = `<div class="section-head" style="padding:14px 0 8px;"><h2>${label}</h2><span class="count">${items.length} items</span></div><div class="grid">${items.map(cardHtml).join("")}</div>`;
+  if (opts.browse) { wrap.innerHTML = browseHtml(); return; }
+  if (opts.isFavorites && !scored.length) {
+    wrap.innerHTML = `<div class="search-empty">No saved items yet.<br>Tap the ♥ on anything you like.</div>${browseHtml()}`; return;
+  }
+  const items = scored.map(x => x.p);
+  if (!items.length) {
+    // A near-miss search still gets something useful: a few related items
+    // instead of a dead end, plus a nudge to try another word.
+    const related = spotlightItems(8);
+    wrap.innerHTML = `
+      <div class="search-empty">No exact matches for "${escapeHtml(opts.query || "")}". Here's what's popular instead:</div>
+      <div class="row-scroller">${related.map(cardHtml).join("")}</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="section-head" style="padding:14px 0 8px;"><h2>${label}</h2><span class="count">${items.length} item${items.length===1?"":"s"}</span></div><div class="grid">${items.map(cardHtml).join("")}</div>`;
 }
 
 /* ---------------- cart ---------------- */
@@ -805,7 +1187,7 @@ function renderDrawer(){
     </div>`;
   }).join("") : `<div class="empty-state"><div class="big">🧺</div>Your cart is empty.<br>Find something delicious above.</div>`;
   const subtotal = lines.reduce((s,{p,qty})=>s+p.price*qty,0);
-  const tax = subtotal*0.03;
+  const tax = lines.reduce((s,{p,qty})=>s + p.price*qty*(p.is_food===false ? 0.08 : 0.03), 0);
   document.getElementById("sumSubtotal").textContent = "$"+subtotal.toFixed(2);
   document.getElementById("sumTax").textContent = "$"+tax.toFixed(2);
   document.getElementById("sumTotal").textContent = "$"+(subtotal+tax).toFixed(2);
@@ -815,6 +1197,14 @@ function closeCart(){ document.getElementById("drawer").classList.remove("open")
 function openCheckoutModal(){
   if(!cartLines().length){ showToast("Your cart is empty."); return; }
   buildPickupSlots();
+  appliedPromo = null;
+  document.getElementById("promoInput").value = "";
+  document.getElementById("promoMsg").textContent = "";
+  if(CUSTOMER){
+    if(!document.getElementById("custName").value.trim()) document.getElementById("custName").value = CUSTOMER.name || "";
+    if(!document.getElementById("custEmail").value.trim()) document.getElementById("custEmail").value = CUSTOMER.email || "";
+    if(!document.getElementById("custPhone").value.trim()) document.getElementById("custPhone").value = CUSTOMER.phone || "";
+  }
   document.getElementById("checkoutModal").classList.add("open");
 }
 
@@ -856,6 +1246,26 @@ function buildPickupSlots(){
 }
 function closeCheckoutModal(){ document.getElementById("checkoutModal").classList.remove("open"); }
 
+let appliedPromo = null; // { code, amount } — re-checked for real at checkout, never trusted as final
+async function applyPromo(){
+  const input = document.getElementById("promoInput");
+  const msg = document.getElementById("promoMsg");
+  const code = input.value.trim();
+  if(!code){ appliedPromo = null; msg.textContent = ""; return; }
+  const subtotal = cartLines().reduce((s,{p,qty})=>s+p.price*qty,0);
+  msg.style.color = "var(--muted)"; msg.textContent = "Checking…";
+  try{
+    const res = await fetch("/.netlify/functions/validate-promo", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ code, subtotal }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "That code isn't valid.");
+    appliedPromo = { code: data.code, amount: data.amount };
+    msg.style.color = "#2E7D53";
+    msg.textContent = `✓ ${data.title} — $${data.amount.toFixed(2)} off (applied at payment)`;
+  }catch(e){ appliedPromo = null; msg.style.color = "#b3262d"; msg.textContent = e.message; }
+}
+
 async function submitCheckout(){
   const name = document.getElementById("custName").value.trim();
   const phone = document.getElementById("custPhone").value.trim();
@@ -866,8 +1276,9 @@ async function submitCheckout(){
   const items = cartLines().map(({p,qty})=>({id:p.id, qty}));
   try{
     const res = await fetch("/.netlify/functions/create-checkout-session", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ items, name, phone, email, requested_pickup: document.getElementById("pickupSlot").value || null, substitution_pref: document.getElementById("subPref").value }),
+      method:"POST", headers:{"Content-Type":"application/json", ...(CUSTOMER_TOKEN ? {"x-customer-token":CUSTOMER_TOKEN} : {})},
+      body: JSON.stringify({ items, name, phone, email, requested_pickup: document.getElementById("pickupSlot").value || null, substitution_pref: document.getElementById("subPref").value,
+        promo_code: appliedPromo ? appliedPromo.code : (document.getElementById("promoInput").value.trim() || undefined) }),
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error || "Unable to start checkout");
@@ -908,28 +1319,194 @@ function rememberOrder(orderCode, phone){
   list = list.slice(0, 20); // keep the most recent 20 on this device
   try{ localStorage.setItem("mhm_my_orders", JSON.stringify(list)); }catch(e){}
 }
+/* ---------------- customer accounts (optional — guest checkout still works) ---------------- */
+let CUSTOMER_TOKEN = null, CUSTOMER = null, acctMode = "signin";
+function loadCustomerFromStorage(){
+  try{ CUSTOMER_TOKEN = localStorage.getItem("mhm_customer_token") || null; CUSTOMER = JSON.parse(localStorage.getItem("mhm_customer")||"null"); }
+  catch(e){ CUSTOMER_TOKEN = null; CUSTOMER = null; }
+}
+function saveCustomerSession(token, info){
+  CUSTOMER_TOKEN = token; CUSTOMER = info;
+  try{ localStorage.setItem("mhm_customer_token", token); localStorage.setItem("mhm_customer", JSON.stringify(info)); }catch(e){}
+}
+function clearCustomerSession(){
+  CUSTOMER_TOKEN = null; CUSTOMER = null;
+  try{ localStorage.removeItem("mhm_customer_token"); localStorage.removeItem("mhm_customer"); }catch(e){}
+}
+function closeModalById(id){ document.getElementById(id).classList.remove("open"); }
+
+function openAccountArea(){ if(!CUSTOMER_TOKEN) openAccountModal("signin"); }
+function openAccountModal(mode){
+  acctMode = mode;
+  document.getElementById("acctEmail").value = mode==="edit" ? (CUSTOMER && CUSTOMER.email || "") : "";
+  document.getElementById("acctPassword").value = "";
+  document.getElementById("acctName").value = mode==="edit" ? (CUSTOMER && CUSTOMER.name || "") : "";
+  document.getElementById("acctPhone").value = mode==="edit" ? (CUSTOMER && CUSTOMER.phone || "") : "";
+  document.getElementById("acctMsg").textContent = "";
+  applyAccountMode();
+  document.getElementById("accountModal").classList.add("open");
+}
+function applyAccountMode(){
+  const signup = acctMode==="signup", edit = acctMode==="edit";
+  document.getElementById("acctTitle").textContent = edit ? "Edit profile" : (signup ? "Create account" : "Sign in");
+  document.getElementById("acctSignupFields").style.display = (signup||edit) ? "block" : "none";
+  document.getElementById("acctEmailWrap").style.display = edit ? "none" : "block";
+  document.getElementById("acctPasswordWrap").style.display = edit ? "none" : "block";
+  document.getElementById("acctSubmitBtn").textContent = edit ? "Save changes" : (signup ? "Create account" : "Sign in");
+  document.getElementById("acctToggleBtn").style.display = edit ? "none" : "block";
+  document.getElementById("acctToggleBtn").textContent = signup ? "Already have an account? Sign in" : "Don't have an account? Create one";
+  document.getElementById("acctForgotBtn").style.display = edit ? "none" : "block";
+  document.getElementById("acctPassword").setAttribute("autocomplete", signup ? "new-password" : "current-password");
+}
+function toggleAccountMode(){ acctMode = acctMode==="signup" ? "signin" : "signup"; document.getElementById("acctMsg").textContent=""; applyAccountMode(); }
+
+async function submitAccountForm(){
+  const msg = document.getElementById("acctMsg"); msg.style.color = "#b3262d";
+  const btn = document.getElementById("acctSubmitBtn"); const original = btn.textContent;
+  try{
+    if(acctMode==="edit"){
+      btn.disabled = true; btn.textContent = "Saving…";
+      const res = await fetch("/.netlify/functions/customer-me", {
+        method:"PATCH", headers:{"Content-Type":"application/json", "x-customer-token":CUSTOMER_TOKEN},
+        body: JSON.stringify({ name: document.getElementById("acctName").value.trim(), phone: document.getElementById("acctPhone").value.trim() }),
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || "Unable to save changes");
+      saveCustomerSession(CUSTOMER_TOKEN, data);
+      closeModalById("accountModal"); showToast("Profile updated"); renderAccountSection();
+      return;
+    }
+    const email = document.getElementById("acctEmail").value.trim();
+    const password = document.getElementById("acctPassword").value;
+    if(!email || !password){ msg.textContent = "Enter your email and password."; return; }
+    btn.disabled = true; btn.textContent = acctMode==="signup" ? "Creating…" : "Signing in…";
+    const path = acctMode==="signup" ? "customer-signup" : "customer-login";
+    const body = acctMode==="signup"
+      ? { email, password, name: document.getElementById("acctName").value.trim(), phone: document.getElementById("acctPhone").value.trim() }
+      : { email, password };
+    const res = await fetch(`/.netlify/functions/${path}`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Something went wrong");
+    saveCustomerSession(data.token, { email:data.email, name:data.name||"", phone:data.phone||"" });
+    closeModalById("accountModal");
+    showToast(acctMode==="signup" ? `Welcome, ${data.name || "there"}!` : "Signed in");
+    renderAccountSection();
+    if(currentView==="orders") renderMyOrders();
+  }catch(e){ msg.textContent = e.message; }
+  btn.disabled = false; btn.textContent = original;
+}
+function signOutCustomer(){
+  clearCustomerSession();
+  renderAccountSection();
+  if(currentView==="orders") renderMyOrders();
+  showToast("Signed out");
+}
+function renderAccountSection(){
+  const el = document.getElementById("accountSection");
+  if(!el) return;
+  if(CUSTOMER_TOKEN && CUSTOMER){
+    el.innerHTML = `<div class="acct-card">
+      <div class="name">${escapeHtml(CUSTOMER.name || CUSTOMER.email)}</div>
+      <div class="sub">${escapeHtml(CUSTOMER.email)}${CUSTOMER.phone ? " · " + escapeHtml(CUSTOMER.phone) : ""}</div>
+      <div class="row">
+        <button class="btn ghost" onclick="openAccountModal('edit')">Edit profile</button>
+        <button class="btn ghost" onclick="signOutCustomer()">Sign out</button>
+      </div>
+    </div>`;
+  } else {
+    el.innerHTML = `<div class="acct-prompt">
+      <div style="font-weight:700;">Sign in to see your order history</div>
+      <div style="color:var(--muted);font-size:.88rem;margin-top:2px;">Or keep going as a guest — you can still track orders by phone number below.</div>
+      <button class="btn" onclick="openAccountModal('signin')">Sign in or create account</button>
+    </div>`;
+  }
+}
+
+function openForgotModal(){
+  closeModalById("accountModal");
+  document.getElementById("forgotEmail").value = document.getElementById("acctEmail").value.trim();
+  document.getElementById("forgotMsg").textContent = "";
+  document.getElementById("forgotModal").classList.add("open");
+}
+async function submitForgotPassword(){
+  const email = document.getElementById("forgotEmail").value.trim();
+  const msg = document.getElementById("forgotMsg");
+  if(!email){ msg.style.color="#b3262d"; msg.textContent = "Enter your email."; return; }
+  msg.style.color = "var(--muted)"; msg.textContent = "Sending…";
+  try{
+    const res = await fetch("/.netlify/functions/customer-forgot-password", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ email }) });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Something went wrong");
+    msg.style.color = "#2E7D53"; msg.textContent = data.message;
+  }catch(e){ msg.style.color="#b3262d"; msg.textContent = e.message; }
+}
+
+let resetCtx = null;
+function checkForPasswordResetLink(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("reset"), email = params.get("email");
+  if(!token || !email) return;
+  resetCtx = { token, email };
+  document.getElementById("resetPassword").value = "";
+  document.getElementById("resetMsg").textContent = "";
+  document.getElementById("resetModal").classList.add("open");
+  // clean the link out of the address bar so a refresh/share doesn't resubmit it
+  const url = new URL(window.location.href); url.searchParams.delete("reset"); url.searchParams.delete("email");
+  window.history.replaceState({}, "", url.toString());
+}
+async function submitResetPassword(){
+  if(!resetCtx) return;
+  const newPassword = document.getElementById("resetPassword").value;
+  const msg = document.getElementById("resetMsg"); msg.style.color = "#b3262d";
+  if(newPassword.length < 8){ msg.textContent = "Password must be at least 8 characters."; return; }
+  try{
+    const res = await fetch("/.netlify/functions/customer-reset-password", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ email: resetCtx.email, token: resetCtx.token, new_password: newPassword }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Unable to reset your password");
+    closeModalById("resetModal"); resetCtx = null;
+    showToast("Password updated — sign in with your new password.");
+    openAccountModal("signin");
+    document.getElementById("acctEmail").value = "";
+  }catch(e){ msg.textContent = e.message; }
+}
+
 let myOrdersBusy = false;
 async function renderMyOrders(silent){
   const wrap = document.getElementById("myOrdersList");
   let list = [];
   try{ list = JSON.parse(localStorage.getItem("mhm_my_orders")||"[]"); }catch(e){ list = []; }
-  if(!list.length){ wrap.innerHTML = `<div class="deal-empty">No orders yet on this device.<br>Your pickup orders will show up here.</div>`; return; }
+  if(!list.length && !CUSTOMER_TOKEN){ wrap.innerHTML = `<div class="deal-empty">No orders yet on this device.<br>Your pickup orders will show up here.</div>`; return; }
   if(myOrdersBusy) return; myOrdersBusy = true;
   if(!silent) wrap.innerHTML = `<div class="deal-empty">Loading your orders…</div>`;
   try{
-    const results = await Promise.all(list.map(async o => {
+    const guestResults = await Promise.all(list.map(async o => {
       try{
         const res = await fetch(`/.netlify/functions/order-status?order_code=${encodeURIComponent(o.order_code)}&phone=${encodeURIComponent(o.phone)}`);
         if(!res.ok) return null;
         const data = await res.json();
         data._phone = o.phone;
-        data._exp = Date.now() + (data.cancel_seconds_left||0)*1000;   // when the cancel window closes, by the store's clock
         return data;
       }catch(e){ return null; }
     }));
-    const cards = results.filter(Boolean).map(orderCardHtml).join("");
+    let acctResults = [];
+    if(CUSTOMER_TOKEN){
+      try{
+        const res = await fetch("/.netlify/functions/customer-orders", { headers:{"x-customer-token":CUSTOMER_TOKEN} });
+        if(res.ok){ acctResults = (await res.json()).map(o => ({ ...o, _phone: o.customer_phone || "" })); }
+      }catch(e){ /* account orders are additive — a hiccup here shouldn't block guest orders from showing */ }
+    }
+    // merge, de-duplicated by order_code (an order placed while signed in appears in both lists)
+    const byCode = new Map();
+    [...acctResults, ...guestResults.filter(Boolean)].forEach(o => { if(o && o.order_code) byCode.set(o.order_code, o); });
+    const merged = [...byCode.values()].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+    merged.forEach(o => { o._exp = Date.now() + (o.cancel_seconds_left||0)*1000; });
+
+    const cards = merged.map(orderCardHtml).join("");
     if(currentView !== "orders") return;
-    wrap.innerHTML = cards || `<div class="deal-empty">Couldn't load your orders right now.</div>`;
+    wrap.innerHTML = cards || `<div class="deal-empty">No orders yet.<br>Your pickup orders will show up here.</div>`;
     tickCancel();
   } finally { myOrdersBusy = false; }
 }
@@ -1055,6 +1632,8 @@ function escAttrJs(s){ return String(s||"").replace(/'/g,"\\'"); }
 if("serviceWorker" in navigator){ window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
 
 init();
+loadCustomerFromStorage();
+checkForPasswordResetLink();
 </script>
 </body>
 </html>

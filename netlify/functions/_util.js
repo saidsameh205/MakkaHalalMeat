@@ -4,7 +4,9 @@ const JSON_HEADERS = { 'Content-Type': 'application/json', 'Cache-Control': 'no-
 
 // Flat estimated tax rate used for order totals (checkout and GIF's
 // adjusted totals both read it from here so they can never disagree).
-const TAX_RATE = 0.03;
+const FOOD_TAX_RATE = 0.03;
+const NONFOOD_TAX_RATE = 0.08;
+const TAX_RATE = FOOD_TAX_RATE; // kept as an alias — some older code/orders assume one flat rate
 
 // Cancellation / refund policy. Everything below is enforced on the server,
 // so no screen (or tampered request) can bypass it.
@@ -52,30 +54,37 @@ function requireAdmin(event) {
   return { ok: true };
 }
 
-// ---------- personal staff sessions (GIF sign-in with name + PIN) ----------
-const SESSION_HOURS = 16;          // one long shift; sign in again next day
+// ---------- signed sessions (staff PINs, and now customer accounts) ----------
+const SESSION_HOURS = 16;          // staff shift length; sign in again next day
+const CUSTOMER_SESSION_DAYS = 30;  // customers stay signed in much longer
 const b64url = (buf) => Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const unb64url = (str) => Buffer.from(String(str).replace(/-/g, '+').replace(/_/g, '/'), 'base64');
 
 // Sessions are signed with a key derived from ADMIN_TOKEN, so there is no
-// extra secret to set up. (Changing ADMIN_TOKEN signs everyone out.)
-function sessionKey() {
+// extra secret to set up. (Changing ADMIN_TOKEN signs everyone out.) `kind`
+// keeps different session types cryptographically separate — a customer
+// token is signed with a different salt than a staff token, so one can
+// never be forged into or mistaken for the other, even though they share
+// the same root secret.
+function sessionKey(kind) {
   const a = process.env.ADMIN_TOKEN;
   if (!a) return null;
-  return crypto.createHmac('sha256', a).update('gif-session-v1').digest();
+  return crypto.createHmac('sha256', a).update(`${kind}-session-v1`).digest();
 }
-function signSession(payload) {
-  const key = sessionKey();
+function signSession(payload, kind = 'gif') {
+  const key = sessionKey(kind);
   if (!key) throw new Error('Server is missing the ADMIN_TOKEN environment variable.');
   const body = b64url(JSON.stringify(payload));
   const sig = b64url(crypto.createHmac('sha256', key).update(body).digest());
-  return `gif1.${body}.${sig}`;
+  const prefix = kind === 'gif' ? 'gif1' : `${kind}1`;
+  return `${prefix}.${body}.${sig}`;
 }
 // -> payload | { expired: true } | null (not a valid session token)
-function verifySession(token) {
+function verifySession(token, kind = 'gif') {
+  const prefix = kind === 'gif' ? 'gif1' : `${kind}1`;
   const parts = String(token || '').split('.');
-  if (parts.length !== 3 || parts[0] !== 'gif1') return null;
-  const key = sessionKey();
+  if (parts.length !== 3 || parts[0] !== prefix) return null;
+  const key = sessionKey(kind);
   if (!key) return null;
   const expected = b64url(crypto.createHmac('sha256', key).update(parts[1]).digest());
   if (!safeEqual(parts[2], expected)) return null;
@@ -86,8 +95,9 @@ function verifySession(token) {
   return payload;
 }
 
-// PINs are stored only as a salted scrypt hash — nobody (including the admin)
-// can look a PIN up again; they can only reset it.
+// Salted scrypt hash — nobody (including the store) can look a PIN or
+// password back up, only reset it. Generic: used for staff PINs and
+// customer passwords alike.
 function hashPin(pin) {
   const salt = crypto.randomBytes(16);
   const hash = crypto.scryptSync(String(pin), salt, 32);
@@ -99,6 +109,7 @@ function checkPin(pin, stored) {
   const got = crypto.scryptSync(String(pin || ''), v === 's1' && salt ? Buffer.from(salt, 'base64') : Buffer.alloc(16), 32);
   return v === 's1' && crypto.timingSafeEqual(got, want);
 }
+const hashPassword = hashPin, checkPassword = checkPin; // same scrypt hashing, clearer names for account code
 function generatePin() { return String(crypto.randomInt(0, 1000000)).padStart(6, '0'); }
 // Rejects PINs that are obvious to guess (1111, 1234, 654321 ...).
 function isWeakPin(pin) {
@@ -106,6 +117,19 @@ function isWeakPin(pin) {
   const d = pin.split('').map(Number);
   const step = d[1] - d[0];
   return (step === 1 || step === -1) && d.every((n, i) => i === 0 || n - d[i - 1] === step);
+}
+// A one-way-hashed, one-time token for "forgot password" email links —
+// same idea as a PIN: only its hash is ever stored, so a leaked database
+// can't be used to reset anyone's password.
+function generateResetToken() { return crypto.randomBytes(32).toString('base64url'); }
+function hashResetToken(token) { return crypto.createHash('sha256').update(String(token)).digest('base64url'); }
+// A simple, honest password rule: long enough to matter, nothing clever
+// that just annoys people into writing it on a sticky note.
+function isWeakPassword(pw) {
+  return String(pw || '').length < 8;
+}
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
 }
 
 // Used by the GIF staff app. A caller may present:
@@ -149,6 +173,35 @@ async function requireStaff(event) {
   if (adminToken && safeEqual(provided, adminToken)) return { ok: true, isAdmin: true, staffName: 'Admin' };
   if (staffToken && safeEqual(provided, staffToken)) return { ok: true, isAdmin: false, staffName: 'Shared staff code' };
   return unauthorized();
+}
+
+// Used by account-only customer endpoints (profile, order history tied to
+// the account). Presented as a 'cust1.' session token from customer-login
+// or customer-signup. Re-checked against the customers table on every
+// request, same reasoning as staff: a password reset or account deactivation
+// takes effect immediately, not just on next login.
+async function requireCustomer(event) {
+  const provided = header(event, 'x-customer-token');
+  const unauthorized = (msg) => ({ ok: false, response: json(401, { error: msg || 'Unauthorized' }) });
+  if (!provided) return unauthorized();
+
+  const session = verifySession(provided, 'cust');
+  if (!session) return unauthorized();
+  if (session.expired) return unauthorized('Your session ended — please sign in again.');
+
+  let row = null;
+  try {
+    const rows = await supabaseFetch(`customers?id=eq.${encodeURIComponent(session.sid)}&select=id,email,name,phone,active,sessions_valid_after`);
+    row = rows && rows[0];
+  } catch (e) {
+    console.error('requireCustomer: lookup failed', e);
+    return { ok: false, response: json(500, { error: 'Unable to check your sign-in right now.' }) };
+  }
+  if (!row || !row.active) return unauthorized('This account is no longer active.');
+  if (row.sessions_valid_after && (session.iat || 0) < new Date(row.sessions_valid_after).getTime()) {
+    return unauthorized('Your session ended — please sign in again.');
+  }
+  return { ok: true, customerId: row.id, email: row.email, name: row.name, phone: row.phone };
 }
 
 // Adds one line to an order's activity log (who did what), keeping the last 80.
@@ -237,24 +290,34 @@ async function restoreOrderStock(items) {
 // Works out what an order is worth now, given what staff actually picked:
 // picked items at the picked weight, substitutes at their own price,
 // unavailable items at nothing, and untouched items as originally ordered.
+// Each item carries its own tax_rate (food 3% / non-food 8%), snapshotted at
+// checkout — same reasoning as price/name: a later change to a product's
+// category should never rewrite the tax on an order already placed. Orders
+// from before this feature existed have no tax_rate on their items, so they
+// fall back to the old flat food rate (which is what they were actually charged).
 function computeAdjusted(items) {
-  let subtotal = 0;
+  let subtotal = 0, tax = 0;
   for (const it of items || []) {
     const price = Number(it.price) || 0;
+    const rate = it.tax_rate != null ? Number(it.tax_rate) : FOOD_TAX_RATE;
     const status = it.pick_status || 'pending';
-    if (status === 'unavailable') continue;
-    if (status === 'substituted') {
+    let amount = 0;
+    if (status === 'unavailable') {
+      amount = 0;
+    } else if (status === 'substituted') {
       const sub = it.substitute || {};
-      subtotal += (Number(sub.price) || 0) * (Number(sub.qty) || 0);
+      amount = (Number(sub.price) || 0) * (Number(sub.qty) || 0);
     } else if (status === 'picked') {
       const q = it.picked_qty != null ? Number(it.picked_qty) : Number(it.qty);
-      subtotal += price * (Number.isFinite(q) ? q : 0);
+      amount = price * (Number.isFinite(q) ? q : 0);
     } else {
-      subtotal += price * (Number(it.qty) || 0);
+      amount = price * (Number(it.qty) || 0);
     }
+    subtotal += amount;
+    tax += amount * rate;
   }
   const sub = round2(subtotal);
-  return { adjusted_subtotal: sub, adjusted_total: round2(sub + sub * TAX_RATE) };
+  return { adjusted_subtotal: sub, adjusted_total: round2(sub + round2(tax)) };
 }
 
 // Seconds left in the customer's cancellation window (0 once it has closed).
@@ -264,13 +327,22 @@ function cancelSecondsLeft(order, nowMs = Date.now()) {
 }
 
 module.exports = {
+  FOOD_TAX_RATE,
+  NONFOOD_TAX_RATE,
   SESSION_HOURS,
+  CUSTOMER_SESSION_DAYS,
   signSession,
   verifySession,
   hashPin,
   checkPin,
+  hashPassword,
+  checkPassword,
   generatePin,
   isWeakPin,
+  generateResetToken,
+  hashResetToken,
+  isWeakPassword,
+  isValidEmail,
   appendEvent,
   cancelSecondsLeft,
   CANCEL_WINDOW_MINUTES,
@@ -281,6 +353,7 @@ module.exports = {
   safeEqual,
   requireAdmin,
   requireStaff,
+  requireCustomer,
   supabaseFetch,
   supabaseStorageUpload,
   restoreStock,

@@ -52,6 +52,9 @@
     <a href="gif.html" target="_blank" style="color:#fff;font-size:.85rem;margin-left:auto;margin-right:12px;text-decoration:underline;">Open GIF staff app ↗</a>
     <button class="btn ghost" style="background:rgba(255,255,255,.15); color:#fff; border-color:rgba(255,255,255,.4);" onclick="signOut()">Sign out</button>
   </header>
+  <div id="visitorStrip" style="padding:8px 20px;background:#f4ede1;border-bottom:1px solid #e3d7c2;font-size:.88rem;font-weight:600;color:#5b4a2f;">
+    <span id="visitorLive">Loading visitor stats…</span>
+  </div>
   <main>
     <div class="tabs">
       <div class="tab active" data-tab="orders" onclick="showTab('orders')">Orders</div>
@@ -86,7 +89,7 @@
         <span class="msg" id="productsMsg"></span>
       </div>
       <table>
-        <thead><tr><th>Name</th><th>Dept</th><th>Category</th><th>Price</th><th>Unit</th><th>Stock</th><th>Image path</th><th>Photo</th><th>Active</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Dept</th><th>Category</th><th>Description</th><th>Price</th><th>Unit</th><th>Stock</th><th>Image path</th><th>Photo</th><th>Active</th><th>Tax</th><th>Featured</th><th></th></tr></thead>
         <tbody id="productsBody"></tbody>
       </table>
     </section>
@@ -97,8 +100,10 @@
         <button class="btn small" onclick="loadDeals()">Refresh</button>
         <span class="msg" id="dealsMsg"></span>
       </div>
+      <p class="msg">Give a deal a <b>code and a discount</b> to actually take money off at checkout. A deal with no code
+        (or no discount amount) just shows as a notice on the Deals tab — nothing to redeem.</p>
       <table>
-        <thead><tr><th>Title</th><th>Description</th><th>Requirements</th><th>Code</th><th>Expires</th><th>Active</th><th></th></tr></thead>
+        <thead><tr><th>Title</th><th>Description</th><th>Requirements</th><th>Code</th><th>Discount</th><th>Photo</th><th>Expires</th><th>Active</th><th></th></tr></thead>
         <tbody id="dealsBody"></tbody>
       </table>
     </section>
@@ -161,7 +166,7 @@ async function signIn() {
     sessionStorage.setItem("mhm_admin_token", TOKEN);
     document.getElementById("gate").style.display = "none";
     document.getElementById("app").style.display = "block";
-    loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam();
+    loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam(); loadVisitorStats(); startVisitorPolling();
   } catch (e) {
     document.getElementById("gateMsg").textContent = "Incorrect token, or ADMIN_TOKEN isn't set in Netlify yet.";
   }
@@ -171,7 +176,7 @@ function signOut() { sessionStorage.removeItem("mhm_admin_token"); location.relo
 if (TOKEN) {
   document.getElementById("gate").style.display = "none";
   document.getElementById("app").style.display = "block";
-  loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam();
+  loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam(); loadVisitorStats(); startVisitorPolling();
 }
 
 function showTab(name) {
@@ -272,6 +277,7 @@ function productRow(p) {
     <td><input value="${escAttr(p.name)}" data-field="name"></td>
     <td><input value="${escAttr(p.department)}" data-field="department"></td>
     <td><input value="${escAttr(p.category)}" data-field="category"></td>
+    <td><textarea data-field="description" rows="2" placeholder="Optional — shown to customers on the item's page" style="width:150px;resize:vertical;">${escHtml(p.description || "")}</textarea></td>
     <td><input value="${p.price == null ? "" : p.price}" data-field="price" type="number" step="0.01"></td>
     <td><input value="${escAttr(p.unit || "")}" data-field="unit"></td>
     <td><input value="${p.stock == null ? "" : p.stock}" data-field="stock" type="number" step="1" placeholder="blank = unlimited"></td>
@@ -281,6 +287,13 @@ function productRow(p) {
       <div class="msg" data-field="uploadMsg"></div>
     </td>
     <td><input type="checkbox" data-field="active" ${p.active ? "checked" : ""}></td>
+    <td>
+      <select data-field="is_food" title="Which sales tax rate applies to this item">
+        <option value="true" ${p.is_food !== false ? "selected" : ""}>Food (3%)</option>
+        <option value="false" ${p.is_food === false ? "selected" : ""}>Non-food (8%)</option>
+      </select>
+    </td>
+    <td><input type="checkbox" data-field="featured" ${p.featured ? "checked" : ""} title="Show in the home page's Featured today slideshow"></td>
     <td class="row-actions">
       <button class="btn small" onclick="saveProduct(${p.id})">Save</button>
       <button class="btn small ghost" onclick="deleteProduct(${p.id})">Remove</button>
@@ -321,11 +334,14 @@ function readRow(id) {
     name: get("name").value,
     department: get("department").value,
     category: get("category").value,
+    description: get("description").value,
     price: get("price").value === "" ? null : Number(get("price").value),
     unit: get("unit").value,
     stock: get("stock").value === "" ? null : Number(get("stock").value),
     image: get("image").value,
     active: get("active").checked,
+    is_food: get("is_food").value === "true",
+    featured: get("featured").checked,
   };
 }
 async function saveProduct(id) {
@@ -340,8 +356,9 @@ async function deleteProduct(id) {
 async function addProductRow() {
   const name = prompt("Product name:"); if (!name) return;
   const department = prompt("Department (meat, grocery, household, beauty, baby, clothing):", "grocery");
+  const is_food = !["household", "beauty", "baby", "clothing"].includes(String(department || "").trim().toLowerCase());
   try {
-    const created = await api("admin-products", { method: "POST", body: JSON.stringify({ id: Date.now(), name, department, category: department, price: null, unit: "each", active: true }) });
+    const created = await api("admin-products", { method: "POST", body: JSON.stringify({ id: Date.now(), name, department, category: department, price: null, unit: "each", active: true, is_food }) });
     PRODUCTS.unshift(created); renderProducts();
   } catch (e) { alert(e.message); }
 }
@@ -357,11 +374,25 @@ function renderDealsRows(deals) {
 }
 function dealRow(d) {
   const expiresVal = d.expires_at ? new Date(d.expires_at).toISOString().slice(0,10) : "";
+  const type = d.discount_type || "";
   return `<tr data-id="${d.id}">
     <td><input value="${escAttr(d.title)}" data-field="title"></td>
     <td><input value="${escAttr(d.description || "")}" data-field="description"></td>
     <td><input value="${escAttr(d.requirements || "")}" data-field="requirements"></td>
-    <td><input value="${escAttr(d.code || "")}" data-field="code"></td>
+    <td><input value="${escAttr(d.code || "")}" data-field="code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"></td>
+    <td>
+      <select data-field="discount_type" style="margin-bottom:4px;">
+        <option value="" ${!type ? "selected" : ""}>No discount (just a notice)</option>
+        <option value="percent" ${type === "percent" ? "selected" : ""}>% off</option>
+        <option value="amount" ${type === "amount" ? "selected" : ""}>$ off</option>
+      </select>
+      <input type="number" min="0" step="0.01" value="${d.discount_value != null ? d.discount_value : ""}" data-field="discount_value" placeholder="10" style="width:80px;">
+    </td>
+    <td>
+      <input value="${escAttr(d.image || "")}" data-field="image" placeholder="deals/example.jpg" style="width:100px;">
+      <input type="file" accept="image/*;capture=camera" style="max-width:100px;" onchange="uploadDealPhoto(${d.id}, this)">
+      <div class="msg" data-field="uploadMsg"></div>
+    </td>
     <td><input type="date" value="${expiresVal}" data-field="expires_at"></td>
     <td><input type="checkbox" data-field="active" ${d.active ? "checked" : ""}></td>
     <td class="row-actions">
@@ -370,21 +401,47 @@ function dealRow(d) {
     </td>
   </tr>`;
 }
+async function uploadDealPhoto(dealId, input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const tr = input.closest("tr");
+  const msgEl = tr.querySelector('[data-field="uploadMsg"]');
+  msgEl.textContent = "Uploading…";
+  try {
+    const dataBase64 = await fileToBase64(file);
+    const result = await api("admin-upload-photo", {
+      method: "POST",
+      body: JSON.stringify({ dealId, filename: file.name, contentType: file.type, dataBase64 }),
+    });
+    tr.querySelector('[data-field="image"]').value = result.url;
+    msgEl.textContent = "Uploaded — click Save to apply.";
+  } catch (e) {
+    msgEl.textContent = e.message || "Upload failed";
+  }
+}
 function readDealRow(id) {
   const tr = document.querySelector(`#dealsBody tr[data-id="${id}"]`);
   const get = (f) => tr.querySelector(`[data-field="${f}"]`);
+  const type = get("discount_type").value || null;
+  const valRaw = get("discount_value").value;
   return {
     id,
     title: get("title").value,
     description: get("description").value,
     requirements: get("requirements").value,
-    code: get("code").value,
+    code: get("code").value.trim().toUpperCase(),
+    discount_type: type,
+    discount_value: type && valRaw !== "" ? Number(valRaw) : null,
+    image: get("image").value,
     expires_at: get("expires_at").value || null,
     active: get("active").checked,
   };
 }
 async function saveDeal(id) {
-  try { await api("admin-discounts", { method: "PATCH", body: JSON.stringify(readDealRow(id)) }); document.getElementById("dealsMsg").textContent = "Saved."; }
+  const row = readDealRow(id);
+  if (row.code && row.discount_type && !(row.discount_value > 0)) { alert("Enter how much the code takes off (a number greater than 0)."); return; }
+  if (row.discount_type && !row.code) { alert("A discount needs a code customers can type in at checkout."); return; }
+  try { await api("admin-discounts", { method: "PATCH", body: JSON.stringify(row) }); document.getElementById("dealsMsg").textContent = "Saved."; }
   catch (e) { alert(e.message); }
 }
 async function deleteDeal(id) {
@@ -399,6 +456,18 @@ async function addDealRow() {
     window._deals = [created, ...(window._deals || [])]; renderDealsRows(window._deals);
   } catch (e) { alert(e.message); }
 }
+
+/* ---------------- Visitor stats (live + today) ---------------- */
+async function loadVisitorStats(){
+  try{
+    const s = await api("admin-analytics");
+    const el = document.getElementById("visitorLive");
+    const dot = s.live_now > 0 ? "🟢" : "⚪️";
+    el.textContent = `${dot} ${s.live_now} on the site right now · ${s.today} visit${s.today === 1 ? "" : "s"} today`;
+  }catch(e){ /* quiet — this is a nice-to-have, not worth interrupting the admin over */ }
+}
+let visitorPollStarted = false;
+function startVisitorPolling(){ if (visitorPollStarted) return; visitorPollStarted = true; setInterval(loadVisitorStats, 20000); }
 
 /* ---------------- Team ---------------- */
 const escH = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -506,6 +575,7 @@ async function saveSettings() {
 }
 
 function escAttr(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;"); }
+function escHtml(s) { return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 </script>
 </body>
 </html>

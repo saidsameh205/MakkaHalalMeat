@@ -59,11 +59,28 @@ exports.handler = async (event) => {
 
 function sanitizeDiscount(b) {
   const out = {};
-  if (b.id !== undefined) out.id = Number(b.id);
+  // NOTE: id is intentionally never included here. discounts.id is a
+  // GENERATED ALWAYS identity column — Postgres rejects writing ANY value
+  // to it, even the row's own unchanged id, which is exactly what broke
+  // every deal edit before this fix. The id is only ever used in the URL
+  // filter (discounts?id=eq....), never in the update body.
   if (b.title !== undefined) out.title = String(b.title).slice(0, 200);
   if (b.description !== undefined) out.description = String(b.description).slice(0, 500);
   if (b.requirements !== undefined) out.requirements = String(b.requirements).slice(0, 300);
-  if (b.code !== undefined) out.code = String(b.code).slice(0, 50);
+  if (b.code !== undefined) out.code = String(b.code).trim().slice(0, 50).toUpperCase();
+  if (b.image !== undefined) out.image = String(b.image).slice(0, 500);
+  if (b.discount_type !== undefined) {
+    if (b.discount_type !== null && b.discount_type !== 'percent' && b.discount_type !== 'amount') {
+      throw new Error("discount_type must be 'percent', 'amount', or blank");
+    }
+    out.discount_type = b.discount_type || null;
+  }
+  if (b.discount_value !== undefined) {
+    const v = b.discount_value === null || b.discount_value === '' ? null : Number(b.discount_value);
+    if (v !== null && (!Number.isFinite(v) || v <= 0)) throw new Error('discount_value must be a number greater than 0');
+    if (v !== null && out.discount_type === 'percent' && v > 100) throw new Error('A percent discount cannot be more than 100');
+    out.discount_value = v;
+  }
   if (b.expires_at !== undefined) out.expires_at = b.expires_at ? new Date(b.expires_at).toISOString() : null;
   if (b.active !== undefined) out.active = !!b.active;
   return out;
