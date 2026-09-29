@@ -14,12 +14,15 @@ create table if not exists public.products (
   department text not null,        -- meat | grocery | household | beauty | baby | clothing
   category text not null,          -- e.g. "Beef", "Pantry"
   subcategory text default '',
+  description text default '',        -- optional; shown on the customer's product detail page when set
   price numeric(10,2),             -- null = "market price" / call for price
   unit text default 'each',        -- '/ lb', 'each', etc.
   image text default '',           -- path under /product-images, or a full https URL
   emoji text default '',           -- fallback glyph shown when there's no image
   brand text default '',
   active boolean not null default true,
+  featured boolean not null default false,  -- pin to the home page's "Featured today" slideshow
+  is_food boolean not null default true,     -- true = taxed at the food rate (3%), false = non-food rate (8%)
   sort_order int not null default 0,
   stock numeric(10,2),             -- null = unlimited stock; otherwise auto-decreases as orders are placed (can be fractional for by-the-pound items)
   created_at timestamptz not null default now(),
@@ -31,6 +34,13 @@ create index if not exists idx_products_department on public.products (departmen
 -- Adds the stock column even if this table already existed from an earlier
 -- run of this file (CREATE TABLE IF NOT EXISTS alone wouldn't add it).
 alter table public.products add column if not exists stock numeric(10,2);
+alter table public.products add column if not exists featured boolean not null default false;
+alter table public.products add column if not exists description text default '';
+alter table public.products add column if not exists is_food boolean not null default true;
+-- Sensible one-time default: household/beauty/baby/clothing start as non-food; meat/grocery stay food.
+-- Review and adjust per item afterward in admin.html (some "grocery" items — paper towels, foil,
+-- cleaning supplies — are really non-food, and some "baby" items — formula, baby food — are food).
+update public.products set is_food = false where department in ('household','beauty','baby','clothing');
 -- If stock was created earlier as a whole number, allow fractional pounds:
 alter table public.products alter column stock type numeric(10,2);
 
@@ -71,7 +81,10 @@ create table if not exists public.discounts (
   title text not null,
   description text default '',
   requirements text default '',   -- e.g. "Minimum $30 purchase", "Lamb & goat cuts only"
-  code text default '',           -- optional promo code customers mention at pickup
+  code text default '',           -- promo code the customer enters at checkout
+  discount_type text,             -- 'percent' or 'amount' -- null/no code = informational only, no discount applied
+  discount_value numeric(10,2),   -- 10 = 10% off, or $10.00 off, depending on discount_type
+  image text default '',          -- optional photo shown on the Deals tab
   expires_at timestamptz,         -- null = no expiration
   active boolean not null default true,
   created_at timestamptz not null default now(),
@@ -143,6 +156,11 @@ alter table public.orders add column if not exists refund_decision_note text;
 alter table public.orders add column if not exists refund_approved_amount numeric(10,2);
 alter table public.orders add column if not exists refunded_amount numeric(10,2);
 alter table public.orders add column if not exists events jsonb not null default '[]'::jsonb;
+alter table public.orders add column if not exists discount_code text;
+alter table public.orders add column if not exists discount_amount numeric(10,2);
+alter table public.discounts add column if not exists discount_type text;
+alter table public.discounts add column if not exists discount_value numeric(10,2);
+alter table public.discounts add column if not exists image text default '';
 
 -- ---------- TEAM (personal PINs for the GIF staff app) ----------
 -- One row per associate. PINs are stored only as a salted hash, so nobody can
@@ -166,6 +184,44 @@ create unique index if not exists idx_staff_name_key on public.staff (name_key);
 alter table public.staff enable row level security;   -- no policies: only the server can touch it
 grant all privileges on public.staff to service_role;
 grant usage, select on all sequences in schema public to service_role;
+
+-- ---------- CUSTOMER ACCOUNTS (optional — guest checkout still works) ----------
+-- An account is never required to order; it just lets a customer see their
+-- past orders and stay signed in across visits. Passwords are stored only
+-- as a salted hash — same approach as staff PINs — so nobody, including the
+-- store, can look one up; only a reset is possible.
+create table if not exists public.customers (
+  id bigint generated always as identity primary key,
+  email text not null,
+  email_key text not null,              -- lowercased/trimmed, used for lookup
+  password_hash text not null,
+  name text default '',
+  phone text default '',
+  active boolean not null default true,
+  failed_attempts int not null default 0,
+  locked_until timestamptz,
+  reset_token_hash text,                -- set only while a "forgot password" link is outstanding
+  reset_token_expires timestamptz,
+  sessions_valid_after timestamptz,     -- a password reset signs out every earlier session
+  last_login_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create unique index if not exists idx_customers_email_key on public.customers (email_key);
+alter table public.customers enable row level security;   -- no policies: only the server can touch it
+grant all privileges on public.customers to service_role;
+
+alter table public.orders add column if not exists customer_id bigint references public.customers(id);
+
+-- ---------- VISITS (simple, cookieless traffic + live-visitor count) ----------
+-- One row per browser session (a random id the page keeps in sessionStorage,
+-- so it resets when the tab closes — no cookies, nothing tied to a person).
+create table if not exists public.visits (
+  session_id text primary key,
+  first_seen timestamptz not null default now(),
+  last_seen timestamptz not null default now()
+);
+alter table public.visits enable row level security;   -- no policies: only the server (service_role) can read/write it
+grant all privileges on public.visits to service_role;
 
 -- ---------- PRODUCT PHOTO STORAGE ----------
 -- A public bucket so admin.html can upload real photos instead of typing

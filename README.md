@@ -53,6 +53,104 @@ Orders are only handed to the store once payment is confirmed. Checkouts that ar
 abandoned are closed automatically after about 30 minutes and their reserved
 stock is released.
 
+## Customer accounts (email + password) — optional, guest checkout unaffected
+
+- **Sign in or create an account** from the Orders tab (tap the 👤 icon). Signing in is
+  never required to order — guest checkout works exactly as before.
+- **Order history tied to the account**: any order placed while signed in shows up under
+  My Orders automatically, from any device, alongside the existing phone-number lookup.
+- **Passwords are stored only as a salted hash** — the same approach as staff PINs — so
+  nobody, including you, can look one up; only a reset is possible.
+- **"Forgot password"** works today by telling the customer plainly that email reset isn't
+  set up yet, with no crash and no dead end. The moment you add `RESEND_API_KEY` in
+  Netlify, it starts actually sending reset emails automatically — no re-upload needed.
+- **Lockout after 5 wrong password attempts** (15 minutes), same protection as staff PINs.
+- I ran a full security test suite against this — session forgery, password reset
+  single-use/expiry, account privacy (no one can see another customer's orders), and
+  confirmed guest checkout is completely unaffected even with an expired or garbage token.
+- One-time database update: run **`supabase-update-accounts.sql`** in Supabase.
+- **To finish enabling real reset emails later:** add two Netlify environment variables —
+  `RESEND_API_KEY` (from your Resend account) and optionally `RESEND_FROM` (e.g.
+  `Makka Halal Meat <support@makkahalalmeat.com>`, once that domain is verified in Resend).
+
+## Fixed: the weight quick-pick buttons (1 lb / 1.5 lb / 2 lb / 3 lb / 5 lb)
+
+The popup for weighing meat is back to how it worked before (my last update misread what
+you meant). What I found and actually fixed: clicking a preset weight button read its
+**display text** ("2 lb") as a number instead of its real value, so `Number("2 lb")` came out
+`NaN` and the tap silently failed — that's why the buttons looked broken. Now each button
+carries its real number separately from its label, so every one of them works, and the
+"enter your own weight" field still works exactly as before. Also removed the smallest
+preset (0.5 lb) — there was never a literal 0.25 lb button, so if you meant something else,
+let me know.
+
+## Sales tax: 3% for food, 8% for non-food
+
+- Each product in `admin.html` → Products now has a **Tax** dropdown: **Food (3%)** or
+  **Non-food (8%)**. On upload, meat and grocery default to food; household, beauty, baby,
+  and clothing default to non-food — worth a quick pass to fix any exceptions (paper towels
+  in "grocery," baby formula in "baby," etc.).
+- Promo code discounts are split proportionally across food and non-food, so tax is always
+  computed on what was actually paid for each — tested against several discount scenarios.
+- Orders placed before this update keep working correctly at the old flat 3% rate; nothing
+  about past orders changes.
+- One-time database update: run **`supabase-update-tax.sql`** in Supabase.
+
+## Admin: live visitor count
+
+- A small strip now sits at the top of every tab in `admin.html`: **🟢 3 on the site right
+  now · 41 visits today**, refreshing automatically.
+- No cookies, no personal data — just a random id the browser keeps for as long as that tab
+  is open, the same idea as a "who's online" counter.
+- No new service and no extra cost — it's a small table in the Supabase you already have.
+- One-time database update: run **`supabase-update-visits.sql`** in Supabase.
+
+## No more forced weight popup, and an optional description per item
+
+- **Tapping + on a by-the-pound item now just adds it** (1 lb to start), the same as any
+  other item — no popup interrupts them. Once it's in the cart, tapping the quantity still
+  opens the exact weight picker for anyone who wants something other than 1 lb. This applies
+  everywhere: grid cards, the item's own page, and the home slideshow's quick-add.
+- **Optional product description:** in `admin.html` → Products, each row now has a
+  Description box. Leave it blank (the default) or type a couple of sentences — either way
+  is fine, it's entirely optional. When set, it shows on that item's own page for customers
+  (added in the last update); when blank, nothing extra shows.
+- One-time database update: run **`supabase-update-description.sql`** in Supabase.
+
+## Tappable address & phone, and a real product page for each item
+
+- **Address and phone now actually work.** On the home page's Store information card,
+  the address opens Google Maps and the phone number opens the dialer — both use
+  whatever you've set in `admin.html` → Settings, no extra setup needed.
+- **Every item now has its own page.** Tapping a product card (anywhere — home, search,
+  a department page) opens a full detail page: bigger photo, name, brand, category, price,
+  and the same add-to-cart / choose-weight controls. Tapping the heart or the + button
+  still just favorites or adds it, without leaving the list. The back button returns
+  exactly where the customer was — the same search results, or the same department
+  with its color theme — not back to Home.
+- No database changes and no SQL to run for this one.
+
+## Fixed: editing a deal gave an error
+
+Deals couldn't be edited because Postgres refuses to accept a write to `discounts.id`
+even when the value is unchanged (it auto-generates that column). Every save was quietly
+sending it back, so every edit failed. Fixed in `admin-discounts.js` — nothing to do on
+your end besides re-uploading.
+
+## Deal photos + a "Featured today" slideshow
+
+- **Deal photos:** in `admin.html` → Deals, each row now has a photo picker just like
+  Products — pick a photo from your phone, it uploads, then Save. It shows at the top of
+  that deal's card on the customer's Deals tab.
+- **Featured today slideshow:** the home page now has an auto-advancing photo slideshow
+  under the top banner. Swipe it manually, or leave it — it moves on its own every few
+  seconds and pauses when the tab isn't visible or you've left Home.
+  - **You control it:** tick **Featured** next to any product in `admin.html` → Products
+    to pin it to the slideshow.
+  - **No pinned items?** It automatically rotates through your priced, photographed items
+    instead, changing daily, so the slideshow is never empty and needs no setup.
+- One-time database update: run **`supabase-update-deals-featured.sql`** in Supabase.
+
 ## Team: a personal PIN for each associate
 
 Instead of one shared code, every associate signs in to GIF with their **own name + PIN**.
