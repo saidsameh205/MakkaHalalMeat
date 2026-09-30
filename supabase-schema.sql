@@ -203,6 +203,7 @@ create table if not exists public.customers (
   reset_token_hash text,                -- set only while a "forgot password" link is outstanding
   reset_token_expires timestamptz,
   sessions_valid_after timestamptz,     -- a password reset signs out every earlier session
+  favorites jsonb not null default '[]'::jsonb,  -- product ids the customer has favorited
   last_login_at timestamptz,
   created_at timestamptz not null default now()
 );

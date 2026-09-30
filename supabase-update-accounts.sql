@@ -25,3 +25,4 @@ alter table public.customers enable row level security;
 grant all privileges on public.customers to service_role;
 
 alter table public.orders add column if not exists customer_id bigint references public.customers(id);
+alter table public.customers add column if not exists favorites jsonb not null default '[]'::jsonb;

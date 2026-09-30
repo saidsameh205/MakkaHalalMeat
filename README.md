@@ -53,6 +53,42 @@ Orders are only handed to the store once payment is confirmed. Checkouts that ar
 abandoned are closed automatically after about 30 minutes and their reserved
 stock is released.
 
+## v17 — Scroll fix, SVG nav icons, dark/light theme toggle, faster slideshow
+
+- **Scroll glitch fixed.** Switching tabs or views no longer lets the scroll position
+  bleed between them. The page always resets to the top on every navigation.
+- **Professional SVG navigation icons** — all five bottom tab icons (Home, Search,
+  Deals, Orders, Cart) and all six department icons are now clean line-art SVGs instead
+  of emojis. Same for the cart button in the top header.
+- **Dark / Light theme toggle.** Tap ☀️ in the top-right to switch to a dark background.
+  The preference is saved and remembered across visits. Both themes look good — the
+  default stays light, but use dark for evening browsing or personal preference.
+- **Slideshow advances faster (every 3 seconds instead of 4)** and no longer glitches
+  back to slide 0 when it can't measure the scroller width correctly.
+- **Resend DNS + API key**: domain records verified, `RESEND_API_KEY` added to Netlify —
+  password reset emails will now send as soon as the domain verifies in Resend dashboard.
+
+## v16 — My Account dashboard, Support page, Buy Again, Resend DNS
+
+- **My Account dashboard** — tapping 👤 now opens a proper screen: avatar with initial,
+  name, email, and a menu of My Orders / My Favorites / Buy Again / Support & Inquiries /
+  Edit Profile / Sign Out. The Orders tab shows a slim "Signed in as X · My Account ›"
+  strip above the order list instead of a large card.
+- **Support & Inquiries page** — reachable from the account menu: Order Support (opens
+  email app with order number prefilled when signed in), General Inquiries, Call Us,
+  and Store Hours — all in one place.
+- **Buy Again** — loads items from your last 5 orders, lets you adjust quantities, then
+  adds them all at once to the cart. Builds on the existing order-history system.
+- **Favorites synced to account** — tap ❤️ on any item while signed in and it's saved
+  to the account, not just this device. Signing in on a new device merges cloud favorites
+  with local ones, never losing either.
+- **Resend DNS** — add 3 records in Squarespace (see DNS instructions) then verify in
+  Resend dashboard. Once done, password reset emails will send automatically.
+- **Netlify env vars to add:** `RESEND_API_KEY` (from Resend API Keys tab) and optionally
+  `RESEND_FROM` = `Makka Halal Meat <support@makkahalalmeat.com>` (once domain verified).
+- Schema change: `favorites jsonb not null default '[]'` on customers table — included in
+  the catch-up SQL.
+
 ## Customer accounts (email + password) — optional, guest checkout unaffected
 
 - **Sign in or create an account** from the Orders tab (tap the 👤 icon). Signing in is

@@ -8,7 +8,7 @@ exports.handler = async (event) => {
 
   try {
     if (event.httpMethod === 'GET') {
-      return json(200, { email: auth.email, name: auth.name || '', phone: auth.phone || '' });
+      return json(200, { email: auth.email, name: auth.name || '', phone: auth.phone || '', favorites: auth.favorites || [] });
     }
 
     if (event.httpMethod === 'PATCH') {
@@ -16,6 +16,12 @@ exports.handler = async (event) => {
       const patch = {};
       if (b.name !== undefined) patch.name = String(b.name).trim().slice(0, 60);
       if (b.phone !== undefined) patch.phone = String(b.phone).trim().slice(0, 30);
+      // favorites: an array of product ids stored as a jsonb column, so a customer's
+      // liked items follow them across devices when they sign in.
+      if (b.favorites !== undefined) {
+        const ids = Array.isArray(b.favorites) ? b.favorites.map(Number).filter(Number.isFinite) : [];
+        patch.favorites = ids;
+      }
       if (!Object.keys(patch).length) return json(400, { error: 'Nothing to update' });
 
       const rows = await supabaseFetch(`customers?id=eq.${auth.customerId}`, {
