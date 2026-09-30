@@ -191,7 +191,7 @@ async function requireCustomer(event) {
 
   let row = null;
   try {
-    const rows = await supabaseFetch(`customers?id=eq.${encodeURIComponent(session.sid)}&select=id,email,name,phone,active,sessions_valid_after`);
+    const rows = await supabaseFetch(`customers?id=eq.${encodeURIComponent(session.sid)}&select=id,email,name,phone,active,sessions_valid_after,favorites`);
     row = rows && rows[0];
   } catch (e) {
     console.error('requireCustomer: lookup failed', e);
@@ -201,7 +201,7 @@ async function requireCustomer(event) {
   if (row.sessions_valid_after && (session.iat || 0) < new Date(row.sessions_valid_after).getTime()) {
     return unauthorized('Your session ended — please sign in again.');
   }
-  return { ok: true, customerId: row.id, email: row.email, name: row.name, phone: row.phone };
+  return { ok: true, customerId: row.id, email: row.email, name: row.name, phone: row.phone, favorites: row.favorites || [] };
 }
 
 // Adds one line to an order's activity log (who did what), keeping the last 80.
