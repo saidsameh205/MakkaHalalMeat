@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Makka Halal Meat — Order for Pickup</title>
 <meta name="description" content="Fresh halal meat, groceries and more from Makka Halal Meat. Order ahead for pickup.">
 <link rel="manifest" href="manifest.json">
@@ -48,8 +48,10 @@
   .theme-label-l{ left:6px; }
   .theme-label-r{ right:6px; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html{scroll-behavior:smooth; height:100%; overflow:hidden;}
-  body{ overflow-y:auto; height:100%; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  html{scroll-behavior:smooth; height:100%; overflow:hidden; overflow-x:hidden;}
+  body{ overflow-y:auto; overflow-x:hidden; height:100%; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; max-width:100vw; position:relative; }
+  main{ overflow-x:hidden; max-width:100vw; }
+  *{ max-width:100%; }
   body{
     margin:0; font-family:'IBM Plex Sans',system-ui,sans-serif;
     background:var(--bg); color:var(--fg);
@@ -86,7 +88,7 @@
   .search-box input{ border:none; background:none; outline:none; font-size:.92rem; width:100%; color:var(--ink); }
   .search-box svg{ flex:0 0 auto; opacity:.55; }
 
-  .depts-strip{ display:flex; gap:8px; overflow-x:auto; padding:0 16px 12px; scrollbar-width:none; }
+  .depts-strip{ display:flex; gap:8px; overflow-x:auto; padding:0 16px 12px; scrollbar-width:none; touch-action:pan-x; }
   .depts-strip::-webkit-scrollbar{display:none;}
   .dept-pill{ flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:999px; background:var(--paper); border:1px solid var(--line); font-size:.82rem; font-weight:600; color:var(--ink); cursor:pointer; transition:.18s; }
   .dept-pill.active{ background:var(--dept-tint); color:#fff; border-color:transparent; }
@@ -662,6 +664,7 @@ const DEPT_ICONS = {
   beauty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
   baby: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
   clothing: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>`,
+  candy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M9.5 2.672a.5.5 0 0 1 1 0V4h3V2.672a.5.5 0 0 1 1 0V4h1a2 2 0 0 1 2 2v1h1.328a.5.5 0 0 1 0 1H17v3h1.328a.5.5 0 0 1 0 1H17v3h1.328a.5.5 0 0 1 0 1H17v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1H5.672a.5.5 0 0 1 0-1H7v-3H5.672a.5.5 0 0 1 0-1H7V7H5.672a.5.5 0 0 1 0-1H7V6a2 2 0 0 1 2-2h1V2.672z"/></svg>`,
 };
 const DEPTS = [
   { id:"meat",      label:"Fresh Meat & Poultry", icon:"🥩", tile:"#8C1A1E" },
@@ -670,6 +673,7 @@ const DEPTS = [
   { id:"beauty",    label:"Beauty",               icon:"💄", tile:"#A8506A" },
   { id:"baby",      label:"Baby",                 icon:"👶", tile:"#4A6F9C" },
   { id:"clothing",  label:"Clothing",             icon:"🧕", tile:"#7D6633" },
+  { id:"candy",     label:"Candy & Sweets",        icon:"🍬", tile:"#C0527D" },
 ];
 const DEPT_MAP = Object.fromEntries(DEPTS.map(d=>[d.id,d]));
 const WEIGHT_CHIPS = [1, 1.5, 2, 3, 5];
