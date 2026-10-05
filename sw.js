@@ -1,4 +1,4 @@
-const CACHE = 'makka-halal-v14';
+const CACHE = 'makka-halal-v16';
 const ASSETS = ['./', './index.html', './manifest.json', './hero-banner.png', './banner-sign.jpg', './icon-180.png', './icon-192.png', './icon-512.png',
   './gif.html', './gif-manifest.json', './gif-icon-180.png', './gif-icon-192.png', './gif-icon-512.png'];
 

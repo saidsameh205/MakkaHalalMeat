@@ -80,7 +80,7 @@
         <input id="productSearch" placeholder="Search products…" oninput="renderProducts()">
         <select id="productDeptFilter" onchange="renderProducts()">
           <option value="">All departments</option>
-          <option value="meat">Meat</option><option value="grocery">Grocery</option>
+          <option value="meat">Meat</option><option value="grocery">Grocery</option><option value="household">Household</option><option value="beauty">Beauty</option><option value="baby">Baby</option><option value="clothing">Clothing</option><option value="candy">Candy & Sweets</option>
           <option value="household">Household</option><option value="beauty">Beauty</option>
           <option value="baby">Baby</option><option value="clothing">Clothing</option>
         </select>
@@ -276,7 +276,10 @@ function productRow(p) {
   return `<tr data-id="${p.id}">
     <td><input value="${escAttr(p.name)}" data-field="name"></td>
     <td><input value="${escAttr(p.department)}" data-field="department"></td>
-    <td><input value="${escAttr(p.category)}" data-field="category"></td>
+    <td>
+      <input value="${escAttr(p.category)}" data-field="category" list="cats_${p.id}" placeholder="e.g. Snacks">
+      <datalist id="cats_${p.id}">${categoryOptions(p.department).map(c=>`<option value="${escAttr(c)}">`).join("")}</datalist>
+    </td>
     <td><textarea data-field="description" rows="2" placeholder="Optional — shown to customers on the item's page" style="width:150px;resize:vertical;">${escHtml(p.description || "")}</textarea></td>
     <td><input value="${p.price == null ? "" : p.price}" data-field="price" type="number" step="0.01"></td>
     <td><input value="${escAttr(p.unit || "")}" data-field="unit"></td>
@@ -355,10 +358,13 @@ async function deleteProduct(id) {
 }
 async function addProductRow() {
   const name = prompt("Product name:"); if (!name) return;
-  const department = prompt("Department (meat, grocery, household, beauty, baby, clothing):", "grocery");
-  const is_food = !["household", "beauty", "baby", "clothing"].includes(String(department || "").trim().toLowerCase());
+  const department = prompt("Department (meat, grocery, household, beauty, baby, clothing, candy):", "grocery");
+  const cats = categoryOptions(String(department || "").trim().toLowerCase());
+  const catSuggestion = cats.length ? cats[0] : department;
+  const category = prompt(`Category for this ${department} item:\n\nSuggestions: ${cats.slice(0,6).join(", ") || "type your own"}`, catSuggestion) || catSuggestion;
+  const is_food = !["household", "beauty", "baby", "clothing"].includes(String(department || "").trim().toLowerCase()); // candy stays food (3%)
   try {
-    const created = await api("admin-products", { method: "POST", body: JSON.stringify({ id: Date.now(), name, department, category: department, price: null, unit: "each", active: true, is_food }) });
+    const created = await api("admin-products", { method: "POST", body: JSON.stringify({ id: Date.now(), name, department, category, price: null, unit: "each", active: true, is_food }) });
     PRODUCTS.unshift(created); renderProducts();
   } catch (e) { alert(e.message); }
 }
@@ -620,6 +626,21 @@ async function saveSettings() {
 }
 
 function escAttr(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;"); }
+
+// Preset categories per department — shows as suggestions in the category field.
+// Staff can still type anything custom; these are just quick picks.
+const DEPT_CATEGORIES = {
+  meat:      ["Beef", "Lamb", "Goat", "Chicken", "Turkey", "Fish", "Veal", "Offal", "Frozen Meat"],
+  grocery:   ["Snacks & Sweets", "Seasoning & Spices", "Rice & Grains", "Oils & Vinegar", "Canned Goods", "Bread & Bakery", "Dairy & Eggs", "Frozen Foods", "Drinks & Beverages", "Condiments & Sauces", "Lentils & Beans", "Pasta & Noodles", "Flour & Baking", "Tea & Coffee"],
+  candy:     ["Gummies & Candy", "Chocolate", "Halal Sweets", "Baklava & Pastry", "Hard Candy", "Chips & Crisps"],
+  household: ["Cleaning", "Paper Products", "Kitchen", "Laundry", "Trash & Storage"],
+  beauty:    ["Skin Care", "Hair Care", "Lotion & Moisturizer", "Soap & Body Wash", "Fragrance"],
+  baby:      ["Baby Food", "Formula", "Diapers", "Baby Care", "Clothing"],
+  clothing:  ["Abayas", "Thobes", "Hijabs", "Kids Clothing", "Accessories"],
+};
+function categoryOptions(dept) {
+  return DEPT_CATEGORIES[dept] || [];
+}
 function escHtml(s) { return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 </script>
 </body>

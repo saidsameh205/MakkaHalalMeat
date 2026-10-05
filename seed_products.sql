@@ -1,102 +1,102 @@
 insert into public.products (id, name, department, category, subcategory, price, unit, image, emoji, brand, active) values
 (7,'Frozen Samosas','grocery','Frozen','Frozen',7.99,'each','','🥟','Makka Halal Meat',true),
-(8,'Basmati Rice 10 lb','grocery','Pantry','Rice',17.99,'each','','🍚','Makka Halal Meat',true),
-(9,'Laxmi Garam Masala Powder','grocery','Pantry','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
-(10,'Laxmi Cinnamon Powder','grocery','Pantry','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
-(11,'Laxmi Fenugreek Whole','grocery','Pantry','Spices & Seasoning',6.99,'each','','🛒','Laxmi',true),
-(12,'Laxmi Crushed Red Chili','grocery','Pantry','Spices & Seasoning',6.99,'each','','🛒','Laxmi',true),
-(13,'Laxmi Chili Powder Kashmiri','grocery','Pantry','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
-(14,'Laxmi Turmeric Powder','grocery','Pantry','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
-(15,'Goya Adobo All Purpose Seasoning','grocery','Pantry','Spices & Seasoning',3.99,'each','','🧂','Goya',true),
-(16,'Member''s Mark Parsley Flakes','grocery','Pantry','Spices & Seasoning',3.99,'each','','🛒','Member''s Mark',true),
-(17,'Ziyad Cumin Powder','grocery','Pantry','Spices & Seasoning',3.99,'each','','🧂','Ziyad',true),
-(18,'Laxmi Ground Allspice','grocery','Pantry','Spices & Seasoning',12.99,'each','','🧂','Laxmi',true),
-(19,'Laxmi Fennel Seeds','grocery','Pantry','Spices & Seasoning',6.99,'each','','🛒','Laxmi',true),
-(20,'Laxmi Cumin Powder large','grocery','Pantry','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
-(21,'Badia Garlic Powder','grocery','Pantry','Spices & Seasoning',3.99,'each','','🧂','Badia',true),
-(22,'Badia Onion Powder','grocery','Pantry','Spices & Seasoning',3.99,'each','','🧂','Badia',true),
-(23,'Kinder''s No Salt Seasoning','grocery','Pantry','Spices & Seasoning',3.99,'each','','🧂','Kinder''s',true),
-(24,'Old Bay Seasoning','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Old Bay',true),
-(25,'Member''s Mark Chili Powder','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(26,'Member''s Mark Crushed Red Pepper','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(27,'Member''s Mark Sesame Seeds','grocery','Pantry','Spices & Seasoning',NULL,'','','🛒','Member''s Mark',true),
-(28,'Member''s Mark Cumin','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(29,'Member''s Mark Cilantro','grocery','Pantry','Spices & Seasoning',NULL,'','','🛒','Member''s Mark',true),
-(30,'Member''s Mark Lemon Pepper','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(31,'Member''s Mark Curry Powder','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(32,'Member''s Mark Ginger','grocery','Pantry','Spices & Seasoning',NULL,'','','🛒','Member''s Mark',true),
-(33,'Member''s Mark Cayenne Pepper','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(34,'Member''s Mark Garlic','grocery','Pantry','Spices & Seasoning',NULL,'','','🥬','Member''s Mark',true),
-(35,'Member''s Mark Turmeric','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(36,'Member''s Mark Paprika','grocery','Pantry','Spices & Seasoning',NULL,'','','🛒','Member''s Mark',true),
-(37,'Member''s Mark Onion','grocery','Pantry','Spices & Seasoning',NULL,'','','🥬','Member''s Mark',true),
-(38,'Member''s Mark Cinnamon','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(39,'Member''s Mark Fennel','grocery','Pantry','Spices & Seasoning',NULL,'','','🛒','Member''s Mark',true),
-(40,'Member''s Mark Fine Black Pepper','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Member''s Mark',true),
-(41,'Laxmi Coriander Seeds','grocery','Pantry','Spices & Seasoning',2.99,'each','','🛒','Laxmi',true),
-(42,'Laxmi Garam Masala','grocery','Pantry','Spices & Seasoning',4.99,'each','','🧂','Laxmi',true),
-(43,'Laxmi Coriander Powder','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Laxmi',true),
-(44,'Laxmi Methi Seed','grocery','Pantry','Spices & Seasoning',4.99,'each','','🛒','Laxmi',true),
-(45,'Ziyad Falafel Mix','grocery','Pantry','Spices & Seasoning',3.99,'each','','🛒','Ziyad',true),
-(46,'Lawry''s Seasoned Salt','grocery','Pantry','Spices & Seasoning',3.99,'each','','🧂','Lawry''s',true),
-(47,'Tone''s Ground Ginger','grocery','Pantry','Spices & Seasoning',NULL,'','','🛒','Tone''s',true),
-(48,'Member''s Mark Thyme Leaves','grocery','Pantry','Spices & Seasoning',NULL,'','','🛒','Member''s Mark',true),
-(49,'Goya Adobo Seasoning','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Goya',true),
-(50,'Badia Garlic Powder','grocery','Pantry','Spices & Seasoning',NULL,'','','🧂','Badia',true),
-(51,'Laxmi Coconut Powder','grocery','Pantry','Baking / Pasta',2.99,'each','','🧂','Laxmi',true),
-(52,'Bisquick Pancake & Baking Mix','grocery','Pantry','Baking / Pasta',11.99,'each','','🛒','Bisquick',true),
-(53,'Argo Corn Starch','grocery','Pantry','Baking / Pasta',2.49,'each','','🛒','Argo',true),
-(54,'Kirkland Organic All-Purpose Flour','grocery','Pantry','Baking / Pasta',11.99,'each','','🛒','Kirkland',true),
-(55,'Gold Medal All Purpose Flour','grocery','Pantry','Baking / Pasta',10.99,'each','','🛒','Gold Medal',true),
-(56,'White Lily Flour','grocery','Pantry','Baking / Pasta',6.99,'each','','🛒','White Lily',true),
-(57,'Five Roses Flour','grocery','Pantry','Baking / Pasta',NULL,'','','🛒','Five Roses',true),
-(58,'Rice Flour','grocery','Pantry','Baking / Pasta',1.99,'each','','🍚','Various',true),
-(59,'White Corn Flour','grocery','Pantry','Baking / Pasta',NULL,'','','🛒','Various',true),
-(60,'Domino Granulated Sugar','grocery','Pantry','Baking / Pasta',NULL,'','','🛒','Domino',true),
-(61,'Pure Cane Sugar large bag','grocery','Pantry','Baking / Pasta',15.0,'each','','🧼','Various',true),
-(62,'Sugar in the Raw Turbinado Cane Sugar','grocery','Pantry','Baking / Pasta',NULL,'','','🛒','Sugar in the Raw',true),
-(63,'Madi Pan Pinton / baking product','grocery','Pantry','Baking / Pasta',8.99,'each','','🛒','Madi',true),
-(64,'Barilla Tri-Color Rotini','grocery','Pantry','Baking / Pasta',1.69,'each','','🛒','Barilla',true),
-(65,'Barilla Tri-Color Penne','grocery','Pantry','Baking / Pasta',1.69,'each','','🛒','Barilla',true),
-(66,'La Moderna Pasta assorted','grocery','Pantry','Baking / Pasta',1.29,'each','','🛒','La Moderna',true),
-(67,'Spaghetti / pasta bags','grocery','Pantry','Baking / Pasta',NULL,'','','🧼','Various',true),
-(68,'Lord del Sud Organic Spaghetti 20x1lb case','grocery','Pantry','Baking / Pasta',NULL,'','','🛒','Lord del Sud',true),
-(69,'Amber Basmati Rice Premium Grade No.1 Extra Clean 10 lb','grocery','Pantry','Rice',10.99,'each','','🍚','Amber',true),
-(70,'Amber Basmati Rice Premium Grade No.1 Extra Clean 20 lb','grocery','Pantry','Rice',18.99,'each','','🍚','Amber',true),
-(71,'Bazarac Basmati Sela Parboiled Grade A 10 lb','grocery','Pantry','Rice',12.99,'each','','🛒','Bazarac',true),
-(72,'Bazarac Basmati Sela Parboiled Grade A 20 lb','grocery','Pantry','Rice',24.99,'each','','🛒','Bazarac',true),
-(73,'Royal Basmati Rice','grocery','Pantry','Rice',NULL,'','','🍚','Royal',true),
-(74,'Hunt''s Tomato Sauce large can','grocery','Pantry','Sauces & Condiments',7.99,'each','','🥬','Hunt''s',true),
-(75,'Member''s Mark Tomato Paste large can','grocery','Pantry','Sauces & Condiments',10.99,'each','','🥬','Member''s Mark',true),
-(76,'Nina Italian Peeled Tomatoes','grocery','Pantry','Sauces & Condiments',3.99,'each','','🥬','Nina',true),
-(77,'Kirkland Organic Diced Tomatoes','grocery','Pantry','Sauces & Condiments',NULL,'','','🥬','Kirkland',true),
-(78,'Kirkland Organic Tomato Sauce','grocery','Pantry','Sauces & Condiments',NULL,'','','🥬','Kirkland',true),
-(79,'Frank''s RedHot Original','grocery','Pantry','Sauces & Condiments',6.99,'each','','🛒','Frank''s',true),
-(80,'Heinz Tomato Ketchup','grocery','Pantry','Sauces & Condiments',4.99,'each','','🥬','Heinz',true),
-(81,'Heinz Yellow Mustard','grocery','Pantry','Sauces & Condiments',5.99,'each','','🛒','Heinz',true),
-(82,'Hellmann''s Real Mayonnaise','grocery','Pantry','Sauces & Condiments',6.99,'each','','🛒','Hellmann''s',true),
-(83,'Tamam Tomato Paste jar','grocery','Pantry','Sauces & Condiments',4.99,'each','','🥬','Tamam',true),
-(84,'Ragu Pasta Sauce assorted','grocery','Pantry','Sauces & Condiments',3.49,'each','','🛒','Ragu',true),
-(85,'Prego Pasta Sauce assorted','grocery','Pantry','Sauces & Condiments',4.49,'each','','🛒','Prego',true),
-(86,'Texas Pete Hot Sauce','grocery','Pantry','Sauces & Condiments',NULL,'','','🛒','Texas Pete',true),
-(87,'Chick-fil-A Sauce bottle','grocery','Pantry','Sauces & Condiments',5.99,'each','','🛒','Chick-fil-A',true),
-(88,'Biscoff Cookie Butter','grocery','Pantry','Sauces & Condiments',NULL,'','','🥛','Biscoff',true),
-(89,'Jif Creamy Peanut Butter','grocery','Pantry','Sauces & Condiments',NULL,'','','🥛','Jif',true),
-(90,'Member''s Mark Creamy Peanut Butter','grocery','Pantry','Sauces & Condiments',NULL,'','','🥛','Member''s Mark',true),
-(91,'Rani Peanut Butter','grocery','Pantry','Sauces & Condiments',NULL,'','','🥛','Rani',true),
-(92,'Goya Adobo assorted','grocery','Pantry','Sauces & Condiments',NULL,'','','🛒','Goya',true),
-(93,'Del Monte Cut Green Beans','grocery','Pantry','Canned Goods',2.79,'each','','🛒','Del Monte',true),
-(94,'Del Monte Whole Kernel Corn','grocery','Pantry','Canned Goods',2.99,'each','','🛒','Del Monte',true),
-(95,'Del Monte Peas','grocery','Pantry','Canned Goods',NULL,'','','🛒','Del Monte',true),
-(96,'Popeye Spinach','grocery','Pantry','Canned Goods',1.99,'each','','🛒','Popeye',true),
-(97,'Veg-All Mixed Vegetables','grocery','Pantry','Canned Goods',1.69,'each','','🛒','Veg-All',true),
-(98,'Sultan Canned vegetables assorted','grocery','Pantry','Canned Goods',1.49,'each','','🛒','Sultan',true),
-(99,'Bush''s Beans assorted','grocery','Pantry','Canned Goods',NULL,'','','🛒','Bush''s',true),
-(100,'Goya Beans assorted','grocery','Pantry','Canned Goods',1.89,'each','','🛒','Goya',true),
-(101,'Goya Tuna / canned seafood assorted','grocery','Pantry','Canned Goods',NULL,'','','🛒','Goya',true),
-(102,'Portofino Tuna','grocery','Pantry','Canned Goods',3.49,'each','','🛒','Portofino',true),
-(103,'Kirkland Pink Salmon','grocery','Pantry','Canned Goods',3.49,'each','','🛒','Kirkland',true),
-(104,'StarKist Tuna','grocery','Pantry','Canned Goods',NULL,'','','🛒','StarKist',true),
+(8,'Basmati Rice 10 lb','grocery','Rice & Grains','Rice',17.99,'each','','🍚','Makka Halal Meat',true),
+(9,'Laxmi Garam Masala Powder','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
+(10,'Laxmi Cinnamon Powder','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
+(11,'Laxmi Fenugreek Whole','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🛒','Laxmi',true),
+(12,'Laxmi Crushed Red Chili','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🛒','Laxmi',true),
+(13,'Laxmi Chili Powder Kashmiri','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
+(14,'Laxmi Turmeric Powder','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
+(15,'Goya Adobo All Purpose Seasoning','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🧂','Goya',true),
+(16,'Parsley Flakes','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🛒','',true),
+(17,'Ziyad Cumin Powder','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🧂','Ziyad',true),
+(18,'Laxmi Ground Allspice','grocery','Seasoning & Spices','Spices & Seasoning',12.99,'each','','🧂','Laxmi',true),
+(19,'Laxmi Fennel Seeds','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🛒','Laxmi',true),
+(20,'Laxmi Cumin Powder large','grocery','Seasoning & Spices','Spices & Seasoning',6.99,'each','','🧂','Laxmi',true),
+(21,'Badia Garlic Powder','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🧂','Badia',true),
+(22,'Badia Onion Powder','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🧂','Badia',true),
+(23,'Kinder''s No Salt Seasoning','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🧂','Kinder''s',true),
+(24,'Old Bay Seasoning','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','Old Bay',true),
+(25,'Chili Powder','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(26,'Crushed Red Pepper','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(27,'Sesame Seeds','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🛒','',true),
+(28,'Cumin','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(29,'Cilantro','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🛒','',true),
+(30,'Lemon Pepper','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(31,'Curry Powder','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(32,'Ginger','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🛒','',true),
+(33,'Cayenne Pepper','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(34,'Garlic','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🥬','',true),
+(35,'Turmeric','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(36,'Paprika','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🛒','',true),
+(37,'Onion','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🥬','',true),
+(38,'Cinnamon','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(39,'Fennel','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🛒','',true),
+(40,'Fine Black Pepper','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','',true),
+(41,'Laxmi Coriander Seeds','grocery','Seasoning & Spices','Spices & Seasoning',2.99,'each','','🛒','Laxmi',true),
+(42,'Laxmi Garam Masala','grocery','Seasoning & Spices','Spices & Seasoning',4.99,'each','','🧂','Laxmi',true),
+(43,'Laxmi Coriander Powder','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','Laxmi',true),
+(44,'Laxmi Methi Seed','grocery','Seasoning & Spices','Spices & Seasoning',4.99,'each','','🛒','Laxmi',true),
+(45,'Ziyad Falafel Mix','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🛒','Ziyad',true),
+(46,'Lawry''s Seasoned Salt','grocery','Seasoning & Spices','Spices & Seasoning',3.99,'each','','🧂','Lawry''s',true),
+(47,'Tone''s Ground Ginger','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🛒','Tone''s',true),
+(48,'Thyme Leaves','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🛒','',true),
+(49,'Goya Adobo Seasoning','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','Goya',true),
+(50,'Badia Garlic Powder','grocery','Seasoning & Spices','Spices & Seasoning',NULL,'','','🧂','Badia',true),
+(51,'Laxmi Coconut Powder','grocery','Pasta & Noodles','Baking / Pasta',2.99,'each','','🧂','Laxmi',true),
+(52,'Bisquick Pancake & Baking Mix','grocery','Pasta & Noodles','Baking / Pasta',11.99,'each','','🛒','Bisquick',true),
+(53,'Argo Corn Starch','grocery','Pasta & Noodles','Baking / Pasta',2.49,'each','','🛒','Argo',true),
+(54,'Kirkland Organic All-Purpose Flour','grocery','Pasta & Noodles','Baking / Pasta',11.99,'each','','🛒','Kirkland',true),
+(55,'Gold Medal All Purpose Flour','grocery','Pasta & Noodles','Baking / Pasta',10.99,'each','','🛒','Gold Medal',true),
+(56,'White Lily Flour','grocery','Pasta & Noodles','Baking / Pasta',6.99,'each','','🛒','White Lily',true),
+(57,'Five Roses Flour','grocery','Pasta & Noodles','Baking / Pasta',NULL,'','','🛒','Five Roses',true),
+(58,'Rice Flour','grocery','Pasta & Noodles','Baking / Pasta',1.99,'each','','🍚','Various',true),
+(59,'White Corn Flour','grocery','Pasta & Noodles','Baking / Pasta',NULL,'','','🛒','Various',true),
+(60,'Domino Granulated Sugar','grocery','Pasta & Noodles','Baking / Pasta',NULL,'','','🛒','Domino',true),
+(61,'Pure Cane Sugar large bag','grocery','Pasta & Noodles','Baking / Pasta',15.0,'each','','🧼','Various',true),
+(62,'Sugar in the Raw Turbinado Cane Sugar','grocery','Pasta & Noodles','Baking / Pasta',NULL,'','','🛒','Sugar in the Raw',true),
+(63,'Madi Pan Pinton / baking product','grocery','Pasta & Noodles','Baking / Pasta',8.99,'each','','🛒','Madi',true),
+(64,'Barilla Tri-Color Rotini','grocery','Pasta & Noodles','Baking / Pasta',1.69,'each','','🛒','Barilla',true),
+(65,'Barilla Tri-Color Penne','grocery','Pasta & Noodles','Baking / Pasta',1.69,'each','','🛒','Barilla',true),
+(66,'La Moderna Pasta assorted','grocery','Pasta & Noodles','Baking / Pasta',1.29,'each','','🛒','La Moderna',true),
+(67,'Spaghetti / pasta bags','grocery','Pasta & Noodles','Baking / Pasta',NULL,'','','🧼','Various',true),
+(68,'Lord del Sud Organic Spaghetti 20x1lb case','grocery','Pasta & Noodles','Baking / Pasta',NULL,'','','🛒','Lord del Sud',true),
+(69,'Amber Basmati Rice Premium Grade No.1 Extra Clean 10 lb','grocery','Rice & Grains','Rice',10.99,'each','','🍚','Amber',true),
+(70,'Amber Basmati Rice Premium Grade No.1 Extra Clean 20 lb','grocery','Rice & Grains','Rice',18.99,'each','','🍚','Amber',true),
+(71,'Bazarac Basmati Sela Parboiled Grade A 10 lb','grocery','Rice & Grains','Rice',12.99,'each','','🛒','Bazarac',true),
+(72,'Bazarac Basmati Sela Parboiled Grade A 20 lb','grocery','Rice & Grains','Rice',24.99,'each','','🛒','Bazarac',true),
+(73,'Royal Basmati Rice','grocery','Rice & Grains','Rice',NULL,'','','🍚','Royal',true),
+(74,'Hunt''s Tomato Sauce large can','grocery','Condiments & Sauces','Sauces & Condiments',7.99,'each','','🥬','Hunt''s',true),
+(75,'Tomato Paste large can','grocery','Condiments & Sauces','Sauces & Condiments',10.99,'each','','🥬','',true),
+(76,'Nina Italian Peeled Tomatoes','grocery','Condiments & Sauces','Sauces & Condiments',3.99,'each','','🥬','Nina',true),
+(77,'Kirkland Organic Diced Tomatoes','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🥬','Kirkland',true),
+(78,'Kirkland Organic Tomato Sauce','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🥬','Kirkland',true),
+(79,'Frank''s RedHot Original','grocery','Condiments & Sauces','Sauces & Condiments',6.99,'each','','🛒','Frank''s',true),
+(80,'Heinz Tomato Ketchup','grocery','Condiments & Sauces','Sauces & Condiments',4.99,'each','','🥬','Heinz',true),
+(81,'Heinz Yellow Mustard','grocery','Condiments & Sauces','Sauces & Condiments',5.99,'each','','🛒','Heinz',true),
+(82,'Hellmann''s Real Mayonnaise','grocery','Condiments & Sauces','Sauces & Condiments',6.99,'each','','🛒','Hellmann''s',true),
+(83,'Tamam Tomato Paste jar','grocery','Condiments & Sauces','Sauces & Condiments',4.99,'each','','🥬','Tamam',true),
+(84,'Ragu Pasta Sauce assorted','grocery','Condiments & Sauces','Sauces & Condiments',3.49,'each','','🛒','Ragu',true),
+(85,'Prego Pasta Sauce assorted','grocery','Condiments & Sauces','Sauces & Condiments',4.49,'each','','🛒','Prego',true),
+(86,'Texas Pete Hot Sauce','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🛒','Texas Pete',true),
+(87,'Chick-fil-A Sauce bottle','grocery','Condiments & Sauces','Sauces & Condiments',5.99,'each','','🛒','Chick-fil-A',true),
+(88,'Biscoff Cookie Butter','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🥛','Biscoff',true),
+(89,'Jif Creamy Peanut Butter','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🥛','Jif',true),
+(90,'Creamy Peanut Butter','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🥛','',true),
+(91,'Rani Peanut Butter','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🥛','Rani',true),
+(92,'Goya Adobo assorted','grocery','Condiments & Sauces','Sauces & Condiments',NULL,'','','🛒','Goya',true),
+(93,'Del Monte Cut Green Beans','grocery','Canned Goods','Canned Goods',2.79,'each','','🛒','Del Monte',true),
+(94,'Del Monte Whole Kernel Corn','grocery','Canned Goods','Canned Goods',2.99,'each','','🛒','Del Monte',true),
+(95,'Del Monte Peas','grocery','Canned Goods','Canned Goods',NULL,'','','🛒','Del Monte',true),
+(96,'Popeye Spinach','grocery','Canned Goods','Canned Goods',1.99,'each','','🛒','Popeye',true),
+(97,'Veg-All Mixed Vegetables','grocery','Canned Goods','Canned Goods',1.69,'each','','🛒','Veg-All',true),
+(98,'Sultan Canned vegetables assorted','grocery','Canned Goods','Canned Goods',1.49,'each','','🛒','Sultan',true),
+(99,'Bush''s Beans assorted','grocery','Canned Goods','Canned Goods',NULL,'','','🛒','Bush''s',true),
+(100,'Goya Beans assorted','grocery','Canned Goods','Canned Goods',1.89,'each','','🛒','Goya',true),
+(101,'Goya Tuna / canned seafood assorted','grocery','Canned Goods','Canned Goods',NULL,'','','🛒','Goya',true),
+(102,'Portofino Tuna','grocery','Canned Goods','Canned Goods',3.49,'each','','🛒','Portofino',true),
+(103,'Kirkland Pink Salmon','grocery','Canned Goods','Canned Goods',3.49,'each','','🛒','Kirkland',true),
+(104,'StarKist Tuna','grocery','Canned Goods','Canned Goods',NULL,'','','🛒','StarKist',true),
 (105,'Shan Mutton Biryani','grocery','Pantry','Recipe Mix',2.29,'each','','🛒','Shan',true),
 (106,'Shan Sindhi Biryani','grocery','Pantry','Recipe Mix',2.29,'each','','🛒','Shan',true),
 (107,'Shan Fish Biryani','grocery','Pantry','Recipe Mix',2.29,'each','','🛒','Shan',true),
@@ -115,102 +115,102 @@ insert into public.products (id, name, department, category, subcategory, price,
 (120,'Shan Chicken Curry','grocery','Pantry','Recipe Mix',2.29,'each','','🍗','Shan',true),
 (121,'Shan Korma','grocery','Pantry','Recipe Mix',2.29,'each','','🛒','Shan',true),
 (122,'Shan Haleem','grocery','Pantry','Recipe Mix',2.29,'each','','🛒','Shan',true),
-(123,'Mazola Corn Oil large','grocery','Pantry','Cooking Oil & Ghee',19.99,'each','','🛒','Mazola',true),
-(124,'Ottavio Organic High Oleic Sunflower Oil','grocery','Pantry','Cooking Oil & Ghee',13.99,'each','','🛒','Ottavio',true),
-(125,'Laxmi Cold Pressed Sesame Oil','grocery','Pantry','Cooking Oil & Ghee',NULL,'','','🛒','Laxmi',true),
-(126,'Pompeian Extra Virgin Olive Oil','grocery','Pantry','Cooking Oil & Ghee',28.99,'each','','🛒','Pompeian',true),
-(127,'Extra Virgin Olive Oil','grocery','Pantry','Cooking Oil & Ghee',26.99,'each','','🛒','Various',true),
-(128,'Supremo Italiano Extra Virgin Olive Oil tin','grocery','Pantry','Cooking Oil & Ghee',39.99,'each','','🛒','Supremo Italiano',true),
-(129,'Wesson Canola Oil','grocery','Pantry','Cooking Oil & Ghee',NULL,'','','🛒','Wesson',true),
-(130,'Wesson Vegetable Oil','grocery','Pantry','Cooking Oil & Ghee',NULL,'','','🛒','Wesson',true),
-(131,'Crisco Vegetable Shortening / oil','grocery','Pantry','Cooking Oil & Ghee',12.99,'each','','🛒','Crisco',true),
-(132,'Kirkland Ghee','grocery','Pantry','Cooking Oil & Ghee',22.99,'each','','🛒','Kirkland',true),
-(133,'Ghee jars','grocery','Pantry','Cooking Oil & Ghee',11.99,'each','','🛒','Various',true),
-(134,'Ahmad Tea Cardamom Tea','grocery','Drinks','Tea & Coffee',6.99,'each','','🥤','Ahmad Tea',true),
-(135,'Ahmad Tea English Tea No.1','grocery','Drinks','Tea & Coffee',6.99,'each','','🥤','Ahmad Tea',true),
-(136,'Ahmad Tea Earl Grey Tea','grocery','Drinks','Tea & Coffee',6.99,'each','','🥤','Ahmad Tea',true),
-(137,'Ahmad Tea Aromatic Earl Grey','grocery','Drinks','Tea & Coffee',8.99,'each','','🥤','Ahmad Tea',true),
-(138,'Ahmad Tea Ceylon Tea','grocery','Drinks','Tea & Coffee',9.99,'each','','🥤','Ahmad Tea',true),
-(139,'Ahmad Tea Imperial Blend','grocery','Drinks','Tea & Coffee',8.99,'each','','🥤','Ahmad Tea',true),
-(140,'Ahmad Tea Kalami Assam','grocery','Drinks','Tea & Coffee',NULL,'','','🥤','Ahmad Tea',true),
-(141,'Ahmad Tea English Breakfast','grocery','Drinks','Tea & Coffee',NULL,'','','🥤','Ahmad Tea',true),
-(142,'Pocas Instant Honey Ginger Tea','grocery','Drinks','Tea & Coffee',6.99,'each','','🥤','Pocas',true),
-(143,'China Slim Tea Herbal Tea Delight','grocery','Drinks','Tea & Coffee',NULL,'','','🥤','China Slim Tea',true),
-(144,'3 Ballerina Herbal Tea','grocery','Drinks','Tea & Coffee',NULL,'','','🥤','3 Ballerina',true),
-(145,'Green Fresh Herbal Dieter''s Tea','grocery','Drinks','Tea & Coffee',5.99,'each','','🥤','Green Fresh',true),
-(146,'Jacobs Kronung Coffee','grocery','Drinks','Tea & Coffee',NULL,'','','🥤','Jacobs',true),
-(147,'Nescafe Instant Coffee','grocery','Drinks','Tea & Coffee',13.99,'each','','🥤','Nescafe',true),
-(148,'Maxwell House Coffee','grocery','Drinks','Tea & Coffee',19.99,'each','','🥤','Maxwell House',true),
-(149,'Folgers Coffee','grocery','Drinks','Tea & Coffee',NULL,'','','🥤','Folgers',true),
-(150,'Tri-C Instant Drink Powder assorted','grocery','Drinks','Drinks',10.99,'each','','🥤','Tri-C',true),
-(151,'Vimto Fruit Cordial','grocery','Drinks','Drinks',5.99,'each','','🥤','Vimto',true),
-(152,'Frooti Mango / fruit drink large','grocery','Drinks','Drinks',5.99,'each','','🥤','Frooti',true),
-(153,'Arabican Fruit drink cartons assorted','grocery','Drinks','Drinks',6.99,'each','','🥤','Arabican',true),
-(154,'Vita Malt Classic','grocery','Drinks','Drinks',8.99,'each','','🥤','Vita Malt',true),
-(155,'Vita Malt Ginger','grocery','Drinks','Drinks',8.99,'each','','🥤','Vita Malt',true),
-(156,'Power Malt Energy drink','grocery','Drinks','Drinks',8.99,'each','','🥤','Power Malt',true),
-(157,'Kesar Mango Pulp canned','grocery','Drinks','Drinks',4.29,'each','','🥤','Kesar',true),
-(158,'Bird''s Custard Powder','grocery','Drinks','Drinks',4.99,'each','','🥤','Bird''s',true),
-(159,'Langers Organic Mango Nectar gallon','grocery','Drinks','Drinks',NULL,'','','🥤','Langers',true),
-(160,'Fanta Orange glass bottle case','grocery','Drinks','Drinks',NULL,'','','🥤','Fanta',true),
-(161,'Jarritos Case assorted','grocery','Drinks','Drinks',NULL,'','','🥤','Jarritos',true),
-(162,'Coca-Cola 2 liter','grocery','Drinks','Drinks',NULL,'','','🥤','Coca-Cola',true),
-(163,'Sprite 2 liter','grocery','Drinks','Drinks',NULL,'','','🥤','Sprite',true),
-(164,'Pepsi 2 liter','grocery','Drinks','Drinks',NULL,'','','🥤','Pepsi',true),
-(165,'Fanta 2 liter','grocery','Drinks','Drinks',NULL,'','','🥤','Fanta',true),
-(166,'Fiji Bottled water','grocery','Drinks','Drinks',1.59,'each','','🥤','Fiji',true),
-(167,'Deer Park Bottled water','grocery','Drinks','Drinks',0.99,'each','','🥤','Deer Park',true),
-(168,'Evian Bottled water','grocery','Drinks','Drinks',2.19,'each','','🥤','Evian',true),
-(169,'Acqua Panna Bottled water','grocery','Drinks','Drinks',0.89,'each','','🥤','Acqua Panna',true),
-(170,'Dasani Bottled water','grocery','Drinks','Drinks',2.49,'each','','🥤','Dasani',true),
-(171,'Aquafina Bottled water','grocery','Drinks','Drinks',NULL,'','','🥤','Aquafina',true),
-(172,'Powerade Assorted flavors','grocery','Drinks','Drinks',1.59,'each','','🥤','Powerade',true),
-(173,'Gatorade Assorted flavors','grocery','Drinks','Drinks',1.59,'each','','🥤','Gatorade',true),
-(174,'Gatorade Larger bottle assorted','grocery','Drinks','Drinks',2.49,'each','','🥤','Gatorade',true),
-(175,'Perrier Glass bottle','grocery','Drinks','Drinks',2.69,'each','','🥤','Perrier',true),
-(176,'Topo Chico Glass bottle','grocery','Drinks','Drinks',2.49,'each','','🥤','Topo Chico',true),
-(177,'Mogu Mogu Assorted flavors','grocery','Drinks','Drinks',1.89,'each','','🥤','Mogu Mogu',true),
-(178,'Coca-Cola Can','grocery','Drinks','Drinks',1.09,'each','','🥤','Coca-Cola',true),
-(179,'Mountain Dew Can','grocery','Drinks','Drinks',1.09,'each','','🥤','Mountain Dew',true),
-(180,'Fanta Can assorted','grocery','Drinks','Drinks',1.09,'each','','🥤','Fanta',true),
-(181,'Red Bull Can','grocery','Drinks','Drinks',2.69,'each','','🥤','Red Bull',true),
-(182,'Coca-Cola 20 oz bottle','grocery','Drinks','Drinks',1.99,'each','','🥤','Coca-Cola',true),
-(183,'Sprite 20 oz bottle','grocery','Drinks','Drinks',1.99,'each','','🥤','Sprite',true),
-(184,'Pepsi 20 oz bottle','grocery','Drinks','Drinks',1.99,'each','','🥤','Pepsi',true),
-(185,'Dr Pepper Bottle/can','grocery','Drinks','Drinks',1.09,'each','','🥤','Dr Pepper',true),
-(186,'7UP 20 oz bottle','grocery','Drinks','Drinks',1.99,'each','','🥤','7UP',true),
-(187,'Fanta 20 oz bottle assorted','grocery','Drinks','Drinks',1.99,'each','','🥤','Fanta',true),
-(188,'Sunkist Bottle/can assorted','grocery','Drinks','Drinks',1.09,'each','','🥤','Sunkist',true),
-(189,'Jarritos Assorted glass bottles','grocery','Drinks','Drinks',1.79,'each','','🥤','Jarritos',true),
-(190,'FOCO Coconut Juice','grocery','Drinks','Drinks',2.79,'each','','🥤','FOCO',true),
-(191,'FOCO Tamarind Drink','grocery','Drinks','Drinks',2.79,'each','','🥤','FOCO',true),
-(192,'Jumex Coconut Water','grocery','Drinks','Drinks',1.29,'each','','🥤','Jumex',true),
-(193,'FOCO Coconut Water','grocery','Drinks','Drinks',1.29,'each','','🥤','FOCO',true),
-(194,'Farmer''s Aloe Vera Aloe Vera Drink','grocery','Drinks','Drinks',NULL,'','','🥤','Farmer''s Aloe Vera',true),
-(195,'Tropical Fantasy Assorted flavors','grocery','Drinks','Drinks',1.49,'each','','🥤','Tropical Fantasy',true),
-(196,'Ocean Spray Cranberry Juice','grocery','Drinks','Drinks',4.99,'each','','🥤','Ocean Spray',true),
-(197,'Kirkland Organic Lemonade','grocery','Drinks','Drinks',4.99,'each','','🥤','Kirkland',true),
-(198,'Veryfine Fruit Punch','grocery','Drinks','Drinks',6.99,'each','','🥤','Veryfine',true),
-(199,'Langers Tart Cherry Pineapple','grocery','Drinks','Drinks',6.5,'each','','🥤','Langers',true),
-(200,'Mott''s 100% Apple Juice','grocery','Drinks','Drinks',4.99,'each','','🥤','Mott''s',true),
-(201,'Hawaiian Punch Large jug','grocery','Drinks','Drinks',4.99,'each','','🥤','Hawaiian Punch',true),
-(202,'Langers Mango Nectar','grocery','Drinks','Drinks',NULL,'','','🥤','Langers',true),
-(203,'Sunberry Farms Guava Nectar','grocery','Drinks','Drinks',NULL,'','','🥤','Sunberry Farms',true),
-(204,'Sunberry Farms Orange Passion Nectar','grocery','Drinks','Drinks',NULL,'','','🥤','Sunberry Farms',true),
-(205,'Great Value Sour Bears Candy','grocery','Snacks','Snacks',NULL,'','','🍬','Great Value',true),
-(206,'Great Value Cherry Gummies','grocery','Snacks','Snacks',NULL,'','','🍬','Great Value',true),
-(207,'Great Value Peach Rings','grocery','Snacks','Snacks',NULL,'','','🍬','Great Value',true),
-(208,'Great Value Gummy Sharks','grocery','Snacks','Snacks',NULL,'','','🍬','Great Value',true),
-(209,'Great Value Gummy Worms','grocery','Snacks','Snacks',NULL,'','','🍬','Great Value',true),
-(210,'Gushers Variety Pack','grocery','Snacks','Snacks',NULL,'','','🍬','Gushers',true),
-(211,'Kopiko Coffee Candy assorted','grocery','Snacks','Snacks',2.99,'each','','🥤','Kopiko',true),
-(212,'Al Safa Crispy Rice Squares','grocery','Snacks','Snacks',2.49,'each','','🍚','Al Safa',true),
-(213,'Biscoff Cookies','grocery','Snacks','Snacks',9.99,'each','','🍬','Biscoff',true),
-(214,'Cake Rusk Assorted boxes','grocery','Snacks','Snacks',6.99,'each','','🍬','Cake Rusk',true),
-(215,'Parle-G / assorted Biscuits','grocery','Snacks','Snacks',NULL,'','','🍬','Parle-G / assorted',true),
-(216,'Cream Biscuits assorted','grocery','Snacks','Snacks',NULL,'','','🥛','Various',true),
-(217,'Baklava / boxed sweets','grocery','Snacks','Snacks',18.99,'each','','🍬','Various',true),
-(218,'Dates / sweets gift box','grocery','Snacks','Snacks',NULL,'','','🍬','Various',true),
+(123,'Mazola Corn Oil large','grocery','Oils & Vinegar','Cooking Oil & Ghee',19.99,'each','','🛒','Mazola',true),
+(124,'Ottavio Organic High Oleic Sunflower Oil','grocery','Oils & Vinegar','Cooking Oil & Ghee',13.99,'each','','🛒','Ottavio',true),
+(125,'Laxmi Cold Pressed Sesame Oil','grocery','Oils & Vinegar','Cooking Oil & Ghee',NULL,'','','🛒','Laxmi',true),
+(126,'Pompeian Extra Virgin Olive Oil','grocery','Oils & Vinegar','Cooking Oil & Ghee',28.99,'each','','🛒','Pompeian',true),
+(127,'Extra Virgin Olive Oil','grocery','Oils & Vinegar','Cooking Oil & Ghee',26.99,'each','','🛒','Various',true),
+(128,'Supremo Italiano Extra Virgin Olive Oil tin','grocery','Oils & Vinegar','Cooking Oil & Ghee',39.99,'each','','🛒','Supremo Italiano',true),
+(129,'Wesson Canola Oil','grocery','Oils & Vinegar','Cooking Oil & Ghee',NULL,'','','🛒','Wesson',true),
+(130,'Wesson Vegetable Oil','grocery','Oils & Vinegar','Cooking Oil & Ghee',NULL,'','','🛒','Wesson',true),
+(131,'Crisco Vegetable Shortening / oil','grocery','Oils & Vinegar','Cooking Oil & Ghee',12.99,'each','','🛒','Crisco',true),
+(132,'Kirkland Ghee','grocery','Oils & Vinegar','Cooking Oil & Ghee',22.99,'each','','🛒','Kirkland',true),
+(133,'Ghee jars','grocery','Oils & Vinegar','Cooking Oil & Ghee',11.99,'each','','🛒','Various',true),
+(134,'Ahmad Tea Cardamom Tea','grocery','Tea & Coffee','Tea & Coffee',6.99,'each','','🥤','Ahmad Tea',true),
+(135,'Ahmad Tea English Tea No.1','grocery','Tea & Coffee','Tea & Coffee',6.99,'each','','🥤','Ahmad Tea',true),
+(136,'Ahmad Tea Earl Grey Tea','grocery','Tea & Coffee','Tea & Coffee',6.99,'each','','🥤','Ahmad Tea',true),
+(137,'Ahmad Tea Aromatic Earl Grey','grocery','Tea & Coffee','Tea & Coffee',8.99,'each','','🥤','Ahmad Tea',true),
+(138,'Ahmad Tea Ceylon Tea','grocery','Tea & Coffee','Tea & Coffee',9.99,'each','','🥤','Ahmad Tea',true),
+(139,'Ahmad Tea Imperial Blend','grocery','Tea & Coffee','Tea & Coffee',8.99,'each','','🥤','Ahmad Tea',true),
+(140,'Ahmad Tea Kalami Assam','grocery','Tea & Coffee','Tea & Coffee',NULL,'','','🥤','Ahmad Tea',true),
+(141,'Ahmad Tea English Breakfast','grocery','Tea & Coffee','Tea & Coffee',NULL,'','','🥤','Ahmad Tea',true),
+(142,'Pocas Instant Honey Ginger Tea','grocery','Tea & Coffee','Tea & Coffee',6.99,'each','','🥤','Pocas',true),
+(143,'China Slim Tea Herbal Tea Delight','grocery','Tea & Coffee','Tea & Coffee',NULL,'','','🥤','China Slim Tea',true),
+(144,'3 Ballerina Herbal Tea','grocery','Tea & Coffee','Tea & Coffee',NULL,'','','🥤','3 Ballerina',true),
+(145,'Green Fresh Herbal Dieter''s Tea','grocery','Tea & Coffee','Tea & Coffee',5.99,'each','','🥤','Green Fresh',true),
+(146,'Jacobs Kronung Coffee','grocery','Tea & Coffee','Tea & Coffee',NULL,'','','🥤','Jacobs',true),
+(147,'Nescafe Instant Coffee','grocery','Tea & Coffee','Tea & Coffee',13.99,'each','','🥤','Nescafe',true),
+(148,'Maxwell House Coffee','grocery','Tea & Coffee','Tea & Coffee',19.99,'each','','🥤','Maxwell House',true),
+(149,'Folgers Coffee','grocery','Tea & Coffee','Tea & Coffee',NULL,'','','🥤','Folgers',true),
+(150,'Tri-C Instant Drink Powder assorted','grocery','Drinks & Beverages','Drinks',10.99,'each','','🥤','Tri-C',true),
+(151,'Vimto Fruit Cordial','grocery','Drinks & Beverages','Drinks',5.99,'each','','🥤','Vimto',true),
+(152,'Frooti Mango / fruit drink large','grocery','Drinks & Beverages','Drinks',5.99,'each','','🥤','Frooti',true),
+(153,'Arabican Fruit drink cartons assorted','grocery','Drinks & Beverages','Drinks',6.99,'each','','🥤','Arabican',true),
+(154,'Vita Malt Classic','grocery','Drinks & Beverages','Drinks',8.99,'each','','🥤','Vita Malt',true),
+(155,'Vita Malt Ginger','grocery','Drinks & Beverages','Drinks',8.99,'each','','🥤','Vita Malt',true),
+(156,'Power Malt Energy drink','grocery','Drinks & Beverages','Drinks',8.99,'each','','🥤','Power Malt',true),
+(157,'Kesar Mango Pulp canned','grocery','Drinks & Beverages','Drinks',4.29,'each','','🥤','Kesar',true),
+(158,'Bird''s Custard Powder','grocery','Drinks & Beverages','Drinks',4.99,'each','','🥤','Bird''s',true),
+(159,'Langers Organic Mango Nectar gallon','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Langers',true),
+(160,'Fanta Orange glass bottle case','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Fanta',true),
+(161,'Jarritos Case assorted','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Jarritos',true),
+(162,'Coca-Cola 2 liter','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Coca-Cola',true),
+(163,'Sprite 2 liter','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Sprite',true),
+(164,'Pepsi 2 liter','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Pepsi',true),
+(165,'Fanta 2 liter','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Fanta',true),
+(166,'Fiji Bottled water','grocery','Drinks & Beverages','Drinks',1.59,'each','','🥤','Fiji',true),
+(167,'Deer Park Bottled water','grocery','Drinks & Beverages','Drinks',0.99,'each','','🥤','Deer Park',true),
+(168,'Evian Bottled water','grocery','Drinks & Beverages','Drinks',2.19,'each','','🥤','Evian',true),
+(169,'Acqua Panna Bottled water','grocery','Drinks & Beverages','Drinks',0.89,'each','','🥤','Acqua Panna',true),
+(170,'Dasani Bottled water','grocery','Drinks & Beverages','Drinks',2.49,'each','','🥤','Dasani',true),
+(171,'Aquafina Bottled water','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Aquafina',true),
+(172,'Powerade Assorted flavors','grocery','Drinks & Beverages','Drinks',1.59,'each','','🥤','Powerade',true),
+(173,'Gatorade Assorted flavors','grocery','Drinks & Beverages','Drinks',1.59,'each','','🥤','Gatorade',true),
+(174,'Gatorade Larger bottle assorted','grocery','Drinks & Beverages','Drinks',2.49,'each','','🥤','Gatorade',true),
+(175,'Perrier Glass bottle','grocery','Drinks & Beverages','Drinks',2.69,'each','','🥤','Perrier',true),
+(176,'Topo Chico Glass bottle','grocery','Drinks & Beverages','Drinks',2.49,'each','','🥤','Topo Chico',true),
+(177,'Mogu Mogu Assorted flavors','grocery','Drinks & Beverages','Drinks',1.89,'each','','🥤','Mogu Mogu',true),
+(178,'Coca-Cola Can','grocery','Drinks & Beverages','Drinks',1.09,'each','','🥤','Coca-Cola',true),
+(179,'Mountain Dew Can','grocery','Drinks & Beverages','Drinks',1.09,'each','','🥤','Mountain Dew',true),
+(180,'Fanta Can assorted','grocery','Drinks & Beverages','Drinks',1.09,'each','','🥤','Fanta',true),
+(181,'Red Bull Can','grocery','Drinks & Beverages','Drinks',2.69,'each','','🥤','Red Bull',true),
+(182,'Coca-Cola 20 oz bottle','grocery','Drinks & Beverages','Drinks',1.99,'each','','🥤','Coca-Cola',true),
+(183,'Sprite 20 oz bottle','grocery','Drinks & Beverages','Drinks',1.99,'each','','🥤','Sprite',true),
+(184,'Pepsi 20 oz bottle','grocery','Drinks & Beverages','Drinks',1.99,'each','','🥤','Pepsi',true),
+(185,'Dr Pepper Bottle/can','grocery','Drinks & Beverages','Drinks',1.09,'each','','🥤','Dr Pepper',true),
+(186,'7UP 20 oz bottle','grocery','Drinks & Beverages','Drinks',1.99,'each','','🥤','7UP',true),
+(187,'Fanta 20 oz bottle assorted','grocery','Drinks & Beverages','Drinks',1.99,'each','','🥤','Fanta',true),
+(188,'Sunkist Bottle/can assorted','grocery','Drinks & Beverages','Drinks',1.09,'each','','🥤','Sunkist',true),
+(189,'Jarritos Assorted glass bottles','grocery','Drinks & Beverages','Drinks',1.79,'each','','🥤','Jarritos',true),
+(190,'FOCO Coconut Juice','grocery','Drinks & Beverages','Drinks',2.79,'each','','🥤','FOCO',true),
+(191,'FOCO Tamarind Drink','grocery','Drinks & Beverages','Drinks',2.79,'each','','🥤','FOCO',true),
+(192,'Jumex Coconut Water','grocery','Drinks & Beverages','Drinks',1.29,'each','','🥤','Jumex',true),
+(193,'FOCO Coconut Water','grocery','Drinks & Beverages','Drinks',1.29,'each','','🥤','FOCO',true),
+(194,'Farmer''s Aloe Vera Aloe Vera Drink','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Farmer''s Aloe Vera',true),
+(195,'Tropical Fantasy Assorted flavors','grocery','Drinks & Beverages','Drinks',1.49,'each','','🥤','Tropical Fantasy',true),
+(196,'Ocean Spray Cranberry Juice','grocery','Drinks & Beverages','Drinks',4.99,'each','','🥤','Ocean Spray',true),
+(197,'Kirkland Organic Lemonade','grocery','Drinks & Beverages','Drinks',4.99,'each','','🥤','Kirkland',true),
+(198,'Veryfine Fruit Punch','grocery','Drinks & Beverages','Drinks',6.99,'each','','🥤','Veryfine',true),
+(199,'Langers Tart Cherry Pineapple','grocery','Drinks & Beverages','Drinks',6.5,'each','','🥤','Langers',true),
+(200,'Mott''s 100% Apple Juice','grocery','Drinks & Beverages','Drinks',4.99,'each','','🥤','Mott''s',true),
+(201,'Hawaiian Punch Large jug','grocery','Drinks & Beverages','Drinks',4.99,'each','','🥤','Hawaiian Punch',true),
+(202,'Langers Mango Nectar','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Langers',true),
+(203,'Sunberry Farms Guava Nectar','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Sunberry Farms',true),
+(204,'Sunberry Farms Orange Passion Nectar','grocery','Drinks & Beverages','Drinks',NULL,'','','🥤','Sunberry Farms',true),
+(205,'Sour Bears Candy','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','',true),
+(206,'Cherry Gummies','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','',true),
+(207,'Peach Rings','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','',true),
+(208,'Gummy Sharks','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','',true),
+(209,'Gummy Worms','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','',true),
+(210,'Gushers Variety Pack','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','Gushers',true),
+(211,'Kopiko Coffee Candy assorted','candy','Candy & Sweets','Snacks & Sweets',2.99,'each','','🥤','Kopiko',true),
+(212,'Al Safa Crispy Rice Squares','candy','Candy & Sweets','Snacks & Sweets',2.49,'each','','🍚','Al Safa',true),
+(213,'Biscoff Cookies','candy','Candy & Sweets','Snacks & Sweets',9.99,'each','','🍬','Biscoff',true),
+(214,'Cake Rusk Assorted boxes','candy','Candy & Sweets','Snacks & Sweets',6.99,'each','','🍬','Cake Rusk',true),
+(215,'Parle-G / assorted Biscuits','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','Parle-G / assorted',true),
+(216,'Cream Biscuits assorted','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🥛','Various',true),
+(217,'Baklava / boxed sweets','candy','Candy & Sweets','Snacks & Sweets',18.99,'each','','🍬','Various',true),
+(218,'Dates / sweets gift box','candy','Candy & Sweets','Snacks & Sweets',NULL,'','','🍬','Various',true),
 (219,'Clorox Disinfecting Bleach','household','Household','Cleaning & Disposable',4.99,'each','','🧼','Clorox',true),
 (220,'Lysol Power Clinging Gel','household','Household','Cleaning & Disposable',4.99,'each','','🛒','Lysol',true),
 (221,'Kleenex Facial Tissue','household','Household','Cleaning & Disposable',NULL,'','','🧼','Kleenex',true),
@@ -230,7 +230,7 @@ insert into public.products (id, name, department, category, subcategory, price,
 (235,'Ajax Dish Liquid assorted','household','Household','Cleaning & Disposable',NULL,'','','🛒','Ajax',true),
 (236,'Joy Dish Liquid','household','Household','Cleaning & Disposable',1.99,'each','','🛒','Joy',true),
 (237,'Dawn Platinum Dish Soap','household','Household','Cleaning & Disposable',NULL,'','','🧼','Dawn',true),
-(238,'Member''s Mark Liquid Dish Soap','household','Household','Cleaning & Disposable',NULL,'','','🧼','Member''s Mark',true),
+(238,'Liquid Dish Soap','household','Household','Cleaning & Disposable',NULL,'','','🧼','',true),
 (239,'Glad Trash Bags','household','Household','Cleaning & Disposable',NULL,'','','🧼','Glad',true),
 (240,'Ziploc Freezer Bags','household','Household','Cleaning & Disposable',6.99,'each','','🧼','Ziploc',true),
 (241,'Kirkland Freezer Quart Plus Bags','household','Household','Cleaning & Disposable',3.99,'each','','🧼','Kirkland',true),
@@ -238,8 +238,8 @@ insert into public.products (id, name, department, category, subcategory, price,
 (243,'POM Paper Towels','household','Household','Cleaning & Disposable',17.99,'each','','🛒','POM',true),
 (244,'Bath Tissue Large Roll Pack','household','Household','Cleaning & Disposable',15.99,'each','','🧼','Bath Tissue',true),
 (245,'Hefty Foam Plates / bowls assorted','household','Household','Cleaning & Disposable',NULL,'','','🧼','Hefty',true),
-(246,'Member''s Mark White Plastic Cutlery Packets','household','Household','Cleaning & Disposable',NULL,'','','🛒','Member''s Mark',true),
-(247,'Member''s Mark Plastic Spoons','household','Household','Cleaning & Disposable',NULL,'','','🛒','Member''s Mark',true),
+(246,'White Plastic Cutlery Packets','household','Household','Cleaning & Disposable',NULL,'','','🛒','',true),
+(247,'Plastic Spoons','household','Household','Cleaning & Disposable',NULL,'','','🛒','',true),
 (248,'Foam Takeout Containers','household','Household','Cleaning & Disposable',NULL,'','','🛒','Various',true),
 (249,'Disposable Plates/Bowls','household','Household','Cleaning & Disposable',NULL,'','','🧼','Various',true),
 (250,'Aluminum Pans','household','Household','Cleaning & Disposable',1.69,'each','','🛒','Various',true),
@@ -255,7 +255,7 @@ insert into public.products (id, name, department, category, subcategory, price,
 (260,'Tomatoes','grocery','Produce','Fresh Produce',NULL,'','','🥬','Fresh',true),
 (261,'Garlic','grocery','Produce','Fresh Produce',NULL,'','','🥬','Fresh',true),
 (262,'Yellow Onions','grocery','Produce','Fresh Produce',NULL,'','','🥬','Fresh',true),
-(263,'Member''s Mark Commercial Airpot','household','Household','Kitchen & Home',NULL,'','','🛒','Member''s Mark',true),
+(263,'Commercial Airpot','household','Household','Kitchen & Home',NULL,'','','🛒','',true),
 (264,'Aluminum Cooking Pot Set','household','Household','Kitchen & Home',NULL,'','','🛒','Various',true),
 (265,'Vacuum Flask','household','Household','Kitchen & Home',25.0,'each','','🛒','Various',true),
 (266,'Always Electric Kettle','household','Household','Kitchen & Home',20.0,'each','','🛒','Always',true),
@@ -380,3 +380,217 @@ insert into public.products (id, name, department, category, subcategory, price,
 (9078,'Beef Bologna','meat','Deli','Deli Meat',8.99,'/ lb','product-images/deli_beef.jpg','🥪','Makka Halal Meat',true),
 (9079,'Beef Pastrami','meat','Deli','Deli Meat',8.99,'/ lb','product-images/deli_beef.jpg','🥪','Makka Halal Meat',true)
 on conflict (id) do nothing;
+
+-- Aisle 1 customer-facing descriptions (best-effort, based on POS product names)
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 7 and coalesce(description,'') = '';
+update public.products set description = 'A pantry grain staple for rice dishes, sides, pilafs, and traditional family meals.' where id = 8 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 9 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 10 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 11 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 12 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 13 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 14 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 15 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 16 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 17 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 18 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 19 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 20 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 21 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 22 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 23 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 24 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 25 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 26 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 27 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 28 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 29 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 30 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 31 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 32 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 33 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 34 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 35 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 36 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 37 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 38 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 39 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 40 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 41 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 42 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 43 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 44 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 45 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 46 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 47 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 48 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 49 and coalesce(description,'') = '';
+update public.products set description = 'A pantry seasoning or spice for adding flavor and aroma to everyday cooking, rice dishes, meats, sauces, and traditional recipes.' where id = 50 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 51 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 52 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 53 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 54 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 55 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 56 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 57 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 58 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 59 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 60 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 61 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 62 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 63 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 64 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 65 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 66 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 67 and coalesce(description,'') = '';
+update public.products set description = 'A pantry staple for preparing pasta or noodle dishes, soups, sides, and family meals.' where id = 68 and coalesce(description,'') = '';
+update public.products set description = 'A pantry grain staple for rice dishes, sides, pilafs, and traditional family meals.' where id = 69 and coalesce(description,'') = '';
+update public.products set description = 'A pantry grain staple for rice dishes, sides, pilafs, and traditional family meals.' where id = 70 and coalesce(description,'') = '';
+update public.products set description = 'A pantry grain staple for rice dishes, sides, pilafs, and traditional family meals.' where id = 71 and coalesce(description,'') = '';
+update public.products set description = 'A pantry grain staple for rice dishes, sides, pilafs, and traditional family meals.' where id = 72 and coalesce(description,'') = '';
+update public.products set description = 'A pantry grain staple for rice dishes, sides, pilafs, and traditional family meals.' where id = 73 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 74 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 75 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 76 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 77 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 78 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 79 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 80 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 81 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 82 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 83 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 84 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 85 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 86 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 87 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 88 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 89 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 90 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 91 and coalesce(description,'') = '';
+update public.products set description = 'A flavorful sauce or condiment for cooking, dipping, marinating, dressing, or serving with meals.' where id = 92 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 93 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 94 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 95 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 96 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 97 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 98 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 99 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 100 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 101 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 102 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 103 and coalesce(description,'') = '';
+update public.products set description = 'A convenient pantry item for quick meals, sides, soups, stews, salads, and everyday recipes.' where id = 104 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 105 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 106 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 107 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 108 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 109 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 110 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 111 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 112 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 113 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 114 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 115 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 116 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 117 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 118 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 119 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 120 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 121 and coalesce(description,'') = '';
+update public.products set description = 'A grocery staple selected for everyday meals, snacks, and pantry use.' where id = 122 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 123 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 124 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 125 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 126 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 127 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 128 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 129 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 130 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 131 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 132 and coalesce(description,'') = '';
+update public.products set description = 'A kitchen staple for cooking, frying, dressing, marinating, or finishing a variety of dishes.' where id = 133 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 134 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 135 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 136 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 137 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 138 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 139 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 140 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 141 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 142 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 143 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 144 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 145 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 146 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 147 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 148 and coalesce(description,'') = '';
+update public.products set description = 'A tea or coffee selection for preparing a warm, flavorful beverage at home.' where id = 149 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 150 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 151 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 152 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 153 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 154 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 155 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 156 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 157 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 158 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 159 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 160 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 161 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 162 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 163 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 164 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 165 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 166 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 167 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 168 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 169 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 170 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 171 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 172 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 173 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 174 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 175 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 176 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 177 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 178 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 179 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 180 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 181 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 182 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 183 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 184 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 185 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 186 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 187 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 188 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 189 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 190 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 191 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 192 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 193 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 194 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 195 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 196 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 197 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 198 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 199 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 200 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 201 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 202 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 203 and coalesce(description,'') = '';
+update public.products set description = 'A refreshing beverage option for serving chilled or enjoying with meals.' where id = 204 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 205 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 206 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 207 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 208 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 209 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 210 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 211 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 212 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 213 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 214 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 215 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 216 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 217 and coalesce(description,'') = '';
+update public.products set description = 'A sweet snack or treat for enjoying on its own, sharing, or serving with tea and coffee.' where id = 218 and coalesce(description,'') = '';
