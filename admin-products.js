@@ -69,10 +69,20 @@ function sanitizeProduct(b) {
   if (b.subcategory !== undefined) out.subcategory = String(b.subcategory).slice(0, 100);
   if (b.description !== undefined) out.description = String(b.description).slice(0, 1000);
   if (b.is_food !== undefined) out.is_food = !!b.is_food;
+  if (b.media !== undefined) {
+    const items = Array.isArray(b.media) ? b.media.slice(0, 10).map(m => ({
+      url: String(m.url || '').slice(0, 500),
+      type: m.type === 'video' ? 'video' : 'image',
+      cover: !!m.cover,
+    })) : [];
+    out.media = items;
+    // keep image in sync with the cover photo
+    const cover = items.find(m => m.cover) || items[0];
+    if (cover) out.image = cover.url;
+  }
   if (b.price !== undefined) out.price = b.price === null || b.price === '' ? null : Number(b.price);
   if (b.unit !== undefined) out.unit = String(b.unit).slice(0, 20);
   if (b.image !== undefined) out.image = String(b.image).slice(0, 500);
-  if (b.media !== undefined) out.media = Array.isArray(b.media) ? b.media.slice(0,10).map(m => ({ url:String(m.url||'').slice(0,1000), type:m.type === 'video' ? 'video' : 'image', cover:!!m.cover })).filter(m=>m.url) : [];
   if (b.emoji !== undefined) out.emoji = String(b.emoji).slice(0, 10);
   if (b.brand !== undefined) out.brand = String(b.brand).slice(0, 100);
   if (b.active !== undefined) out.active = !!b.active;

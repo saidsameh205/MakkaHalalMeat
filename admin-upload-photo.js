@@ -23,11 +23,12 @@ exports.handler = async (event) => {
     const filename = String(body.filename || 'photo.jpg').replace(/[^a-zA-Z0-9_.-]/g, '_');
     const contentType = String(body.contentType || 'image/jpeg');
     const dataBase64 = String(body.dataBase64 || '');
-    if (!dataBase64) throw new Error('No media data received');
-    if (!contentType.startsWith('image/') && !contentType.startsWith('video/')) throw new Error('Only image and video files are allowed');
+    if (!dataBase64) throw new Error('No image data received');
 
     const buffer = Buffer.from(dataBase64, 'base64');
-    if (buffer.length > 4 * 1024 * 1024) throw new Error('Media file is too large (max 4 MB)');
+    const isVideo = contentType.startsWith('video/');
+    const maxSize = isVideo ? 50 * 1024 * 1024 : 4 * 1024 * 1024; // 50MB for video, 4MB for images
+    if (buffer.length > maxSize) throw new Error(isVideo ? 'Video is too large (max 50 MB)' : 'Image is too large (max 4 MB) — try a smaller photo');
 
     const folder = settingKey ? 'settings' : dealId ? 'deals' : 'products';
     const id = settingKey || dealId || productId;
