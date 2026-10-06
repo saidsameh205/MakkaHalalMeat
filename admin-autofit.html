@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Makka Halal Meat — Staff Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{ --ink:#221912; --paper:#faf6ef; --accent:#7a1f2b; --muted:#6b5f55; --line:rgba(0,0,0,.1); }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,sans-serif; background:var(--paper); color:var(--ink); }
+  header{ background:var(--accent); color:#fff; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; }
+  header h1{ font-size:1.1rem; margin:0; }
+  main{ max-width:1100px; margin:0 auto; padding:20px; }
+  .gate{ max-width:360px; margin:80px auto; text-align:center; }
+  .gate input{ width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); margin:12px 0; }
+  .gate button, .btn{ background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer; }
+  .btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  .btn.small{ padding:6px 10px; font-size:.8rem; }
+  .tabs{ display:flex; gap:6px; margin-bottom:18px; border-bottom:1px solid var(--line); }
+  .tab{ padding:10px 16px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; font-weight:600; }
+  .tab.active{ color:var(--accent); border-color:var(--accent); }
+  .panel{ display:none; } .panel.active{ display:block; }
+  table{ width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+  .table-scroll{ overflow-x:auto; border-radius:10px; }
+  .table-scroll table{ min-width:1650px; }
+  .table-scroll input[type="text"],.table-scroll input:not([type]){ transition:width .15s; }
+  
+  .media-gallery{ display:flex; flex-direction:column; gap:6px; }
+  .media-thumbs{ display:flex; flex-wrap:wrap; gap:6px; }
+  .media-thumb{ position:relative; width:72px; height:72px; border-radius:8px; overflow:hidden; border:2px solid #e0ddd8; background:#f5f0e8; flex:0 0 auto; }
+  .media-thumb img,.media-thumb video{ width:100%; height:100%; object-fit:cover; display:block; }
+  .media-thumb.is-cover{ border-color:#C0272D; border-width:2.5px; }
+  .media-thumb .cover-badge{ position:absolute; top:2px; left:2px; background:#C0272D; color:#fff; font-size:.55rem; font-weight:700; padding:1px 4px; border-radius:3px; }
+  .media-thumb .del-btn{ position:absolute; top:2px; right:2px; background:rgba(0,0,0,.65); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:.65rem; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+  .media-thumb .cover-btn{ position:absolute; bottom:2px; left:2px; right:2px; background:rgba(0,0,0,.55); color:#fff; border:none; border-radius:3px; font-size:.6rem; cursor:pointer; padding:2px; }
+  .media-add-btn{ display:inline-flex; align-items:center; gap:4px; background:#f5f0e8; border:1.5px dashed #c8bdb0; border-radius:8px; padding:6px 12px; font-size:.78rem; color:#776050; cursor:pointer; font-weight:600; }
+  .media-add-btn:hover{ border-color:#C0272D; color:#C0272D; }
+  th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); font-size:.86rem; }
+  th{ background:#f1ece2; }
+  input, select{ padding:6px 8px; border-radius:6px; border:1px solid var(--line); font-size:.85rem; width:100%; }
+  .table-scroll input[type="text"], .table-scroll input:not([type]){ min-width:110px; max-width:520px; }
+  .table-scroll textarea{ min-width:360px; width:520px; max-width:700px; min-height:96px; resize:both; line-height:1.45; font-size:.85rem; padding:8px 10px; border-radius:6px; border:1px solid var(--line); box-sizing:border-box; }
+  #productsBody td{ vertical-align:top; }
+  .row-actions{ display:flex; gap:6px; }
+  .toolbar{ display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+  .toolbar input, .toolbar select{ width:auto; }
+  .card{ background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.06); margin-bottom:16px; }
+  .card label{ display:block; font-size:.8rem; color:var(--muted); margin:10px 0 4px; }
+  .badge{ font-size:.72rem; padding:2px 8px; border-radius:999px; background:#eee; }
+  .badge.paid{ background:#dff2e2; color:#1d6a37; }
+  .badge.new{ background:#fdeecb; color:#8a5b00; }
+  .msg{ font-size:.85rem; color:var(--muted); margin-top:8px; }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <h2>Staff sign-in</h2>
+  <p class="msg">Enter the admin token configured in Netlify (ADMIN_TOKEN).</p>
+  <input type="password" id="tokenInput" placeholder="Admin token">
+  <button onclick="signIn()">Continue</button>
+  <div class="msg" id="gateMsg"></div>
+</div>
+
+<div id="app" style="display:none;">
+  <header>
+    <h1>Makka Halal Meat — Staff Admin</h1>
+    <a href="gif.html" target="_blank" style="color:#fff;font-size:.85rem;margin-left:auto;margin-right:12px;text-decoration:underline;">Open GIF staff app ↗</a>
+    <button class="btn ghost" style="background:rgba(255,255,255,.15); color:#fff; border-color:rgba(255,255,255,.4);" onclick="signOut()">Sign out</button>
+  </header>
+  <div id="visitorStrip" style="padding:8px 20px;background:#f4ede1;border-bottom:1px solid #e3d7c2;font-size:.88rem;font-weight:600;color:#5b4a2f;">
+    <span id="visitorLive">Loading visitor stats…</span>
+  </div>
+  <main>
+    <div class="tabs">
+      <div class="tab active" data-tab="orders" onclick="showTab('orders')">Orders</div>
+      <div class="tab" data-tab="products" onclick="showTab('products')">Products</div>
+      <div class="tab" data-tab="deals" onclick="showTab('deals')">Deals</div>
+      <div class="tab" data-tab="team" onclick="showTab('team')">Team</div>
+      <div class="tab" data-tab="settings" onclick="showTab('settings')">Site settings</div>
+    </div>
+
+    <section class="panel active" id="panel-orders">
+      <div class="toolbar">
+        <button class="btn small" onclick="loadOrders()">Refresh</button>
+        <span class="msg" id="ordersMsg"></span>
+      </div>
+      <table>
+        <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Pickup time</th><th>Staff notes</th><th></th></tr></thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="panel-products">
+      <div class="toolbar">
+        <input id="productSearch" placeholder="Search products…" oninput="renderProducts()">
+        <select id="productDeptFilter" onchange="renderProducts()">
+          <option value="">All departments</option>
+          <option value="meat">Meat</option><option value="grocery">Grocery</option><option value="household">Household</option><option value="beauty">Beauty</option><option value="baby">Baby</option><option value="clothing">Clothing</option><option value="candy">Candy & Sweets</option>
+          <option value="household">Household</option><option value="beauty">Beauty</option>
+          <option value="baby">Baby</option><option value="clothing">Clothing</option>
+        </select>
+        <button class="btn small" onclick="addProductRow()">+ New product</button>
+        <button class="btn small" onclick="loadProducts()">Refresh</button>
+        <span class="msg" id="productsMsg"></span>
+      </div>
+      <div class="table-scroll"><table>
+        <thead><tr><th style="min-width:260px;">Name</th><th style="min-width:150px;">Dept</th><th style="min-width:220px;">Category</th><th style="min-width:520px;">Description</th><th style="min-width:80px;">Price</th><th style="min-width:70px;">Unit</th><th style="min-width:65px;">Stock</th><th colspan="2" style="min-width:220px;">Media Gallery</th><th>Active</th><th>Tax</th><th>Featured</th><th></th></tr></thead>
+        <tbody id="productsBody"></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel" id="panel-deals">
+      <div class="toolbar">
+        <button class="btn small" onclick="addDealRow()">+ New deal</button>
+        <button class="btn small" onclick="loadDeals()">Refresh</button>
+        <span class="msg" id="dealsMsg"></span>
+      </div>
+      <p class="msg">Give a deal a <b>code and a discount</b> to actually take money off at checkout. A deal with no code
+        (or no discount amount) just shows as a notice on the Deals tab — nothing to redeem.</p>
+      <table>
+        <thead><tr><th>Title</th><th>Description</th><th>Requirements</th><th>Code</th><th>Discount</th><th>Photo</th><th>Expires</th><th>Active</th><th></th></tr></thead>
+        <tbody id="dealsBody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="panel-team">
+      <div class="card" id="pinBox" hidden style="border:2px solid var(--accent);">
+        <div id="pinFor" style="font-weight:700;"></div>
+        <div id="pinBig" style="font-size:2.4rem;font-weight:800;letter-spacing:.25em;margin:8px 0;"></div>
+        <div class="msg">Write this down or tell them now. For security it is <b>never shown again</b> (you can always reset it for a new one).</div>
+        <button class="btn small" style="margin-top:10px;" onclick="document.getElementById('pinBox').hidden=true">Done</button>
+      </div>
+      <div class="card">
+        <b>Add an associate</b>
+        <div class="toolbar" style="margin-top:10px;">
+          <input id="newName" placeholder="Name (e.g. Amina)" style="min-width:150px;">
+          <input id="newPin" placeholder="PIN (optional)" inputmode="numeric" style="width:130px;">
+          <label style="font-size:.85rem;"><input type="checkbox" id="newApprove" style="width:auto;"> Can approve cancellations &amp; refunds</label>
+          <button class="btn" onclick="addStaff()">Add &amp; create PIN</button>
+        </div>
+        <div class="msg">Leave the PIN blank to get a random 6-digit one (recommended). Each person signs in to GIF with their <b>name + PIN</b>.
+          Names must be different from each other. Leave "can approve" off unless it's a manager you trust with refunds.</div>
+      </div>
+      <div class="toolbar"><button class="btn small" onclick="loadTeam()">Refresh</button><span class="msg" id="teamMsg"></span></div>
+      <table>
+        <thead><tr><th>Name</th><th>Access</th><th>Can approve</th><th>Last sign-in</th><th></th></tr></thead>
+        <tbody id="teamBody"></tbody>
+      </table>
+      <p class="msg">Turning someone off (or resetting their PIN) signs them out of GIF <b>immediately</b>, even mid-shift.
+        Everything they did on orders stays in each order's activity log.</p>
+    </section>
+
+    <section class="panel" id="panel-settings">
+      <div class="card" id="settingsForm"></div>
+      <button class="btn" onclick="saveSettings()">Save settings</button>
+      <span class="msg" id="settingsMsg"></span>
+    </section>
+  </main>
+</div>
+
+<script>
+let TOKEN = sessionStorage.getItem("mhm_admin_token") || "";
+let PRODUCTS = [];
+let SETTINGS = {};
+
+function api(path, opts = {}) {
+  return fetch(`/.netlify/functions/${path}`, {
+    ...opts,
+    headers: { "Content-Type": "application/json", "x-admin-token": TOKEN, ...(opts.headers || {}) },
+  }).then(async (r) => {
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || "Request failed");
+    return data;
+  });
+}
+
+async function signIn() {
+  TOKEN = document.getElementById("tokenInput").value.trim();
+  try {
+    await api("admin-orders"); // cheap call to validate the token
+    sessionStorage.setItem("mhm_admin_token", TOKEN);
+    document.getElementById("gate").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam(); loadVisitorStats(); startVisitorPolling();
+  } catch (e) {
+    document.getElementById("gateMsg").textContent = "Incorrect token, or ADMIN_TOKEN isn't set in Netlify yet.";
+  }
+}
+function signOut() { sessionStorage.removeItem("mhm_admin_token"); location.reload(); }
+
+if (TOKEN) {
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  loadOrders(); loadProducts(); loadSettings(); loadDeals(); loadTeam(); loadVisitorStats(); startVisitorPolling();
+}
+
+function showTab(name) {
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === "panel-" + name));
+}
+
+/* ---------------- Orders ---------------- */
+async function loadOrders() {
+  document.getElementById("ordersMsg").textContent = "Loading…";
+  try {
+    const orders = await api("admin-orders");
+    window._orders = orders;
+    document.getElementById("ordersBody").innerHTML = orders.map(orderRow).join("");
+    document.getElementById("ordersMsg").textContent = `${orders.length} orders`;
+  } catch (e) { document.getElementById("ordersMsg").textContent = e.message; }
+}
+const ORDER_STATUSES = ["Awaiting Payment", "New", "Preparing", "Ready for Pickup", "Completed", "Cancelled", "Abandoned"];
+const PREF_LABEL = { substitute: "OK to substitute", call: "Call/text first", skip: "Skip if out" };
+const fmtET = (iso) => new Date(iso).toLocaleString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
+function orderRow(o) {
+  const statuses = ORDER_STATUSES.includes(o.status) ? ORDER_STATUSES : [...ORDER_STATUSES, o.status];
+  const badgeClass = o.status === "Completed" || o.status === "Ready for Pickup" ? "paid" : "new";
+  const pickupVal = o.pickup_time ? new Date(o.pickup_time).toISOString().slice(0,16) : "";
+  const payLabel = { unpaid: "Unpaid", authorized: "Card held", captured: "Paid", cancelled: "Hold released", refunded: "Refunded", partially_refunded: "Part refunded" }[o.payment_status] || "";
+  const picked = (o.items || []).filter((i) => i && i.pick_status && i.pick_status !== "pending");
+  const changes = (o.items || []).filter((i) => i && (i.pick_status === "unavailable" || i.pick_status === "substituted"))
+    .map((i) => i.pick_status === "unavailable" ? `✕ ${i.name || "item"} unavailable` : `⇄ ${i.name || "item"} → ${i.substitute ? i.substitute.name : "substitute"}`).join("<br>");
+  const amountToCapture = o.adjusted_total != null ? o.adjusted_total : o.total;
+  const canAct = o.stripe_session_id && o.payment_status !== "captured" && o.payment_status !== "cancelled" && o.status !== "Cancelled" && o.status !== "Abandoned";
+  return `<tr data-order-id="${o.id}">
+    <td>${o.order_code}<div class="msg">${new Date(o.created_at).toLocaleString()}</div></td>
+    <td>${o.customer_name || ""}<div class="msg">${o.customer_phone || ""}</div>
+      <div class="msg">Wants: ${o.requested_pickup ? fmtET(o.requested_pickup) : "ASAP"}</div>
+      <div class="msg">If out: ${PREF_LABEL[o.substitution_pref] || "—"}</div>
+      ${o.cancel_request_status ? `<div class="msg" style="color:${o.cancel_request_status === "pending" ? "#b3262d" : "#555"};font-weight:700;">Cancel request: ${o.cancel_request_status}${o.cancel_request_status === "pending" ? " — decide in GIF" : ""}</div>` : ""}
+      ${o.refund_request_status ? `<div class="msg" style="color:${o.refund_request_status === "pending" ? "#b3262d" : "#555"};font-weight:700;">Refund request: ${o.refund_request_status}${o.refund_request_status === "pending" ? " — decide in GIF" : ""}</div>` : ""}</td>
+    <td>$${Number(o.total || 0).toFixed(2)}
+      ${o.adjusted_total != null && Number(o.adjusted_total) !== Number(o.total) ? `<div class="msg"><b>Now $${Number(o.adjusted_total).toFixed(2)}</b></div>` : ""}
+      ${payLabel ? `<div class="badge ${o.payment_status === "captured" ? "paid" : "new"}" style="margin-top:4px;">${payLabel}</div>` : ""}</td>
+    <td>
+      <select onchange="updateStatus(${o.id}, this.value)">
+        ${statuses.map((s) => `<option ${s === o.status ? "selected" : ""}>${s}</option>`).join("")}
+      </select>
+      ${picked.length ? `<div class="msg">${picked.length}/${(o.items || []).length} items handled in GIF</div>` : ""}
+      ${o.events && o.events.length ? `<div class="msg">Last: <b>${escH(o.events[o.events.length - 1].by)}</b> — ${escH(o.events[o.events.length - 1].what)} <a href="#" onclick="showActivity(${o.id});return false;">all activity</a></div>` : ""}
+      ${changes ? `<div class="msg" style="color:#8a5b00;">${changes}</div>` : ""}
+    </td>
+    <td><input type="datetime-local" data-field="pickup_time" value="${pickupVal}"></td>
+    <td><input data-field="staff_notes" value="${escAttr(o.staff_notes || "")}" placeholder="e.g. called, ready early"></td>
+    <td class="row-actions">
+      <button class="btn small" onclick="saveOrderDetails(${o.id})">Save</button>
+      ${canAct ? `
+        <button class="btn small" onclick="capturePayment('${o.stripe_session_id}', ${amountToCapture})">Capture</button>
+        <button class="btn small ghost" onclick="cancelAuth('${o.stripe_session_id}')">Cancel</button>` : ""}
+    </td>
+  </tr>`;
+}
+async function saveOrderDetails(id) {
+  const tr = document.querySelector(`tr[data-order-id="${id}"]`);
+  const pickup_time = tr.querySelector('[data-field="pickup_time"]').value || null;
+  const staff_notes = tr.querySelector('[data-field="staff_notes"]').value;
+  try { await api("update-order-status", { method: "POST", body: JSON.stringify({ id, pickup_time, staff_notes }) }); document.getElementById("ordersMsg").textContent = "Saved."; }
+  catch (e) { alert(e.message); }
+}
+async function updateStatus(id, status) {
+  try { await api("update-order-status", { method: "POST", body: JSON.stringify({ id, status }) }); }
+  catch (e) { alert(e.message); }
+}
+async function capturePayment(sessionId, total) {
+  const finalAmount = prompt("Final amount to charge (prefilled with the updated total after picking):", Number(total).toFixed(2));
+  if (!finalAmount) return;
+  try {
+    await api("capture-final-payment", { method: "POST", body: JSON.stringify({ sessionId, finalAmount: Number(finalAmount) }) });
+    loadOrders();
+  } catch (e) { alert(e.message); }
+}
+async function cancelAuth(sessionId) {
+  if (!confirm("Cancel this authorization? The customer will not be charged.")) return;
+  try { await api("cancel-authorization", { method: "POST", body: JSON.stringify({ sessionId }) }); loadOrders(); }
+  catch (e) { alert(e.message); }
+}
+
+/* ---------------- Products ---------------- */
+async function loadProducts() {
+  document.getElementById("productsMsg").textContent = "Loading…";
+  try { PRODUCTS = await api("admin-products"); renderProducts(); document.getElementById("productsMsg").textContent = `${PRODUCTS.length} products`; }
+  catch (e) { document.getElementById("productsMsg").textContent = e.message; }
+}
+function renderProducts() {
+  const q = document.getElementById("productSearch").value.toLowerCase();
+  const dept = document.getElementById("productDeptFilter").value;
+  const rows = PRODUCTS.filter((p) => (!dept || p.department === dept) && p.name.toLowerCase().includes(q));
+  document.getElementById("productsBody").innerHTML = rows.map(productRow).join("");
+}
+function productRow(p) {
+  return `<tr data-id="${p.id}">
+    <td><input value="${escAttr(p.name)}" data-field="name" style="min-width:260px;width:${Math.max(260, Math.min(520, (p.name||'').length * 8.5 + 36))}px;"></td>
+    <td><input value="${escAttr(p.department)}" data-field="department" style="min-width:150px;width:${Math.max(150, Math.min(260, (p.department||'').length * 8.5 + 36))}px;"></td>
+    <td>
+      <input value="${escAttr(p.category)}" data-field="category" list="cats_${p.id}" placeholder="e.g. Snacks" style="min-width:220px;width:${Math.max(220, Math.min(380, (p.category||'').length * 8.5 + 36))}px;">
+      <datalist id="cats_${p.id}">${categoryOptions(p.department).map(c=>`<option value="${escAttr(c)}">`).join("")}</datalist>
+    </td>
+    <td><textarea data-field="description" rows="4" placeholder="Optional — shown to customers on the item's page" style="width:520px;min-width:360px;max-width:700px;min-height:96px;resize:both;line-height:1.5;font-size:.85rem;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escHtml(p.description || "")}</textarea></td>
+    <td><input value="${p.price == null ? "" : p.price}" data-field="price" type="number" step="0.01" style="min-width:80px;width:80px;"></td>
+    <td><input value="${escAttr(p.unit || "")}" data-field="unit" style="min-width:100px;width:100px;max-width:180px;"></td>
+    <td><input value="${p.stock == null ? "" : p.stock}" data-field="stock" type="number" step="1" placeholder="∞" style="min-width:65px;width:65px;"></td>
+    <td colspan="2" style="min-width:220px;">
+      <div class="media-gallery" id="gallery_${p.id}">
+        <div class="media-thumbs" id="thumbs_${p.id}">${renderMediaThumbs(p)}</div>
+        <label class="media-add-btn">
+          + Add photos / video
+          <input type="file" accept="image/*,video/mp4,video/quicktime,video/webm" multiple style="display:none;" onchange="addMediaFiles(${p.id}, this)">
+        </label>
+        <div class="msg" id="mediaMsg_${p.id}" style="font-size:.78rem;color:#888;margin-top:4px;"></div>
+      </div>
+      <input type="hidden" data-field="image" value="${escAttr(p.image || '')}">
+      <input type="hidden" data-field="media" value="${escAttr(JSON.stringify(p.media || []))}">
+    </td>
+    <td><input type="checkbox" data-field="active" ${p.active ? "checked" : ""}></td>
+    <td>
+      <select data-field="is_food" title="Which sales tax rate applies to this item">
+        <option value="true" ${p.is_food !== false ? "selected" : ""}>Food (3%)</option>
+        <option value="false" ${p.is_food === false ? "selected" : ""}>Non-food (8%)</option>
+      </select>
+    </td>
+    <td><input type="checkbox" data-field="featured" ${p.featured ? "checked" : ""} title="Show in the home page's Featured today slideshow"></td>
+    <td class="row-actions">
+      <button class="btn small" onclick="saveProduct(${p.id})">Save</button>
+      <button class="btn small ghost" onclick="deleteProduct(${p.id})">Remove</button>
+    </td>
+  </tr>`;
+}
+/* ---- Media gallery helpers ---- */
+const MAX_MEDIA = 10;
+
+// Render thumbnails for existing media on a product row
+function renderMediaThumbs(p) {
+  const items = Array.isArray(p.media) ? p.media : (p.image ? [{ url: p.image, type: 'image', cover: true }] : []);
+  if (!items.length) return '<span style="color:#bbb;font-size:.75rem;">No media yet</span>';
+  return items.map((m, i) => {
+    const isVideo = m.type === 'video';
+    const isCover = m.cover || i === 0;
+    const media = isVideo
+      ? `<video src="${escAttr(m.url)}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`
+      : `<img src="${escAttr(m.url)}" loading="lazy" alt="">`;
+    return `<div class="media-thumb${isCover ? ' is-cover' : ''}" data-idx="${i}">
+      ${media}
+      ${isCover ? '<span class="cover-badge">Cover</span>' : ''}
+      <button class="del-btn" onclick="removeMedia(${p.id},${i})" title="Remove">✕</button>
+      ${!isCover ? `<button class="cover-btn" onclick="setCover(${p.id},${i})">Set cover</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// Get the current media array for a product row
+function getProductMedia(productId) {
+  const tr = document.querySelector(`tr[data-id="${productId}"]`);
+  if (!tr) return [];
+  try { return JSON.parse(tr.querySelector('[data-field="media"]').value || '[]'); } catch(e) { return []; }
+}
+
+// Save media array back to the hidden fields and refresh thumbnails
+function saveProductMedia(productId, items) {
+  const tr = document.querySelector(`tr[data-id="${productId}"]`);
+  if (!tr) return;
+  tr.querySelector('[data-field="media"]').value = JSON.stringify(items);
+  const cover = items.find(m => m.cover) || items[0];
+  tr.querySelector('[data-field="image"]').value = cover ? cover.url : '';
+  const thumbsEl = document.getElementById('thumbs_' + productId);
+  if (thumbsEl) {
+    const p = PRODUCTS.find(x => x.id === productId) || {};
+    p.media = items;
+    p.image = cover ? cover.url : '';
+    thumbsEl.innerHTML = renderMediaThumbs(p);
+  }
+}
+
+// Remove one media item
+function removeMedia(productId, idx) {
+  const items = getProductMedia(productId);
+  items.splice(idx, 1);
+  if (items.length && !items.some(m => m.cover)) items[0].cover = true;
+  saveProductMedia(productId, items);
+}
+
+// Set a different item as the cover photo
+function setCover(productId, idx) {
+  const items = getProductMedia(productId);
+  items.forEach((m, i) => { m.cover = i === idx; });
+  saveProductMedia(productId, items);
+}
+
+// Handle multiple file selection — upload each one
+async function addMediaFiles(productId, input) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  const msgEl = document.getElementById('mediaMsg_' + productId);
+  const existing = getProductMedia(productId);
+  const remaining = MAX_MEDIA - existing.length;
+  if (remaining <= 0) { if (msgEl) msgEl.textContent = `Max ${MAX_MEDIA} media files per product.`; return; }
+  const toUpload = files.slice(0, remaining);
+  if (msgEl) msgEl.textContent = `Uploading ${toUpload.length} file${toUpload.length > 1 ? 's' : ''}…`;
+  let uploaded = 0;
+  for (const file of toUpload) {
+    try {
+      const dataBase64 = await fileToBase64(file);
+      const isVideo = file.type.startsWith('video/');
+      const result = await api('admin-upload-photo', {
+        method: 'POST',
+        body: JSON.stringify({ productId, filename: file.name, contentType: file.type, dataBase64 }),
+      });
+      const current = getProductMedia(productId);
+      current.push({ url: result.url, type: isVideo ? 'video' : 'image', cover: current.length === 0 });
+      saveProductMedia(productId, current);
+      uploaded++;
+      if (msgEl) msgEl.textContent = `Uploaded ${uploaded} of ${toUpload.length}…`;
+    } catch(e) {
+      if (msgEl) msgEl.textContent = `Error: ${e.message}`;
+    }
+  }
+  if (msgEl) msgEl.textContent = uploaded === toUpload.length ? `✓ ${uploaded} file${uploaded > 1 ? 's' : ''} uploaded` : `${uploaded} of ${toUpload.length} uploaded`;
+  input.value = '';
+}
+
+async function uploadPhoto(productId, input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const tr = input.closest("tr");
+  const msgEl = tr.querySelector('[data-field="uploadMsg"]');
+  msgEl.textContent = "Uploading…";
+  try {
+    const dataBase64 = await fileToBase64(file);
+    const result = await api("admin-upload-photo", {
+      method: "POST",
+      body: JSON.stringify({ productId, filename: file.name, contentType: file.type, dataBase64 }),
+    });
+    tr.querySelector('[data-field="image"]').value = result.url;
+    msgEl.textContent = "Uploaded — click Save to apply.";
+  } catch (e) {
+    msgEl.textContent = e.message || "Upload failed";
+  }
+}
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function readRow(id) {
+  const tr = document.querySelector(`tr[data-id="${id}"]`);
+  const get = (f) => tr.querySelector(`[data-field="${f}"]`);
+  return {
+    id,
+    name: get("name").value,
+    department: get("department").value,
+    category: get("category").value,
+    description: get("description").value,
+    image: get("image").value,
+    media: (() => { try { return JSON.parse(get("media").value || "[]"); } catch(e) { return []; } })(),
+    price: get("price").value === "" ? null : Number(get("price").value),
+    unit: get("unit").value,
+    stock: get("stock").value === "" ? null : Number(get("stock").value),
+    image: get("image").value,
+    active: get("active").checked,
+    is_food: get("is_food").value === "true",
+    featured: get("featured").checked,
+  };
+}
+async function saveProduct(id) {
+  try { await api("admin-products", { method: "PATCH", body: JSON.stringify(readRow(id)) }); document.getElementById("productsMsg").textContent = "Saved."; }
+  catch (e) { alert(e.message); }
+}
+async function deleteProduct(id) {
+  if (!confirm("Remove this product from the storefront? (It stays on past orders.)")) return;
+  try { await api("admin-products", { method: "DELETE", body: JSON.stringify({ id }) }); loadProducts(); }
+  catch (e) { alert(e.message); }
+}
+async function addProductRow() {
+  const name = prompt("Product name:"); if (!name) return;
+  const department = prompt("Department (meat, grocery, household, beauty, baby, clothing, candy):", "grocery");
+  const cats = categoryOptions(String(department || "").trim().toLowerCase());
+  const catSuggestion = cats.length ? cats[0] : department;
+  const category = prompt(`Category for this ${department} item:\n\nSuggestions: ${cats.slice(0,6).join(", ") || "type your own"}`, catSuggestion) || catSuggestion;
+  const is_food = !["household", "beauty", "baby", "clothing"].includes(String(department || "").trim().toLowerCase()); // candy stays food (3%)
+  try {
+    const created = await api("admin-products", { method: "POST", body: JSON.stringify({ id: Date.now(), name, department, category, price: null, unit: "each", active: true, is_food }) });
+    PRODUCTS.unshift(created); renderProducts();
+  } catch (e) { alert(e.message); }
+}
+
+/* ---------------- Deals ---------------- */
+async function loadDeals() {
+  document.getElementById("dealsMsg").textContent = "Loading…";
+  try { const deals = await api("admin-discounts"); window._deals = deals; renderDealsRows(deals); document.getElementById("dealsMsg").textContent = `${deals.length} deals`; }
+  catch (e) { document.getElementById("dealsMsg").textContent = e.message; }
+}
+function renderDealsRows(deals) {
+  document.getElementById("dealsBody").innerHTML = deals.map(dealRow).join("");
+}
+function dealRow(d) {
+  const expiresVal = d.expires_at ? new Date(d.expires_at).toISOString().slice(0,10) : "";
+  const type = d.discount_type || "";
+  return `<tr data-id="${d.id}">
+    <td><input value="${escAttr(d.title)}" data-field="title"></td>
+    <td><textarea data-field="description" rows="3" oninput="autoFitTextarea(this)">${escHtml(d.description || "")}</textarea></td>
+    <td><textarea data-field="requirements" rows="3" oninput="autoFitTextarea(this)">${escHtml(d.requirements || "")}</textarea></td>
+    <td><input value="${escAttr(d.code || "")}" data-field="code" placeholder="e.g. WELCOME10" style="text-transform:uppercase;"></td>
+    <td>
+      <select data-field="discount_type" style="margin-bottom:4px;">
+        <option value="" ${!type ? "selected" : ""}>No discount (just a notice)</option>
+        <option value="percent" ${type === "percent" ? "selected" : ""}>% off</option>
+        <option value="amount" ${type === "amount" ? "selected" : ""}>$ off</option>
+      </select>
+      <input type="number" min="0" step="0.01" value="${d.discount_value != null ? d.discount_value : ""}" data-field="discount_value" placeholder="10" style="width:80px;">
+    </td>
+    <td>
+      <input value="${escAttr(d.image || "")}" data-field="image" placeholder="deals/example.jpg" style="width:100px;">
+      <input type="file" accept="image/*;capture=camera" style="max-width:100px;" onchange="uploadDealPhoto(${d.id}, this)">
+      <div class="msg" data-field="uploadMsg"></div>
+    </td>
+    <td><input type="date" value="${expiresVal}" data-field="expires_at"></td>
+    <td><input type="checkbox" data-field="active" ${d.active ? "checked" : ""}></td>
+    <td class="row-actions">
+      <button class="btn small" onclick="saveDeal(${d.id})">Save</button>
+      <button class="btn small ghost" onclick="deleteDeal(${d.id})">Remove</button>
+    </td>
+  </tr>`;
+}
+async function uploadDealPhoto(dealId, input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const tr = input.closest("tr");
+  const msgEl = tr.querySelector('[data-field="uploadMsg"]');
+  msgEl.textContent = "Uploading…";
+  try {
+    const dataBase64 = await fileToBase64(file);
+    const result = await api("admin-upload-photo", {
+      method: "POST",
+      body: JSON.stringify({ dealId, filename: file.name, contentType: file.type, dataBase64 }),
+    });
+    tr.querySelector('[data-field="image"]').value = result.url;
+    msgEl.textContent = "Uploaded — click Save to apply.";
+  } catch (e) {
+    msgEl.textContent = e.message || "Upload failed";
+  }
+}
+function readDealRow(id) {
+  const tr = document.querySelector(`#dealsBody tr[data-id="${id}"]`);
+  const get = (f) => tr.querySelector(`[data-field="${f}"]`);
+  const type = get("discount_type").value || null;
+  const valRaw = get("discount_value").value;
+  return {
+    id,
+    title: get("title").value,
+    description: get("description").value,
+    requirements: get("requirements").value,
+    code: get("code").value.trim().toUpperCase(),
+    discount_type: type,
+    discount_value: type && valRaw !== "" ? Number(valRaw) : null,
+    image: get("image").value,
+    expires_at: get("expires_at").value || null,
+    active: get("active").checked,
+  };
+}
+async function saveDeal(id) {
+  const row = readDealRow(id);
+  if (row.code && row.discount_type && !(row.discount_value > 0)) { alert("Enter how much the code takes off (a number greater than 0)."); return; }
+  if (row.discount_type && !row.code) { alert("A discount needs a code customers can type in at checkout."); return; }
+  try { await api("admin-discounts", { method: "PATCH", body: JSON.stringify(row) }); document.getElementById("dealsMsg").textContent = "Saved."; }
+  catch (e) { alert(e.message); }
+}
+async function deleteDeal(id) {
+  if (!confirm("Remove this deal?")) return;
+  try { await api("admin-discounts", { method: "DELETE", body: JSON.stringify({ id }) }); loadDeals(); }
+  catch (e) { alert(e.message); }
+}
+async function addDealRow() {
+  const title = prompt("Deal title:"); if (!title) return;
+  try {
+    const created = await api("admin-discounts", { method: "POST", body: JSON.stringify({ title, active: true }) });
+    window._deals = [created, ...(window._deals || [])]; renderDealsRows(window._deals);
+  } catch (e) { alert(e.message); }
+}
+
+/* ---------------- Visitor stats (live + today) ---------------- */
+async function loadVisitorStats(){
+  try{
+    const s = await api("admin-analytics");
+    const el = document.getElementById("visitorLive");
+    const dot = s.live_now > 0 ? "🟢" : "⚪️";
+    el.textContent = `${dot} ${s.live_now} on the site right now · ${s.today} visit${s.today === 1 ? "" : "s"} today`;
+  }catch(e){ /* quiet — this is a nice-to-have, not worth interrupting the admin over */ }
+}
+let visitorPollStarted = false;
+function startVisitorPolling(){ if (visitorPollStarted) return; visitorPollStarted = true; setInterval(loadVisitorStats, 20000); }
+
+/* ---------------- Team ---------------- */
+const escH = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let TEAM = [];
+async function loadTeam() {
+  document.getElementById("teamMsg").textContent = "Loading…";
+  try { TEAM = await api("admin-staff"); renderTeam(); document.getElementById("teamMsg").textContent = `${TEAM.length} ${TEAM.length === 1 ? "person" : "people"}`; }
+  catch (e) { document.getElementById("teamMsg").textContent = e.message; }
+}
+function renderTeam() {
+  document.getElementById("teamBody").innerHTML = TEAM.length ? TEAM.map((p) => {
+    const locked = p.locked_until && new Date(p.locked_until) > new Date();
+    const last = p.last_login_at ? new Date(p.last_login_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" }) : "Never";
+    return `<tr>
+      <td><b>${escH(p.name)}</b></td>
+      <td>${p.active ? '<span class="badge paid">On</span>' : '<span class="badge">Off</span>'}${locked ? ' <span class="badge new">Locked</span>' : ""}</td>
+      <td><input type="checkbox" style="width:auto;" ${p.can_approve ? "checked" : ""} onchange="setApprove(${p.id}, this.checked)"></td>
+      <td>${escH(last)}</td>
+      <td class="row-actions">
+        <button class="btn small" onclick="resetPin(${p.id})">Reset PIN</button>
+        <button class="btn small ghost" onclick="setActive(${p.id}, ${!p.active})">${p.active ? "Turn off" : "Turn on"}</button>
+        ${locked ? `<button class="btn small ghost" onclick="unlockStaff(${p.id})">Unlock</button>` : ""}
+        <button class="btn small ghost" onclick="removeStaff(${p.id})">Remove</button>
+      </td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="msg">No one added yet. Add your first associate above.</td></tr>`;
+}
+function showPin(name, pin, verb) {
+  document.getElementById("pinFor").textContent = `${verb} for ${name}:`;
+  document.getElementById("pinBig").textContent = pin;
+  document.getElementById("pinBox").hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+async function addStaff() {
+  const name = document.getElementById("newName").value.trim();
+  const pin = document.getElementById("newPin").value.trim();
+  if (!name) { alert("Enter a name first."); return; }
+  try {
+    const r = await api("admin-staff", { method: "POST", body: JSON.stringify({ name, pin, can_approve: document.getElementById("newApprove").checked }) });
+    showPin(r.staff.name, r.pin, "PIN");
+    document.getElementById("newName").value = ""; document.getElementById("newPin").value = ""; document.getElementById("newApprove").checked = false;
+    loadTeam();
+  } catch (e) { alert(e.message); }
+}
+async function resetPin(id) {
+  const name = (TEAM.find((p) => p.id === id) || {}).name || "this person";
+  if (!confirm(`Give ${name} a new PIN? Their old PIN stops working and they're signed out of GIF right away.`)) return;
+  try { const r = await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, reset_pin: true }) }); showPin(name, r.pin, "New PIN"); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+async function setActive(id, active) {
+  try { await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, active }) }); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+async function setApprove(id, can_approve) {
+  if (can_approve && !confirm("Let this person approve or deny customer cancellations and refunds (which moves real money)?")) { loadTeam(); return; }
+  try { await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, can_approve }) }); loadTeam(); }
+  catch (e) { alert(e.message); loadTeam(); }
+}
+async function unlockStaff(id) {
+  try { await api("admin-staff", { method: "PATCH", body: JSON.stringify({ id, unlock: true }) }); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+async function removeStaff(id) {
+  const name = (TEAM.find((p) => p.id === id) || {}).name || "this person";
+  if (!confirm(`Remove ${name} from the team? They're signed out immediately. Their past activity stays on orders.`)) return;
+  try { await api("admin-staff", { method: "DELETE", body: JSON.stringify({ id }) }); loadTeam(); }
+  catch (e) { alert(e.message); }
+}
+function showActivity(id) {
+  const o = (window._orders || []).find((x) => x.id === id);
+  const ev = (o && o.events) || [];
+  alert(ev.length ? ev.map((e) => `${new Date(e.at).toLocaleString([], { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })} — ${e.by}: ${e.what}`).join("\n") : "No staff activity recorded yet.");
+}
+
+/* ---------------- Settings ---------------- */
+async function loadSettings() {
+  try { SETTINGS = await api("admin-settings"); renderSettingsForm(); }
+  catch (e) { document.getElementById("settingsMsg").textContent = e.message; }
+}
+const SETTINGS_FIELDS = [
+  ["home_title", "Store name shown at the top of the site"],
+  ["home_subtitle", "Subtitle under the store name"],
+  ["store_phone", "Store phone number"],
+  ["store_address", "Store address (shown in footer & directions link)"],
+  ["store_hours", "Store hours text"],
+  ["store_shopping", "Shopping options text, e.g. \"In-store & online\""],
+  ["store_order_options", "Order options text, e.g. \"Store pickup\""],
+  ["deal_title", "Deal-of-the-day label"],
+  ["deal_text", "Deal-of-the-day headline"],
+  ["deal_price_label", "Deal-of-the-day price text, e.g. $5.99/lb"],
+  ["deal_image", "Deal-of-the-day image path or URL"],
+];
+function renderSettingsForm() {
+  const wrap = document.getElementById("settingsForm");
+  wrap.innerHTML = SETTINGS_FIELDS.map(([key, label]) => {
+    if (key === "deal_image") {
+      return `
+        <label>${label}</label>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input id="set_${key}" value="${escAttr(SETTINGS[key] || "")}" placeholder="Upload a photo or paste a URL" style="flex:1;">
+            <label style="cursor:pointer;background:var(--brand,#C0272D);color:#fff;padding:8px 14px;border-radius:8px;font-size:.82rem;font-weight:600;white-space:nowrap;">
+              📷 Upload
+              <input type="file" accept="image/*;capture=camera" style="display:none;" onchange="uploadSettingImage('deal_image', this)">
+            </label>
+          </div>
+          <div id="deal_image_preview" style="display:none;margin-top:4px;">
+            <img id="deal_image_thumb" src="" style="max-height:80px;border-radius:8px;border:1px solid #ddd;">
+          </div>
+          <div id="deal_image_msg" style="font-size:.82rem;color:var(--muted);min-height:16px;"></div>
+        </div>`;
+    }
+    return `<label>${label}</label><input id="set_${key}" value="${escAttr(SETTINGS[key] || "")}">`;
+  }).join("");
+
+  // show existing image preview if there's already one set
+  const existing = SETTINGS["deal_image"] || "";
+  if (existing) {
+    const preview = document.getElementById("deal_image_preview");
+    const thumb = document.getElementById("deal_image_thumb");
+    if (preview && thumb) { thumb.src = existing; preview.style.display = "block"; }
+  }
+}
+async function uploadSettingImage(key, input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const msgEl = document.getElementById(key + "_msg");
+  const preview = document.getElementById(key + "_preview");
+  const thumb = document.getElementById(key + "_thumb");
+  if (msgEl) msgEl.textContent = "Uploading…";
+  try {
+    const dataBase64 = await fileToBase64(file);
+    const result = await api("admin-upload-photo", {
+      method: "POST",
+      body: JSON.stringify({ settingKey: key, filename: file.name, contentType: file.type, dataBase64 }),
+    });
+    document.getElementById("set_" + key).value = result.url;
+    if (preview && thumb) { thumb.src = result.url; preview.style.display = "block"; }
+    if (msgEl) msgEl.textContent = "✓ Uploaded — click Save settings to apply.";
+  } catch (e) {
+    if (msgEl) msgEl.textContent = e.message || "Upload failed";
+  }
+}
+
+async function saveSettings() {
+  const patch = {};
+  SETTINGS_FIELDS.forEach(([key]) => { patch[key] = document.getElementById("set_" + key).value; });
+  try { SETTINGS = await api("admin-settings", { method: "PATCH", body: JSON.stringify(patch) }); document.getElementById("settingsMsg").textContent = "Saved."; }
+  catch (e) { document.getElementById("settingsMsg").textContent = e.message; }
+}
+
+function escAttr(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;"); }
+
+// Auto-fit editable Admin fields so long values remain readable.
+function autoFitInput(el) {
+  if (!el || el.tagName !== 'INPUT') return;
+  const type = (el.type || 'text').toLowerCase();
+  if (!['text','search','url','email','tel',''].includes(type)) return;
+  const field = el.dataset.field || '';
+  const minMap = { name:260, department:150, category:220, unit:100, title:180, code:120, image:180, staff_notes:180 };
+  const maxMap = { name:520, department:260, category:380, unit:180, title:460, code:240, image:520, staff_notes:520 };
+  const minW = minMap[field] || 130;
+  const maxW = maxMap[field] || 520;
+  const probe = document.createElement('span');
+  const cs = getComputedStyle(el);
+  probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:'+cs.font+';letter-spacing:'+cs.letterSpacing+';';
+  probe.textContent = el.value || el.placeholder || '';
+  document.body.appendChild(probe);
+  const newW = Math.max(minW, Math.min(maxW, Math.ceil(probe.getBoundingClientRect().width) + 34));
+  probe.remove();
+  el.style.width = newW + 'px';
+}
+function autoFitTextarea(el) {
+  if (!el || el.tagName !== 'TEXTAREA') return;
+  el.style.height = 'auto';
+  el.style.height = Math.max(96, Math.min(320, el.scrollHeight + 2)) + 'px';
+}
+function autoFitAdminFields(root=document) {
+  root.querySelectorAll('.table-scroll input').forEach(autoFitInput);
+  root.querySelectorAll('.table-scroll textarea').forEach(autoFitTextarea);
+}
+document.addEventListener('input', function(e) {
+  const el = e.target;
+  if (!el.closest || !el.closest('.table-scroll')) return;
+  if (el.tagName === 'TEXTAREA') autoFitTextarea(el);
+  else if (el.tagName === 'INPUT') autoFitInput(el);
+});
+window.addEventListener('load', () => setTimeout(() => autoFitAdminFields(), 250));
+</script>
+</body>
+</html>
