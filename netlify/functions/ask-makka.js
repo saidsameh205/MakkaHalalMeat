@@ -1,6 +1,3 @@
-cat /home/claude/build2/netlify/functions/ask-makka.js
-Output
-
 const { json, supabaseFetch } = require('./_util');
 
 const MODEL = process.env.ASK_MAKKA_MODEL || 'gpt-4o-mini';
