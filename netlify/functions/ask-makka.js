@@ -1,5 +1,3 @@
-bash
-
 cat /home/claude/build2/netlify/functions/ask-makka.js
 Output
 
