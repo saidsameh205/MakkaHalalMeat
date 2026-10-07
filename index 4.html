@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Makka Halal Meat — Order for Pickup</title>
+<meta name="description" content="Fresh halal meat, groceries and more from Makka Halal Meat. Order ahead for pickup.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#C0272D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --makka-wine:#C0272D; --makka-wine2:#8C1A1E; --makka-cream:#fffaf3; --makka-gold:#E2A63B;
+    --brand:#C0272D; --brand-dark:#8C1A1E; --brand-light:#E5555A;
+    --ink:#1E1712; --paper:#F6F3EE; --card:#FFFFFF;
+    --gold:#E2A63B; --gold-dark:#B9812A;
+    --fresh:#2E7D53; --fresh-light:#E5F3EC;
+    --line:rgba(30,23,18,.09);
+    --muted:#7A6E62;
+    --shadow-sm:0 2px 8px rgba(30,23,18,.06);
+    --shadow-md:0 10px 28px rgba(30,23,18,.12);
+    --radius-lg:20px; --radius-md:14px; --radius-sm:10px;
+
+    --bg: var(--paper); --fg: var(--ink); --card-bg: var(--card);
+    --accent: var(--brand); --accent-text:#fff; --dept-tint: var(--brand);
+  }
+  /* DARK theme — applied when <html data-theme="dark"> */
+  [data-theme="dark"]:root,
+  html[data-theme="dark"] {
+    --ink:#F0EBE4; --paper:#121010; --card:#1E1B18;
+    --line:rgba(240,235,228,.1); --muted:#9A9087;
+    --shadow-sm:0 2px 8px rgba(0,0,0,.25);
+    --shadow-md:0 10px 28px rgba(0,0,0,.40);
+    --bg: var(--paper); --fg: var(--ink); --card-bg: var(--card);
+  }
+  html[data-theme="dark"] .search-box{ background:#1E1B18; }
+  html[data-theme="dark"] .tabbar{ background:#1A1714; border-top-color:rgba(255,255,255,.07); }
+  html[data-theme="dark"] .modal{ background:#1E1B18; }
+  html[data-theme="dark"] .drawer{ background:#1A1714; }
+  .theme-toggle{ background:none; border:none; cursor:pointer; padding:4px 2px; display:flex; align-items:center; }
+  .theme-track{ position:relative; width:62px; height:28px; border-radius:999px; background:var(--line); border:1.5px solid rgba(0,0,0,.12); display:flex; align-items:center; transition:background .25s; overflow:hidden; }
+  html[data-theme="dark"] .theme-track{ background:#2a2520; border-color:rgba(255,255,255,.12); }
+  .theme-thumb{ position:absolute; left:2px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.2); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:1; }
+  html[data-theme="dark"] .theme-thumb{ transform:translateX(34px); background:#3a3530; }
+  .theme-label-l,.theme-label-r{ position:absolute; font-size:.75rem; line-height:1; top:50%; transform:translateY(-50%); }
+  .theme-label-l{ left:6px; }
+  .theme-label-r{ right:6px; }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; height:100%; overflow:hidden; overflow-x:hidden;}
+  body{ overflow-y:auto; overflow-x:hidden; height:100%; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; max-width:100vw; position:relative; }
+  main{ overflow-x:hidden; max-width:100vw; }
+  *{ max-width:100%; }
+  body{
+    margin:0; font-family:'IBM Plex Sans',system-ui,sans-serif;
+    background:var(--bg); color:var(--fg);
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+    transition:background-color .35s ease, color .35s ease;
+  }
+  h1,h2,h3,.display{font-family:'Sora',sans-serif;}
+  button{font-family:inherit;}
+  img{max-width:100%; display:block;}
+
+  /* Each department gets its own full theme, but ONLY while its dedicated
+     page is open (data-view="dept") — Home always stays on the neutral
+     paper theme so it doesn't flash colors while scrolling. */
+  body[data-view="dept"][data-dept="meat"]      { --bg:#1C1512; --fg:#F3ECE2; --card-bg:#2A1E19; --accent:#D9B667; --accent-text:#1C1512; --muted:#C9B9AC; --dept-tint:#D9B667; }
+  body[data-view="dept"][data-dept="grocery"]   { --bg:#F3EAD9; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#8C1A1E; --accent-text:#fff; --muted:#7A6A58; --dept-tint:#8C1A1E; }
+  body[data-view="dept"][data-dept="household"] { --bg:#E7EEF1; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#2E6E7D; --accent-text:#fff; --muted:#5B7480; --dept-tint:#2E6E7D; }
+  body[data-view="dept"][data-dept="beauty"]    { --bg:#FBEAEC; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#A8506A; --accent-text:#fff; --muted:#8C6A72; --dept-tint:#A8506A; }
+  body[data-view="dept"][data-dept="baby"]      { --bg:#E7EFF5; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#4A6F9C; --accent-text:#fff; --muted:#63758A; --dept-tint:#4A6F9C; }
+  body[data-view="dept"][data-dept="clothing"]  { --bg:#EFE6DA; --fg:#1E1712; --card-bg:#FFFFFF; --accent:#7D6633; --accent-text:#fff; --muted:#7A6A58; --dept-tint:#7D6633; }
+
+  header.topbar{
+    position:sticky; top:0; z-index:30; background:var(--card-bg);
+    padding-top:env(safe-area-inset-top,0px); box-shadow:var(--shadow-sm); transition:background-color .35s ease;
+  }
+  .topbar-row1{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px 6px; gap:10px; }
+  .brandmark{ display:flex; align-items:center; gap:8px; }
+  .brandmark .logo{ width:34px; height:34px; border-radius:9px; background:var(--brand); display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+  .brandmark .name{ font-weight:800; font-size:1.02rem; letter-spacing:-.01em; }
+  .pickup-line{ font-size:.72rem; color:var(--muted); margin-top:-2px; }
+  .icon-btn{ background:none; border:none; font-size:1.25rem; cursor:pointer; padding:6px; position:relative; color:var(--fg); }
+  .icon-btn .dot{ position:absolute; top:2px; right:2px; background:var(--brand); color:#fff; font-size:.62rem; font-weight:700; border-radius:999px; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 3px; }
+  .search-wrap{ padding:2px 16px 12px; }
+  .search-box{ display:flex; align-items:center; gap:8px; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:10px 16px; }
+  .search-box input{ border:none; background:none; outline:none; font-size:.92rem; width:100%; color:var(--ink); }
+  .search-box svg{ flex:0 0 auto; opacity:.55; }
+
+  .depts-strip{ display:flex; gap:8px; overflow-x:auto; padding:0 16px 12px; scrollbar-width:none; touch-action:pan-x; }
+  .depts-strip::-webkit-scrollbar{display:none;}
+  .dept-pill{ flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:999px; background:var(--paper); border:1px solid var(--line); font-size:.82rem; font-weight:600; color:var(--ink); cursor:pointer; transition:.18s; }
+  .dept-pill.active{ background:var(--dept-tint); color:#fff; border-color:transparent; }
+
+  main{ max-width:640px; margin:0 auto; padding:0 0 20px; }
+  .store-banner{ padding:12px 16px 4px; }
+  .store-banner img{ width:100%; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); display:block; }
+
+  .promo-scroller{ display:flex; gap:12px; overflow-x:auto; padding:14px 16px; scroll-snap-type:x mandatory; scrollbar-width:none; }
+  .promo-scroller::-webkit-scrollbar{display:none;}
+  .promo-card{ scroll-snap-align:start; flex:0 0 86%; border-radius:var(--radius-lg); padding:22px; display:flex; flex-direction:column; justify-content:center; gap:6px; min-height:150px; color:#fff; position:relative; overflow:hidden; box-shadow:var(--shadow-md); }
+  .promo-card.deal{ background:linear-gradient(135deg,var(--brand),var(--brand-dark)); }
+  .promo-card.pickup{ background:linear-gradient(135deg,var(--fresh),#1F5B3D); }
+  .promo-card.halal{ background:linear-gradient(135deg,var(--gold-dark),#8A6420); }
+  .promo-eyebrow{ font-size:.74rem; font-weight:700; opacity:.85; }
+  .promo-card h2{ font-size:1.35rem; margin:0; line-height:1.15; }
+  .promo-card p{ margin:0; font-size:.85rem; opacity:.92; max-width:26ch; }
+  .promo-card .btn{ margin-top:8px; align-self:flex-start; background:#fff; color:var(--ink); }
+
+  .spotlight-scroller{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding:0 16px; scroll-padding:0 16px; }
+  .spotlight-scroller::-webkit-scrollbar{ display:none; }
+  .spotlight-slide{ flex:0 0 calc(100% - 32px); scroll-snap-align:start; position:relative; height:190px; border-radius:var(--radius-lg); overflow:hidden; background-size:cover; background-position:center; background-color:var(--card-bg,#eee); box-shadow:var(--shadow-md); display:flex; align-items:flex-end; }
+  .spotlight-slide .overlay{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.68) 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:16px; color:#fff; }
+  .spotlight-slide .s-name{ font-size:1.1rem; font-weight:800; line-height:1.2; }
+  .spotlight-slide .s-price{ font-size:.9rem; opacity:.95; margin-top:2px; }
+  .spotlight-slide .s-add{ position:absolute; right:14px; bottom:14px; width:40px; height:40px; border-radius:50%; background:var(--brand); color:#fff; font-size:1.3rem; border:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm); }
+  .spotlight-dots{ display:flex; justify-content:center; gap:6px; padding:10px 0 2px; }
+  .spotlight-dot{ width:7px; height:7px; border-radius:50%; background:var(--line,#ddd); transition:all .2s; }
+  .spotlight-dot.active{ background:var(--brand); width:18px; border-radius:4px; }
+
+  .quick-cats{ display:grid; grid-template-columns:repeat(6,1fr); gap:8px; padding:4px 16px 18px; }
+  .quick-cat{ display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; }
+  .quick-cat .tile{ width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:var(--shadow-sm); }
+  .quick-cat span{ font-size:.68rem; font-weight:600; color:var(--ink); text-align:center; line-height:1.15; }
+
+  .btn{ border:none; border-radius:999px; padding:10px 18px; font-weight:700; font-size:.88rem; cursor:pointer; background:var(--brand); color:#fff; }
+  .btn.ghost{ background:transparent; border:1.5px solid var(--brand); color:var(--brand); }
+  .btn.block{ width:100%; }
+  .link-btn{ background:none; border:none; color:var(--dept-tint); font-weight:700; font-size:.8rem; cursor:pointer; display:flex; align-items:center; gap:2px; }
+
+  .section{ padding:18px 0 4px; }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; padding:0 16px 10px; }
+  .section-head h2{ font-size:1.12rem; margin:0; color:var(--fg); }
+  .section-head .tint{ color:var(--dept-tint); }
+  .section-head .count{ font-size:.76rem; color:var(--muted); }
+
+  .row-scroller{ display:flex; gap:12px; overflow-x:auto; padding:2px 16px 8px; scroll-snap-type:x proximity; scrollbar-width:none; }
+  .row-scroller::-webkit-scrollbar{display:none;}
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; padding:2px 16px 4px; }
+
+  .card{ background:var(--card-bg); border-radius:var(--radius-md); padding:10px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:6px; position:relative; transition:transform .15s ease, box-shadow .15s ease, background-color .35s ease; scroll-snap-align:start; flex:0 0 132px; cursor:pointer; }
+  .grid .card{ flex-basis:auto; }
+  .card:active{ transform:scale(.97); }
+  .card-media{ height:88px; border-radius:10px; background:rgba(120,100,80,.12); display:flex; align-items:center; justify-content:center; font-size:2rem; background-size:cover; background-position:center; position:relative; overflow:hidden; }
+  .badge{ position:absolute; top:6px; left:6px; background:var(--gold); color:#3a2a06; font-size:.62rem; font-weight:700; padding:2px 7px; border-radius:999px; }
+  .fav-btn{ position:absolute; top:4px; right:4px; background:rgba(255,255,255,.85); border:none; border-radius:50%; width:26px; height:26px; font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .card h3{ font-size:.82rem; margin:0; font-weight:600; line-height:1.25; min-height:2.1em; color:var(--fg); }
+  .card .brand{ font-size:.66rem; color:var(--muted); margin-top:-4px; }
+  .price-row{ display:flex; align-items:center; justify-content:space-between; margin-top:auto; gap:6px; }
+  .price{ font-weight:700; font-size:.95rem; color:var(--fg); }
+  .price small{ font-weight:500; font-size:.66rem; color:var(--muted); }
+  .price.unknown{ font-size:.7rem; color:var(--muted); font-weight:500; }
+  .add-btn{ background:var(--accent); color:var(--accent-text); border:none; border-radius:999px; width:30px; height:30px; font-size:1.1rem; cursor:pointer; line-height:1; flex:0 0 auto; }
+  .add-btn.added{ background:var(--fresh); color:#fff; }
+  .stepper{ display:flex; align-items:center; gap:5px; background:rgba(120,100,80,.1); border-radius:999px; padding:2px 4px; flex:0 0 auto; }
+  .stepper button{ width:24px; height:24px; border-radius:50%; border:none; background:var(--card-bg); box-shadow:var(--shadow-sm); cursor:pointer; flex:0 0 auto; }
+  .stepper .qtytext{ min-width:30px; text-align:center; font-weight:700; font-size:.74rem; cursor:pointer; color:var(--fg); }
+
+  .skeleton{ background:linear-gradient(90deg,#EFEAE1 25%,#F6F3EE 37%,#EFEAE1 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:var(--radius-md); height:170px; }
+  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:-100% 0;} }
+
+  .cart-bar{ position:fixed; left:12px; right:12px; bottom:calc(70px + env(safe-area-inset-bottom,0px)); z-index:35; background:var(--ink); color:#fff; border-radius:16px; padding:12px 16px; display:none; align-items:center; justify-content:space-between; box-shadow:0 12px 28px rgba(0,0,0,.28); animation:barIn .25s ease both; }
+  .cart-bar.show{ display:flex; }
+  @keyframes barIn{ from{ opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  .cart-bar .left{ display:flex; align-items:center; gap:10px; font-size:.85rem; }
+  .cart-bar .count-chip{ background:var(--brand); border-radius:999px; padding:3px 9px; font-weight:700; font-size:.78rem; }
+  .cart-bar button{ background:#fff; color:var(--ink); border:none; border-radius:999px; padding:9px 16px; font-weight:700; font-size:.85rem; cursor:pointer; }
+
+  .tabbar{ position:fixed; left:0; right:0; bottom:0; z-index:34; background:var(--card); border-top:1px solid var(--line); display:flex; padding-bottom:env(safe-area-inset-bottom,0px); box-shadow:0 -4px 14px rgba(0,0,0,.05); }
+  .tab-btn{ flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 0 7px; background:none; border:none; cursor:pointer; color:var(--muted); font-size:.66rem; font-weight:600; position:relative; }
+  .tab-btn.active{ color:var(--brand); }
+  .tab-btn .ic{ font-size:1.25rem; }
+  .nav-svg svg{ width:22px; height:22px; display:block; }
+  .nav-svg{ display:flex; align-items:center; justify-content:center; width:24px; height:24px; }
+  .tab-btn .dot{ position:absolute; top:2px; right:calc(50% - 20px); background:var(--brand); color:#fff; font-size:.6rem; font-weight:700; border-radius:999px; min-width:15px; height:15px; display:flex; align-items:center; justify-content:center; }
+
+  /* ---------- department detail page ---------- */
+  .deptpage-header{ position:sticky; top:0; z-index:30; background:var(--card-bg); padding:env(safe-area-inset-top,0px) 0 0; box-shadow:var(--shadow-sm); transition:background-color .35s ease; }
+  .deptpage-topline{ display:flex; align-items:center; gap:10px; padding:14px 14px 10px; }
+  .back-btn{ background:rgba(120,100,80,.12); border:none; border-radius:50%; width:36px; height:36px; font-size:1.1rem; cursor:pointer; color:var(--fg); flex:0 0 auto; }
+  .deptpage-title{ font-weight:800; font-size:1.15rem; display:flex; align-items:center; gap:8px; color:var(--fg); }
+  .deptpage-count{ font-size:.76rem; color:var(--muted); margin-left:auto; }
+  .cat-chips{ display:flex; gap:8px; overflow-x:auto; padding:0 14px 12px; scrollbar-width:none; }
+  .cat-chips::-webkit-scrollbar{display:none;}
+  .cat-chip{ flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--bg); color:var(--fg); font-size:.8rem; font-weight:600; cursor:pointer; }
+  .cat-chip.active{ background:var(--accent); color:var(--accent-text); border-color:transparent; }
+  .deptpage-body{ max-width:640px; margin:0 auto; padding-bottom:10px; }
+  .product-detail{ max-width:640px; margin:0 auto; padding:0 16px 24px; }
+  .product-detail .pd-media{ width:100%; aspect-ratio:1/1; border-radius:var(--radius-lg); background-size:cover; background-position:center; background-color:var(--card-bg,#eee); display:flex; align-items:center; justify-content:center; font-size:5rem; margin-bottom:18px; position:relative; }
+  .product-detail .pd-fav{ position:absolute; top:12px; right:12px; background:rgba(255,255,255,.9); border:none; border-radius:50%; width:40px; height:40px; font-size:1.2rem; }
+  .product-detail .pd-badge{ position:absolute; top:12px; left:12px; background:var(--accent,#8C1A1E); color:var(--accent-text,#fff); font-size:.78rem; font-weight:700; padding:5px 10px; border-radius:999px; }
+  .product-detail h1{ font-size:1.35rem; margin:0 0 4px; }
+  .product-detail .pd-brand{ color:var(--muted); font-size:.9rem; margin-bottom:10px; }
+  .product-detail .pd-price{ font-size:1.6rem; font-weight:800; margin:6px 0 2px; }
+  .product-detail .pd-unit{ color:var(--muted); font-size:.95rem; }
+  .product-detail .pd-desc{ white-space:pre-wrap; line-height:1.5; color:var(--fg); margin:14px 0 0; font-size:.95rem; }
+  .product-detail .pd-meta{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  .product-detail .pd-chip{ background:var(--card-bg,#fff); border:1px solid rgba(0,0,0,.08); border-radius:999px; padding:6px 12px; font-size:.82rem; }
+  .product-detail .pd-action{ margin-top:20px; }
+  .product-detail .pd-action .btn{ width:100%; padding:14px; font-size:1rem; }
+  .product-detail .pd-stepper{ display:flex; align-items:center; justify-content:center; gap:18px; background:var(--card-bg,#fff); border-radius:var(--radius-lg); padding:10px; }
+  .product-detail .pd-stepper button{ width:42px; height:42px; border-radius:50%; border:none; background:var(--accent,#8C1A1E); color:var(--accent-text,#fff); font-size:1.3rem; }
+  .product-detail .pd-stepper span{ font-size:1.1rem; font-weight:700; min-width:60px; text-align:center; }
+  .cat-section{ padding:16px 0 2px; scroll-margin-top:132px; }
+  .cat-section h3{ padding:0 16px 8px; font-size:1rem; margin:0; color:var(--fg); }
+
+  /* ---------- weight picker modal ---------- */
+  .weight-modal .modal{ padding:0; overflow:hidden; }
+  .wm-media{ height:150px; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:3rem; background-color:rgba(120,100,80,.12); }
+  .wm-body{ padding:20px 22px 22px; }
+  .wm-body h3{ margin:0 0 2px; font-size:1.1rem; }
+  .wm-price{ color:var(--muted); font-size:.86rem; margin-bottom:14px; }
+  .wm-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .wm-chip{ padding:9px 14px; border-radius:999px; border:1.5px solid var(--line); background:#fff; font-weight:700; font-size:.86rem; cursor:pointer; color:var(--ink); }
+  .wm-chip.active{ background:var(--brand); color:#fff; border-color:transparent; }
+  .wm-custom{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .wm-custom input{ flex:1; padding:11px 13px; border-radius:10px; border:1px solid var(--line); font-size:1rem; }
+  .wm-total{ display:flex; justify-content:space-between; font-weight:700; font-size:1.05rem; padding:12px 0; border-top:1px solid var(--line); margin-bottom:12px; }
+  .wm-actions{ display:flex; gap:10px; }
+  .wm-remove{ background:none; border:none; color:var(--brand); font-size:.85rem; font-weight:700; cursor:pointer; margin-top:10px; width:100%; text-align:center; }
+
+  .overlay{ position:fixed; inset:0; background:rgba(20,14,11,.45); opacity:0; pointer-events:none; transition:.25s; z-index:40; }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+  .drawer{ position:fixed; top:0; right:0; height:100%; width:min(420px,92vw); background:var(--paper); color:var(--ink); z-index:41; transform:translateX(100%); transition:transform .3s ease; display:flex; flex-direction:column; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{ display:flex; justify-content:space-between; align-items:center; padding:18px 20px; border-bottom:1px solid var(--line); }
+  .drawer-items{ flex:1; overflow-y:auto; padding:12px 20px; }
+  .drawer-item{ display:flex; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+  .drawer-item .meta{ flex:1; } .drawer-item .name{ font-weight:600; font-size:.88rem; } .drawer-item .unit{ font-size:.74rem; color:var(--muted); }
+  .drawer-foot{ padding:16px 20px; border-top:1px solid var(--line); background:#fff; }
+  .totals-row{ display:flex; justify-content:space-between; font-size:.88rem; margin-bottom:4px; color:#5c5049; }
+  .totals-row.grand{ font-weight:700; color:var(--ink); font-size:1.05rem; margin-top:8px; }
+  .checkout-btn{ width:100%; margin-top:12px; background:var(--brand); color:#fff; border:none; border-radius:14px; padding:15px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .empty-state{ color:var(--muted); text-align:center; padding:50px 20px; }
+  .empty-state .big{ font-size:2.4rem; margin-bottom:8px; }
+
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,14,11,.5); z-index:50; display:none; align-items:center; justify-content:center; padding:16px; }
+  .modal-backdrop.open{ display:flex; }
+  .modal{ background:#fff; color:var(--ink); border-radius:20px; padding:26px; max-width:420px; width:100%; box-shadow:0 24px 60px rgba(0,0,0,.3); max-height:90vh; overflow-y:auto; }
+  .modal h3{ margin-top:0; }
+  .modal input{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); margin-bottom:12px; font-size:.95rem; }
+  .modal select{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); margin-bottom:12px; font-size:.95rem; background:#fff; color:var(--ink); font-family:inherit; }
+  .modal .flabel{ display:block; font-size:.78rem; font-weight:700; color:var(--muted); margin:2px 2px 5px; }
+  .modal .row{ display:flex; gap:10px; } .modal .row .btn{ flex:1; text-align:center; }
+
+  .search-results{ padding:8px 16px 40px; }
+  .search-empty{ text-align:center; color:var(--muted); padding:60px 20px 16px; }
+  .search-browse .search-empty{ padding-top:36px; }
+  .search-chips{ display:flex; flex-wrap:wrap; gap:8px; padding:16px; }
+  .search-chip{ border:1px solid var(--line,#ddd); background:var(--panel,#fff); border-radius:999px; padding:8px 16px; font-size:.88rem; font-weight:600; color:inherit; }
+  .search-chip:active{ opacity:.7; }
+
+  .toast{ position:fixed; bottom:calc(140px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%) translateY(16px); opacity:0; background:var(--ink); color:#fff; padding:11px 20px; border-radius:999px; font-size:.85rem; z-index:60; transition:.25s ease; pointer-events:none; box-shadow:0 8px 20px rgba(0,0,0,.25); max-width:90vw; text-align:center; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  footer{ text-align:center; padding:20px 18px 10px; color:var(--muted); font-size:.8rem; }
+
+  .store-info-card{ margin:22px 16px 4px; background:#171310; color:#F3ECE2; border-radius:var(--radius-lg); padding:20px 22px; box-shadow:var(--shadow-md); }
+  .store-info-card h2{ font-size:1.15rem; margin:0 0 12px; }
+  .info-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:11px 0; border-top:1px solid rgba(255,255,255,.1); font-size:.88rem; }
+  .info-row .info-link{ color:inherit; font-weight:700; text-decoration:underline; text-align:right; }
+  .info-row .info-link:active{ opacity:.7; }
+  .info-row:first-of-type{ border-top:none; }
+  .info-row span{ color:rgba(243,236,226,.7); flex:0 0 auto; }
+  .info-row strong{ text-align:right; font-weight:700; line-height:1.4; }
+
+  .deals-list{ padding:14px 16px 40px; display:flex; flex-direction:column; gap:12px; }
+  .deal-card{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); border-left:5px solid var(--brand); overflow:hidden; }
+  #accountSection{ padding:14px 16px 0; }
+  .ma-header{ text-align:center; padding:28px 16px 18px; }
+  .ma-avatar{ width:64px; height:64px; border-radius:50%; background:var(--brand); color:#fff; font-size:1.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; }
+  .ma-name{ font-weight:800; font-size:1.15rem; }
+  .ma-email{ color:var(--muted); font-size:.88rem; margin-top:2px; }
+  .ma-menu{ background:var(--card); border-radius:var(--radius-md); margin:0 16px; box-shadow:var(--shadow-sm); overflow:hidden; }
+  .ma-row{ width:100%; display:flex; align-items:center; gap:12px; padding:16px 18px; border:none; background:none; font-size:.95rem; font-weight:600; text-align:left; border-top:1px solid var(--line); }
+  .ma-row:first-child{ border-top:none; }
+  .ma-row.danger{ color:#b3262d; }
+  .ma-row:active{ background:var(--paper,#f5f0e8); }
+  .ma-ic{ font-size:1.15rem; flex:0 0 24px; }
+  .ma-arr{ margin-left:auto; color:var(--muted); font-size:1.1rem; }
+  .support-body{ padding:16px; }
+  .support-card{ background:var(--card); border-radius:var(--radius-md); padding:18px; box-shadow:var(--shadow-sm); margin-bottom:12px; }
+  .support-card h3{ margin:0 0 4px; font-size:1rem; }
+  .support-card p{ margin:0 0 12px; color:var(--muted); font-size:.88rem; line-height:1.4; }
+  .support-hours dt{ font-weight:700; font-size:.88rem; margin-top:8px; }
+  .support-hours dd{ margin:0; color:var(--muted); font-size:.88rem; }
+  .acct-card{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); }
+  .acct-card .name{ font-weight:800; font-size:1.05rem; }
+  .acct-card .sub{ color:var(--muted); font-size:.85rem; margin-top:2px; }
+  .acct-card .row{ display:flex; gap:10px; margin-top:12px; }
+  .acct-card .row .btn{ flex:1; padding:10px; font-size:.88rem; }
+  .acct-prompt{ background:var(--card); border-radius:var(--radius-md); padding:16px; box-shadow:var(--shadow-sm); text-align:center; }
+  .acct-prompt .btn{ margin-top:10px; }
+  .deal-photo{ margin:-16px -16px 12px; height:140px; background-size:cover; background-position:center; border-radius:var(--radius-md) var(--radius-md) 0 0; }
+  .deal-card h3{ margin:0 0 4px; font-size:1.02rem; }
+  .deal-card p{ margin:0 0 10px; font-size:.86rem; color:var(--muted); }
+  .deal-meta{ display:flex; flex-wrap:wrap; gap:8px; }
+  .deal-chip{ font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:999px; background:var(--paper); color:var(--ink); }
+  .deal-chip.expiry{ background:var(--gold); color:#3a2a06; }
+  .deal-chip.expiry.soon{ background:var(--brand); color:#fff; }
+  .deal-empty{ text-align:center; color:var(--muted); padding:60px 20px; }
+
+  @media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  @media (min-width:640px){ .tabbar{ display:none; } body{ padding-bottom:20px; } .cart-bar{ bottom:20px; } }
+  /* === Ask Makka AI === */
+  .ask-makka-fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:48;border:0;background:var(--makka-wine);color:#fff;border-radius:999px;padding:12px 16px;box-shadow:0 10px 28px rgba(122,31,43,.32);font-weight:800;display:flex;align-items:center;gap:7px;cursor:pointer}
+  .ask-makka-panel{position:fixed;right:14px;bottom:calc(140px + env(safe-area-inset-bottom,0px));width:min(390px,calc(100vw - 28px));height:min(570px,calc(100vh - 180px));z-index:60;background:#fffaf5;border:1px solid rgba(122,31,43,.12);border-radius:24px;box-shadow:0 24px 70px rgba(40,20,14,.25);display:none;overflow:hidden;flex-direction:column}.ask-makka-panel.open{display:flex}
+  .ask-head{padding:15px 16px;background:linear-gradient(135deg,var(--makka-wine2),var(--makka-wine));color:#fff;display:flex;align-items:center;gap:10px}.ask-avatar{width:38px;height:38px;border-radius:13px;background:#fff;color:var(--makka-wine);display:grid;place-items:center;font:700 20px Georgia,serif}.ask-head b{display:block}.ask-head small{opacity:.78}.ask-close{margin-left:auto;background:transparent;border:0;color:#fff;font-size:24px;cursor:pointer}
+  .ask-messages{flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:10px}.ask-msg{max-width:84%;padding:10px 12px;border-radius:15px;font-size:.88rem;line-height:1.4;white-space:pre-wrap}.ask-msg.bot{background:#f1e7dc;color:#39261f;border-bottom-left-radius:5px}.ask-msg.user{background:var(--makka-wine);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}.ask-chips{display:flex;gap:6px;overflow:auto;padding:0 14px 10px}.ask-chips button{white-space:nowrap;border:1px solid #dbc7b8;background:#fff;border-radius:999px;padding:7px 10px;font-size:.76rem;color:#6c2b32;cursor:pointer}.ask-input{display:flex;gap:8px;padding:11px;border-top:1px solid #eaded4;background:#fff}.ask-input input{flex:1;border:1px solid #dbcfc5;border-radius:999px;padding:11px 13px;font-size:.9rem}.ask-input button{width:42px;border:0;border-radius:50%;background:var(--makka-wine);color:#fff;font-size:18px;cursor:pointer}
+  @media(min-width:640px){.ask-makka-fab{bottom:24px}.ask-makka-panel{bottom:82px}.makka-hero{max-width:1100px;margin:20px auto 8px}}
+
+
+  /* ===== Mockup-match v2 ===== */
+  .topbar{position:sticky;top:0;z-index:40;padding:0 16px}.topbar-row1{max-width:1100px;margin:auto;padding:12px 0}.search-wrap{max-width:1100px;margin:0 auto;padding:0 0 11px}.depts-strip{max-width:1100px;margin:auto}
+  .brandmark .logo{font-size:0;position:relative}.brandmark .logo:before{content:'M';font:700 24px Georgia,serif;color:#fff}.pickup-line{font-size:.72rem;color:#806c60;margin-top:2px}
+  .makka-hero{display:grid;grid-template-columns:1fr;gap:16px;min-height:235px;padding:31px 25px;background:linear-gradient(115deg,rgba(74,13,24,.97),rgba(122,31,43,.93)),url('hero-banner.png') center/cover no-repeat}
+  .makka-hero h1{font-size:2.35rem;max-width:520px}.makka-hero p{font-size:.95rem;max-width:540px}.makka-hero .primary{padding:12px 18px}.makka-hero .secondary{padding:12px 18px}
+  .mock-benefits{max-width:1100px;margin:14px auto 4px;padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mock-benefit{background:#fff;border:1px solid rgba(122,31,43,.08);border-radius:18px;padding:13px;display:flex;gap:10px;align-items:center;box-shadow:0 5px 18px rgba(58,34,21,.04)}.mock-benefit span{font-size:1.2rem}.mock-benefit b{font-size:.78rem;display:block;color:#4b3028}.mock-benefit small{font-size:.67rem;color:#88766c}
+  .quick-cats{max-width:1100px;margin:auto;padding-left:16px;padding-right:16px}.home-preview,.spotlight-section,.store-info-card{max-width:1100px;margin-left:auto!important;margin-right:auto!important}
+  .section-head{max-width:1100px;margin:auto}.section-head h2{font-size:1.35rem}
+  .product-card{border:1px solid rgba(122,31,43,.07);box-shadow:0 7px 22px rgba(63,35,22,.07)!important}
+  .ask-makka-fab{padding:13px 17px}.ask-makka-fab span{width:24px;height:24px;border-radius:50%;background:#fff;color:var(--makka-wine);display:grid;place-items:center}
+  .ask-makka-panel{border-radius:27px}.ask-head{padding:17px}.ask-avatar{border-radius:50%}.ask-msg.bot{background:#f4e9df}.ask-chips button{background:#fffaf6}.ask-product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.ask-product{background:#fff;border:1px solid #eadbd0;border-radius:13px;padding:8px}.ask-product b{display:block;font-size:.76rem;line-height:1.2}.ask-product small{display:block;color:#7d685e;margin:3px 0 7px}.ask-product button{width:100%;border:0;background:var(--makka-wine);color:#fff;border-radius:9px;padding:6px;font-size:.7rem;font-weight:700}
+  @media(max-width:639px){.theme-toggle{display:none}.makka-hero{margin:10px 12px 3px;border-radius:23px;min-height:250px;padding:27px 20px}.makka-hero h1{font-size:2.15rem}.mock-benefits{padding:0 12px;gap:7px}.mock-benefit{display:block;text-align:center;padding:10px 6px}.mock-benefit span{display:block;margin-bottom:4px}.mock-benefit small{display:none}.quick-cats{padding-left:12px;padding-right:12px}.ask-makka-panel{right:8px;bottom:calc(132px + env(safe-area-inset-bottom,0px));width:calc(100vw - 16px);height:min(610px,calc(100vh - 150px))}}
+
+</style>
+</head>
+<body data-view="home" data-dept="meat">
+
+  <!-- ===================== HOME ===================== -->
+  <header class="topbar" id="homeHeader">
+    <div class="topbar-row1">
+      <div class="brandmark">
+        <div class="logo">🥩</div>
+        <div>
+          <div class="name" id="storeName">Makka Halal Meat</div>
+          <div class="pickup-line">Pickup today · <span id="storeHours">11:00 AM–6:30 PM</span></div>
+        </div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" title="Switch theme">
+        <span class="theme-track">
+          <span class="theme-thumb" id="themeThumb"></span>
+          <span class="theme-label-l">☀️</span>
+          <span class="theme-label-r">🌙</span>
+        </span>
+      </button>
+      <button class="icon-btn" onclick="openCart()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="dot" id="cartDotTop" style="display:none;">0</span></button>
+    </div>
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="searchInput" placeholder="Search lamb, rice, halal deli…" oninput="onSearch()">
+      </div>
+    </div>
+    <nav class="depts-strip" id="deptNav"></nav>
+  </header>
+
+  <main id="homeView">
+    <div class="store-banner"><img src="banner-sign.jpg" alt="Makka Halal Meat, Inc. — Goat, Lamb, Beef, Chicken — 404-297-0008"></div>
+    <div class="promo-scroller" id="promoScroller"></div>
+    <section class="spotlight-section" id="spotlightSection" style="display:none;">
+      <div class="section-head" style="padding:16px 16px 6px;"><h2>✨ Featured today</h2></div>
+      <div class="spotlight-scroller" id="spotlightScroller"></div>
+      <div class="spotlight-dots" id="spotlightDots"></div>
+    </section>
+    <div class="quick-cats" id="quickCats"></div>
+    <div id="homePreviews"></div>
+
+    <section class="store-info-card">
+      <h2>Store information</h2>
+      <div class="info-row"><span>📍 Address</span><a id="infoAddress" class="info-link" target="_blank" rel="noopener"></a></div>
+      <div class="info-row"><span>📞 Phone</span><a id="infoPhone" class="info-link"></a></div>
+      <div class="info-row"><span>🛍️ Shopping</span><strong id="infoShopping"></strong></div>
+      <div class="info-row"><span>📦 Order options</span><strong id="infoOrderOptions"></strong></div>
+      <div class="info-row"><span>🕒 Hours</span><strong id="infoHours"></strong></div>
+    </section>
+
+    <footer>
+      <div style="margin-top:4px;">Prices shown are estimates — weighed items are finalized at pickup.</div>
+    </footer>
+  </main>
+
+  <main id="searchView" style="display:none;">
+    <header class="topbar">
+      <div class="topbar-row1">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="search-wrap" style="flex:1; padding:2px 0;">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="searchInput2" placeholder="Search lamb, rice, halal deli…" oninput="onSearch(true)">
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="search-results" id="searchResults"></div>
+  </main>
+
+  <!-- ===================== DEALS ===================== -->
+  <main id="dealsView" style="display:none;">
+    <header class="topbar">
+      <div class="topbar-row1">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="deptpage-title" style="font-size:1.05rem;">🏷️ Deals</div>
+      </div>
+    </header>
+    <div class="deals-list" id="dealsList"></div>
+  </main>
+
+  <!-- ===================== MY ORDERS ===================== -->
+  <main id="ordersView" style="display:none;">
+    <header class="topbar">
+      <div class="topbar-row1">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="deptpage-title" style="font-size:1.05rem;">🧾 My Orders</div>
+        <button id="accountBtn" onclick="openAccountArea()" style="margin-left:auto;background:none;border:none;font-size:1.4rem;padding:6px;">👤</button>
+      </div>
+    </header>
+    <div id="ordersAcctStrip"></div>
+    <div class="deals-list" id="myOrdersList"></div>
+  </main>
+
+  <div class="modal-backdrop" id="accountModal">
+    <div class="modal">
+      <h3 id="acctTitle">Sign in</h3>
+      <div id="acctSignupFields" style="display:none;">
+        <label class="flabel" for="acctName">Name</label>
+        <input id="acctName" class="field" placeholder="Your name">
+        <label class="flabel" for="acctPhone">Phone</label>
+        <input id="acctPhone" class="field" placeholder="(404) 555-0100" type="tel">
+      </div>
+      <div id="acctEmailWrap">
+        <label class="flabel" for="acctEmail">Email</label>
+        <input id="acctEmail" class="field" placeholder="you@example.com" type="email" autocomplete="email">
+      </div>
+      <div id="acctPasswordWrap">
+        <label class="flabel" for="acctPassword">Password</label>
+        <input id="acctPassword" class="field" placeholder="At least 8 characters" type="password" autocomplete="current-password">
+      </div>
+      <div id="acctMsg" style="font-size:.85rem;color:#b3262d;margin:2px 2px 12px;min-height:18px;"></div>
+      <button class="btn" id="acctSubmitBtn" onclick="submitAccountForm()">Sign in</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="toggleAccountMode()" id="acctToggleBtn">Don't have an account? Create one</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="openForgotModal()" id="acctForgotBtn">Forgot your password?</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="closeModalById('accountModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="forgotModal">
+    <div class="modal">
+      <h3>Reset your password</h3>
+      <p style="margin:0 0 12px;color:var(--muted);font-size:.9rem;">Enter the email on your account and we'll send a link to set a new password.</p>
+      <label class="flabel" for="forgotEmail">Email</label>
+      <input id="forgotEmail" class="field" type="email" placeholder="you@example.com">
+      <div id="forgotMsg" style="font-size:.85rem;margin:2px 2px 12px;min-height:18px;"></div>
+      <button class="btn" onclick="submitForgotPassword()">Send reset link</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="closeModalById('forgotModal')">Back</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="resetModal">
+    <div class="modal">
+      <h3>Set a new password</h3>
+      <label class="flabel" for="resetPassword">New password</label>
+      <input id="resetPassword" class="field" type="password" placeholder="At least 8 characters" autocomplete="new-password">
+      <div id="resetMsg" style="font-size:.85rem;color:#b3262d;margin:2px 2px 12px;min-height:18px;"></div>
+      <button class="btn" onclick="submitResetPassword()">Set password</button>
+    </div>
+  </div>
+
+  <!-- ===================== MY ACCOUNT ===================== -->
+  <main id="accountView" style="display:none;">
+    <header class="topbar">
+      <div class="topbar-row1">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="deptpage-title" style="font-size:1.05rem;">👤 My Account</div>
+        <span style="width:40px;"></span>
+      </div>
+    </header>
+    <div id="accountSection" style="padding-bottom:40px;"></div>
+  </main>
+
+  <!-- ===================== SUPPORT ===================== -->
+  <main id="supportView" style="display:none;">
+    <header class="topbar">
+      <div class="topbar-row1">
+        <button class="back-btn" onclick="switchView('account')">←</button>
+        <div class="deptpage-title" style="font-size:1.05rem;">💬 Support & Inquiries</div>
+        <span style="width:40px;"></span>
+      </div>
+    </header>
+    <div class="support-body">
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px;">Questions about an order, product availability, pickup, or anything else? We're here to help.</p>
+
+      <div class="support-card">
+        <h3>✉️ Send us a message</h3>
+        <p>We'll reply to your email, usually within one business day.</p>
+        <div id="supportFormWrap">
+          <div style="margin-bottom:10px;">
+            <label class="flabel" for="sfName">Your name</label>
+            <input id="sfName" class="field" placeholder="Sameh Said">
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="flabel" for="sfEmail">Your email</label>
+            <input id="sfEmail" class="field" placeholder="you@example.com" type="email">
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="flabel" for="sfType">Topic</label>
+            <select id="sfType" class="field" onchange="updateSupportSubject()">
+              <option value="general">General inquiry</option>
+              <option value="order">Question about an order</option>
+              <option value="availability">Product availability</option>
+              <option value="other">Something else</option>
+            </select>
+          </div>
+          <div id="sfOrderWrap" style="display:none;margin-bottom:10px;">
+            <label class="flabel" for="sfOrder">Order number (optional)</label>
+            <input id="sfOrder" class="field" placeholder="MHM-12345">
+          </div>
+          <div style="margin-bottom:10px;">
+            <label class="flabel" for="sfMsg">Message</label>
+            <textarea id="sfMsg" class="field" rows="4" placeholder="Tell us how we can help…" style="resize:vertical;"></textarea>
+          </div>
+          <div id="sfMsg2" style="font-size:.85rem;min-height:18px;margin-bottom:10px;"></div>
+          <button class="btn" style="width:100%;" onclick="submitSupportForm()">Send message</button>
+        </div>
+      </div>
+
+      <div class="support-card">
+        <h3>📞 Call Us</h3>
+        <p>Prefer to talk? We're available during store hours.</p>
+        <a class="btn ghost" href="tel:4042970008" style="display:block;text-align:center;text-decoration:none;">Call 404-297-0008</a>
+      </div>
+
+      <div class="support-card">
+        <h3>📧 Email directly</h3>
+        <p style="margin-bottom:6px;">You can also email us directly:</p>
+        <a href="mailto:support@makkahalalmeat.com" style="color:var(--brand);font-weight:700;font-size:.92rem;">support@makkahalalmeat.com</a>
+      </div>
+
+      <div class="support-card">
+        <h3>🕐 Store Hours</h3>
+        <dl class="support-hours">
+          <dt>Tuesday – Sunday</dt><dd>11:00 AM – 6:30 PM (meat counter closes 6:00 PM)</dd>
+          <dt>Monday</dt><dd>Closed</dd>
+        </dl>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px;">431 N Indian Creek Dr, Clarkston, GA 30021</div>
+      <div style="text-align:center;margin-top:16px;padding-bottom:8px;">
+        <a href="/privacy.html" style="color:var(--muted);font-size:.75rem;margin:0 10px;">Privacy Policy</a>
+        <a href="/terms.html" style="color:var(--muted);font-size:.75rem;margin:0 10px;">Terms of Use</a>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="buyAgainModal">
+    <div class="modal">
+      <h3>🔁 Buy Again</h3>
+      <p id="buyAgainDesc" style="color:var(--muted);font-size:.88rem;margin:0 0 12px;"></p>
+      <div id="buyAgainItems" style="max-height:280px;overflow-y:auto;margin-bottom:14px;"></div>
+      <button class="btn" onclick="confirmBuyAgain()">Add all to cart</button>
+      <button class="btn ghost" style="margin-top:8px;" onclick="closeModalById('buyAgainModal')">Cancel</button>
+    </div>
+  </div>
+  <main id="deptView" style="display:none;">
+    <header class="deptpage-header">
+      <div class="deptpage-topline">
+        <button class="back-btn" onclick="switchView('home')">←</button>
+        <div class="deptpage-title"><span id="deptPageIcon"></span><span id="deptPageLabel"></span></div>
+        <span class="deptpage-count" id="deptPageCount"></span>
+      </div>
+      <div class="cat-chips" id="deptPageChips"></div>
+    </header>
+    <div class="deptpage-body" id="deptPageBody"></div>
+  </main>
+
+  <main id="productView" style="display:none;">
+    <header class="deptpage-header">
+      <div class="deptpage-topline">
+        <button class="back-btn" onclick="closeProductPage()">←</button>
+        <div class="deptpage-title"><span>Item details</span></div>
+        <span class="deptpage-count"></span>
+      </div>
+    </header>
+    <div id="productBody" class="product-detail"></div>
+  </main>
+
+  <div class="cart-bar" id="cartBar" onclick="openCart()">
+    <div class="left"><span class="count-chip" id="cartBarCount">0</span><span id="cartBarSub">$0.00</span></div>
+    <button onclick="event.stopPropagation(); openCart()">View cart</button>
+  </div>
+
+  <nav class="tabbar">
+    <button class="tab-btn active" data-tab="home" onclick="switchView('home')"><span class="ic nav-svg"><!-- home --><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>Home</button>
+    <button class="tab-btn" data-tab="search" onclick="switchView('search')"><span class="ic nav-svg"><!-- search --><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg></span>Search</button>
+    <button class="tab-btn" data-tab="deals" onclick="switchView('deals')"><span class="ic nav-svg"><!-- tag --><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Deals</button>
+    <button class="tab-btn" data-tab="orders" onclick="switchView('orders')"><span class="ic nav-svg"><!-- receipt --><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 2 2 2-2 2 2 2-2 3 2V4a2 2 0 0 0-2-2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg></span>Orders</button>
+    <button class="tab-btn" onclick="openCart()"><span class="ic nav-svg"><!-- bag --><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Cart<span class="dot" id="cartDotTab" style="display:none;">0</span></button>
+  </nav>
+
+  <div class="overlay" id="overlay" onclick="closeCart()"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head"><strong>Your order</strong><button class="icon-btn" onclick="closeCart()">✕</button></div>
+    <div class="drawer-items" id="drawerItems"></div>
+    <div class="drawer-foot">
+      <div class="totals-row"><span>Subtotal</span><span id="sumSubtotal">$0.00</span></div>
+      <div class="totals-row"><span>Estimated tax</span><span id="sumTax">$0.00</span></div>
+      <div class="totals-row grand"><span>Total</span><span id="sumTotal">$0.00</span></div>
+      <button class="checkout-btn" onclick="openCheckoutModal()">Checkout</button>
+    </div>
+  </aside>
+
+  <div class="modal-backdrop" id="checkoutModal">
+    <div class="modal">
+      <h3>Pickup details</h3>
+      <input id="custName" placeholder="Full name">
+      <input id="custPhone" placeholder="Phone number">
+      <input id="custEmail" placeholder="Email (for receipt)">
+      <label class="flabel" for="pickupSlot">Pickup time</label>
+      <select id="pickupSlot"></select>
+      <label class="flabel" for="subPref">If something is out of stock</label>
+      <select id="subPref">
+        <option value="call">Call or text me first</option>
+        <option value="substitute">Substitute a similar item</option>
+        <option value="skip">Just skip it</option>
+      </select>
+      <label class="flabel" for="promoInput">Promo code (optional)</label>
+      <div class="row" style="margin-bottom:0;">
+        <input id="promoInput" placeholder="e.g. WELCOME10" style="text-transform:uppercase; flex:1;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault();applyPromo();}">
+        <button class="btn ghost" type="button" style="flex:0 0 auto;" onclick="applyPromo()">Apply</button>
+      </div>
+      <div id="promoMsg" style="font-size:.85rem; margin:6px 2px 12px; min-height:18px;"></div>
+      <div class="row">
+        <button class="btn ghost" onclick="closeCheckoutModal()">Back</button>
+        <button class="btn" id="payBtn" onclick="submitCheckout()">Continue to payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weight picker for by-the-pound items -->
+  <div class="modal-backdrop weight-modal" id="weightModal">
+    <div class="modal">
+      <div class="wm-media" id="wmMedia"></div>
+      <div class="wm-body">
+        <h3 id="wmName"></h3>
+        <div class="wm-price" id="wmPrice"></div>
+        <div class="wm-chips" id="wmChips"></div>
+        <div class="wm-custom">
+          <span style="font-weight:600; font-size:.85rem;">Custom:</span>
+          <input type="number" id="wmCustom" step="0.25" min="0.25" placeholder="e.g. 2.75">
+          <span style="font-weight:600; font-size:.85rem;">lb</span>
+        </div>
+        <div class="wm-total"><span>Estimated total</span><span id="wmTotal">$0.00</span></div>
+        <div class="wm-actions">
+          <button class="btn ghost" style="flex:1;" onclick="closeWeightModal()">Cancel</button>
+          <button class="btn" style="flex:1;" onclick="confirmWeight()">Add to order</button>
+        </div>
+        <button class="wm-remove" id="wmRemoveBtn" style="display:none;" onclick="removeFromWeightModal()">Remove from order</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="requestModal">
+    <div class="modal">
+      <h3 id="rqTitle">Request</h3>
+      <p id="rqIntro" style="margin:0 0 12px;color:var(--muted);font-size:.9rem;line-height:1.45;"></p>
+      <label class="flabel" for="rqReason" id="rqLabel">Reason</label>
+      <textarea id="rqReason" rows="3" maxlength="300" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);font-size:.95rem;font-family:inherit;margin-bottom:12px;resize:vertical;"></textarea>
+      <div class="row">
+        <button class="btn ghost" onclick="closeRequestModal()">Back</button>
+        <button class="btn" id="rqSend" onclick="submitRequest()">Send request</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://zbsesllddfjwfsowxlgp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_fgQoJ3lUEfNIxqbOSxit3Q_FK89Oxn_";
+
+const DEPT_ICONS = {
+  // Meat — drumstick/leg of meat shape
+  meat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M15.5 3.5a4 4 0 0 1 5 5l-9 9-2 .5.5-2 9-9z"/><path d="M14 5l5 5"/><circle cx="6.5" cy="17.5" r="3.5"/></svg>`,
+  // Grocery — shopping basket
+  grocery: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M5.52 5H21l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.35a2 2 0 0 1-1.96-1.61L5 5H2"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/><path d="M8 5l1-3h6l1 3"/></svg>`,
+  // Household — spray bottle / cleaning
+  household: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M3 22V11l4-4V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3l4 4v11H3z"/><path d="M3 11h14"/><path d="M13 7h5l2 2"/><line x1="9" y1="15" x2="9" y2="18"/><line x1="12" y1="15" x2="12" y2="18"/></svg>`,
+  // Beauty — sparkle / star wand
+  beauty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>`,
+  // Baby — baby bottle
+  baby: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M6 2h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6V2z"/><path d="M6 8v8a6 6 0 0 0 12 0V8"/><line x1="9" y1="2" x2="9" y2="5"/><line x1="15" y1="2" x2="15" y2="5"/><line x1="10" y1="13" x2="14" y2="13"/></svg>`,
+  // Clothing — folded shirt / hanger
+  clothing: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>`,
+  // Candy — lollipop
+  candy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><circle cx="11" cy="9" r="6"/><path d="M11 15l-4 6"/><path d="M8 9a3 3 0 0 1 6 0"/></svg>`,
+};
+const DEPTS = [
+  { id:"meat",      label:"Fresh Meat & Poultry", icon:"🥩", tile:"#8C1A1E" },
+  { id:"grocery",   label:"Grocery",              icon:"🛒", tile:"#B9812A" },
+  { id:"household", label:"Household",            icon:"🧼", tile:"#2E6E7D" },
+  { id:"beauty",    label:"Beauty",               icon:"💄", tile:"#A8506A" },
+  { id:"baby",      label:"Baby",                 icon:"👶", tile:"#4A6F9C" },
+  { id:"clothing",  label:"Clothing",             icon:"🧕", tile:"#7D6633" },
+  { id:"candy",     label:"Candy & Sweets",        icon:"🍬", tile:"#C0527D" },
+];
+const DEPT_MAP = Object.fromEntries(DEPTS.map(d=>[d.id,d]));
+const WEIGHT_CHIPS = [1, 1.5, 2, 3, 5];
+
+let PRODUCTS = [];
+let SETTINGS = {};
+let DISCOUNTS = [];
+let CART = {};        // id -> quantity (lb for weighted items, count for "each" items)
+let FAVORITES = {};
+let currentView = "home";
+let currentDeptPage = null;
+let weightModalProductId = null;
+
+async function sb(path){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } });
+  if(!res.ok) throw new Error("Unable to load data");
+  return res.json();
+}
+
+/* ---------------- support contact form ---------------- */
+function updateSupportSubject(){
+  const t = document.getElementById("sfType").value;
+  const wrap = document.getElementById("sfOrderWrap");
+  if(wrap) wrap.style.display = (t === "order") ? "block" : "none";
+}
+function prefillSupportForm(){
+  if(CUSTOMER){
+    const nm = document.getElementById("sfName"); if(nm && !nm.value) nm.value = CUSTOMER.name || "";
+    const em = document.getElementById("sfEmail"); if(em && !em.value) em.value = CUSTOMER.email || "";
+  }
+  // prefill order number if coming from an order context
+  const orderCode = Object.keys(CUSTOMER_ORDERS||{}).sort().reverse()[0];
+  if(orderCode){
+    const ot = document.getElementById("sfType"); if(ot){ ot.value = "order"; updateSupportSubject(); }
+    const on = document.getElementById("sfOrder"); if(on && !on.value) on.value = orderCode;
+  }
+}
+async function submitSupportForm(){
+  const name = document.getElementById("sfName").value.trim();
+  const email = document.getElementById("sfEmail").value.trim();
+  const type = document.getElementById("sfType").value;
+  const orderCode = document.getElementById("sfOrder")?.value.trim() || "";
+  const message = document.getElementById("sfMsg").value.trim();
+  const msgEl = document.getElementById("sfMsg2");
+  msgEl.style.color = "#b3262d";
+  if(!email){ msgEl.textContent = "Enter your email address so we can reply."; return; }
+  if(!message){ msgEl.textContent = "Please describe what you need help with."; return; }
+
+  const topics = { general:"General Inquiry", order:"Order Support", availability:"Product Availability", other:"Support Request" };
+  const subject = topics[type] || "Support Request";
+
+  const btn = document.querySelector('#supportView .btn');
+  const orig = btn.textContent; btn.textContent = "Sending…"; btn.disabled = true;
+  try{
+    const res = await fetch("/.netlify/functions/customer-support", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ name, email, type, order_code: orderCode, subject, message }),
+    });
+    const data = await res.json();
+    if(data.fallback){
+      msgEl.style.color = "var(--muted)";
+      msgEl.textContent = data.message;
+    } else if(!res.ok || !data.ok){
+      throw new Error(data.error || "Something went wrong");
+    } else {
+      msgEl.style.color = "#2E7D53";
+      msgEl.textContent = data.message;
+      document.getElementById("sfMsg").value = "";
+    }
+  }catch(e){ msgEl.textContent = e.message || "Couldn't send — try again or email us directly."; }
+  btn.textContent = orig; btn.disabled = false;
+}
+
+/* ---------------- buy again / support ---------------- */
+let buyAgainItems = [];
+let CUSTOMER_ORDERS = {};
+
+async function openBuyAgain(){
+  switchView("account");
+  document.getElementById("buyAgainModal").classList.add("open");
+  const desc = document.getElementById("buyAgainDesc");
+  const list = document.getElementById("buyAgainItems");
+  desc.textContent = "Loading your recent orders…";
+  list.innerHTML = "";
+  buyAgainItems = [];
+  try{
+    const res = await fetch("/.netlify/functions/customer-orders", { headers:{"x-customer-token":CUSTOMER_TOKEN} });
+    if(!res.ok) throw new Error("Could not load orders");
+    const orders = await res.json();
+    if(!orders.length){ desc.textContent = "No orders yet on this account."; return; }
+    // Merge all items from the last 5 orders, de-duplicating by product id, keeping most recent quantities
+    const merged = {}; orders.slice(0,5).reverse().forEach(o => { CUSTOMER_ORDERS[o.order_code]=o; (o.items||[]).forEach(it => { merged[it.id] = it; }); });
+    buyAgainItems = Object.values(merged).filter(it => PRODUCTS.find(p=>p.id===it.id && p.price!=null));
+    if(!buyAgainItems.length){ desc.textContent = "None of your recent items are currently available."; return; }
+    desc.textContent = "From your recent orders — tap 'Add all to cart' or adjust quantities.";
+    list.innerHTML = buyAgainItems.map(it => {
+      const p = PRODUCTS.find(x=>x.id===it.id);
+      if(!p) return "";
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
+        <div style="flex:1;font-size:.92rem;font-weight:600;">${escapeHtml(it.name)}</div>
+        <div style="color:var(--muted);font-size:.82rem;">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div>
+        <input type="number" min="0" step="${isWeighted(p)?0.5:1}" value="${it.qty}" style="width:56px;padding:4px 6px;border-radius:8px;border:1px solid var(--line);font-size:.9rem;" data-pid="${p.id}" data-weighted="${isWeighted(p)?1:0}">
+      </div>`;
+    }).join("");
+  }catch(e){ desc.textContent = "Couldn't load your orders — try again."; }
+}
+function confirmBuyAgain(){
+  let added=0;
+  document.querySelectorAll("#buyAgainItems input[data-pid]").forEach(input => {
+    const pid = Number(input.dataset.pid); const qty = Number(input.value);
+    const p = PRODUCTS.find(x=>x.id===pid); if(!p||!qty) return;
+    CART[pid] = (CART[pid]||0) + qty; added++;
+  });
+  if(added){ saveLocal(); renderCartChrome(); showToast(`Added ${added} item${added===1?"":"s"} to your cart`); }
+  closeModalById("buyAgainModal");
+}
+
+/* ---------------- favorites: persist to account when signed in -------------- */
+// Favorites already live in localStorage (FAVORITES object, keyed by product id).
+// When the customer is signed in, we also push changes to customer-me so they
+// survive clearing the browser or switching devices. We merge rather than
+// overwrite, so nothing is ever lost.
+async function syncFavoritesToAccount(){
+  if(!CUSTOMER_TOKEN || !Object.keys(FAVORITES).length) return;
+  try{
+    await fetch("/.netlify/functions/customer-me", {
+      method:"PATCH", headers:{"Content-Type":"application/json","x-customer-token":CUSTOMER_TOKEN},
+      body: JSON.stringify({ favorites: Object.keys(FAVORITES).map(Number).filter(Boolean) }),
+    });
+  }catch(e){ /* non-critical — local copy is still the source of truth */ }
+}
+function toggleFavAndSync(id, btn){
+  toggleFav(id, btn);
+  syncFavoritesToAccount();
+}
+
+/* ---------------- buy again / support ---------------- */
+function visitSessionId(){
+  let id = null;
+  try{ id = sessionStorage.getItem("mhm_session_id"); }catch(e){}
+  if(!id){
+    id = (crypto.randomUUID ? crypto.randomUUID() : "s-"+Date.now()+"-"+Math.random().toString(36).slice(2));
+    try{ sessionStorage.setItem("mhm_session_id", id); }catch(e){}
+  }
+  return id;
+}
+function pingVisit(){
+  fetch("/.netlify/functions/track-visit", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ session_id: visitSessionId() }),
+  }).catch(()=>{}); // never let a tracking hiccup interrupt shopping
+}
+pingVisit();
+setInterval(pingVisit, 25000);
+
+async function init(){
+  renderSkeleton();
+  try{
+    const [products, settingsRows, discounts] = await Promise.all([
+      sb("products?select=*&active=eq.true&order=sort_order.asc,name.asc"),
+      sb("app_settings?key=eq.ui_config&select=value"),
+      sb("discounts?select=*&active=eq.true&order=expires_at.asc.nullslast"),
+    ]);
+    PRODUCTS = products;
+    SETTINGS = (settingsRows[0] && settingsRows[0].value) || {};
+    DISCOUNTS = discounts;
+  }catch(e){ showToast("Couldn't load the catalog — check your connection."); console.error(e); }
+  applySettings();
+  renderDeptNav();
+  renderQuickCats();
+  renderPromos();
+  renderSpotlight();
+  updateAskMakkaVisibility();
+  renderHomePreviews();
+  renderDeals();
+  restoreLocal();
+}
+
+function applySettings(){
+  if(SETTINGS.home_title) document.getElementById("storeName").textContent = SETTINGS.home_title;
+  if(SETTINGS.store_hours) document.getElementById("storeHours").textContent = SETTINGS.store_hours;
+  const address = SETTINGS.store_address || "";
+  const addrEl = document.getElementById("infoAddress");
+  addrEl.textContent = address || "—";
+  if (address) addrEl.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
+  else addrEl.removeAttribute("href");
+
+  const phone = SETTINGS.store_phone || "";
+  const phoneEl = document.getElementById("infoPhone");
+  phoneEl.textContent = phone || "—";
+  const digits = phone.replace(/[^0-9+]/g, "");
+  if (digits) phoneEl.href = "tel:" + digits;
+  else phoneEl.removeAttribute("href");
+
+  document.getElementById("infoShopping").textContent = SETTINGS.store_shopping || "In-store & online";
+  document.getElementById("infoOrderOptions").textContent = SETTINGS.store_order_options || "Store pickup";
+  document.getElementById("infoHours").textContent = SETTINGS.store_hours || "—";
+}
+
+function departmentsInOrder(){
+  const order = SETTINGS.department_order || DEPTS.map(d=>d.id);
+  const hidden = new Set(SETTINGS.hidden_departments || []);
+  return order.filter(d => !hidden.has(d) && DEPT_MAP[d]);
+}
+
+/* ---------------- weight helpers ---------------- */
+function isWeighted(p){ return !!(p.unit && p.unit.toLowerCase().includes("lb")); }
+function stepFor(p){ return isWeighted(p) ? 0.5 : 1; }
+function fmtQty(p, qty){ return isWeighted(p) ? `${qty} lb` : `${qty}`; }
+
+/* ---------------- nav / quick cats / promos ---------------- */
+function renderDeptNav(){
+  document.getElementById("deptNav").innerHTML = departmentsInOrder().map(id => {
+    const d = DEPT_MAP[id];
+    const svgIcon = DEPT_ICONS[id] ? `<span style="display:inline-flex;vertical-align:middle;margin-right:5px;">${DEPT_ICONS[id].replace('width="26" height="26"','width="16" height="16"')}</span>` : d.icon + " ";
+    return `<button class="dept-pill" data-dept="${id}" onclick="openDeptPage('${id}')">${svgIcon}${d.label}</button>`;
+  }).join("");
+}
+function renderQuickCats(){
+  document.getElementById("quickCats").innerHTML = departmentsInOrder().map(id => {
+    const d = DEPT_MAP[id];
+    const icon = DEPT_ICONS[id]
+      ? `<span style="color:${d.tile};">${DEPT_ICONS[id]}</span>`
+      : `<span>${d.icon}</span>`;
+    return `<button class="quick-cat" onclick="openDeptPage('${id}')">
+      <span class="tile" style="background:${d.tile}22; color:${d.tile};">${icon}</span>
+      <span>${d.label}</span>
+    </button>`;
+  }).join("");
+}
+function renderPromos(){
+  const deal = SETTINGS.deal_text || "Today's best cut, ready for pickup";
+  const dealPrice = SETTINGS.deal_price_label || "";
+  document.getElementById("promoScroller").innerHTML = `
+    <div class="promo-card deal">
+      <span class="promo-eyebrow">${SETTINGS.deal_title || "Deal of the day"}</span>
+      <h2>${escapeHtml(deal)}</h2>
+      ${dealPrice ? `<p>${escapeHtml(dealPrice)}</p>` : ""}
+      <button class="btn" onclick="openDeptPage('meat')">Shop now</button>
+    </div>
+    <div class="promo-card pickup">
+      <span class="promo-eyebrow">Free pickup</span>
+      <h2>Order ahead, skip the line</h2>
+      <p>We'll have it ready when you arrive.</p>
+    </div>
+    <div class="promo-card halal">
+      <span class="promo-eyebrow">100% halal</span>
+      <h2>Freshly cut, every day</h2>
+      <p>Sourced and prepared to halal standards.</p>
+    </div>
+  `;
+}
+
+/* ---------------- HOME: "Featured today" slideshow ---------------- */
+// The owner can pin specific items as "Featured" in admin.html; with none
+// pinned, it falls back to the same daily-rotating pick used by Search, so
+// the home page always has something fresh to show without extra setup.
+/* ---------------- theme toggle (light / dark) ---------------- */
+let isDark = false;
+function toggleTheme(){
+  isDark = !isDark;
+  document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+  try{ localStorage.setItem("mhm_theme", isDark ? "dark" : "light"); }catch(e){}
+}
+function loadTheme(){
+  try{
+    const t = localStorage.getItem("mhm_theme");
+    if(t === "dark"){ isDark = true; document.documentElement.setAttribute("data-theme","dark"); }
+  }catch(e){}
+}
+
+let spotlightTimer = null;
+function renderSpotlight(){
+  const section = document.getElementById("spotlightSection");
+  const pinned = PRODUCTS.filter(p => p.active !== false && p.featured);
+  const items = (pinned.length ? pinned : spotlightItems(6)).slice(0, 6);
+  if (!items.length){ section.style.display = "none"; return; }
+  section.style.display = "block";
+  const scroller = document.getElementById("spotlightScroller");
+  scroller.innerHTML = items.map(p => `
+    <div class="spotlight-slide" style="background-image:url('${p.image ? escapeAttr(p.image) : ""}')" onclick="quickAddFromSpotlight(${p.id})">
+      <div class="overlay">
+        <div class="s-name">${escapeHtml(p.name)}</div>
+        <div class="s-price">${p.price != null ? "$" + Number(p.price).toFixed(2) + (p.unit && p.unit !== "each" ? " " + escapeHtml(p.unit) : "") : "Ask in store"}</div>
+      </div>
+      ${p.price != null ? `<button class="s-add" onclick="event.stopPropagation();quickAddFromSpotlight(${p.id})" aria-label="Add">+</button>` : ""}
+    </div>`).join("");
+  document.getElementById("spotlightDots").innerHTML = items.map((_, i) => `<span class="spotlight-dot${i === 0 ? " active" : ""}"></span>`).join("");
+  scroller.scrollLeft = 0;
+  scroller.onscroll = debounce(() => updateSpotlightDots(scroller), 80);
+  startSpotlightAuto(items.length);
+}
+function updateSpotlightDots(scroller){
+  const idx = Math.round(scroller.scrollLeft / Math.max(1, scroller.clientWidth));
+  document.querySelectorAll(".spotlight-dot").forEach((d, i) => d.classList.toggle("active", i === idx));
+}
+function startSpotlightAuto(n){
+  if (spotlightTimer) clearInterval(spotlightTimer);
+  if (n <= 1) return;
+  let idx = 0;
+  spotlightTimer = setInterval(() => {
+    const scroller = document.getElementById("spotlightScroller");
+    if (!scroller || document.hidden || currentView !== "home") return;
+    idx = (idx + 1) % n;
+    // Use scrollLeft arithmetic rather than clientWidth, which can be 0 if the
+    // scroller hasn't been laid out yet (e.g. right after a view switch).
+    const w = scroller.scrollWidth / n;
+    scroller.scrollTo({ left: idx * w, behavior: "smooth" });
+  }, 3000);
+}
+function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function quickAddFromSpotlight(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p || p.price == null) return;
+  if (isWeighted(p)){ openWeightModal(id); return; }
+  const step = stepFor(p);
+  if (p.stock != null && (CART[id] || 0) + step > p.stock){ showToast(`Only ${p.stock} of ${p.name} in stock`); return; }
+  CART[id] = (CART[id] || 0) + step;
+  saveLocal(); refreshAllCardsFor(id); renderCartChrome();
+  showToast(`Added ${p.name}`);
+}
+
+/* ---------------- HOME: preview rows with "See all" ---------------- */
+function renderSkeleton(){
+  document.getElementById("homePreviews").innerHTML = `<div class="grid">${'<div class="skeleton"></div>'.repeat(6)}</div>`;
+}
+function renderHomePreviews(){
+  const wrap = document.getElementById("homePreviews");
+  wrap.innerHTML = "";
+  departmentsInOrder().forEach(id => {
+    const d = DEPT_MAP[id];
+    const items = PRODUCTS.filter(p => p.department === id);
+    if(!items.length) return;
+    const preview = items.slice(0, 10);
+    const section = document.createElement("section");
+    section.className = "section";
+    section.innerHTML = `
+      <div class="section-head">
+        <h2><span class="tint">${d.icon}</span> ${d.label}</h2>
+        <button class="link-btn" onclick="openDeptPage('${id}')">See all (${items.length}) →</button>
+      </div>
+      <div class="row-scroller" id="rowhome-${id}"></div>
+    `;
+    wrap.appendChild(section);
+    document.getElementById(`rowhome-${id}`).innerHTML = preview.map(cardHtml).join("");
+  });
+}
+
+/* ---------------- VIEW SWITCHING ---------------- */
+function switchView(name){
+  currentView = name;
+  document.getElementById("homeView").style.display = name==="home" ? "block" : "none";
+  document.getElementById("homeHeader").style.display = name==="home" ? "block" : "none";
+  document.getElementById("searchView").style.display = name==="search" ? "block" : "none";
+  document.getElementById("dealsView").style.display = name==="deals" ? "block" : "none";
+  document.getElementById("ordersView").style.display = name==="orders" ? "block" : "none";
+  if(name==="orders"){
+    // small strip above order list: signed in = "Viewing Sameh's orders · My Account →"
+    // signed out = "Sign in to see all orders"
+    const strip = document.getElementById("ordersAcctStrip");
+    if(strip){
+      if(CUSTOMER_TOKEN && CUSTOMER){
+        strip.innerHTML = `<div style="padding:10px 16px 0;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:.85rem;color:var(--muted);">Signed in as <strong>${escapeHtml(CUSTOMER.name||CUSTOMER.email)}</strong></span><button onclick="openAccountArea()" style="background:none;border:none;font-size:.82rem;font-weight:700;color:var(--brand);padding:0;">My Account ›</button></div>`;
+      } else {
+        strip.innerHTML = `<div style="padding:10px 16px 0;text-align:center;"><button onclick="openAccountModal('signin')" style="background:none;border:none;font-size:.85rem;color:var(--brand);font-weight:700;">Sign in to see your full order history ›</button></div>`;
+      }
+    }
+    renderMyOrders();
+  }
+  if(name==="support") prefillSupportForm();
+  if(name==="account") renderAccountSection();
+  if(name==="search" && !document.getElementById("searchInput2").value.trim()) renderSearchResults([], "", { browse: true });
+  document.getElementById("deptView").style.display = name==="dept" ? "block" : "none";
+  document.getElementById("productView").style.display = name==="product" ? "block" : "none";
+  document.getElementById("accountView").style.display = name==="account" ? "block" : "none";
+  document.getElementById("supportView").style.display = name==="support" ? "block" : "none";
+  document.querySelectorAll(".tab-btn").forEach(t => t.classList.toggle("active", t.dataset.tab===name));
+  if(name !== "dept" && name !== "product" && name !== "account" && name !== "support"){ document.body.setAttribute("data-view", name==="home" ? "home" : "search"); }
+  document.body.scrollTop = 0; document.documentElement.scrollTop = 0;
+  if(name==="search") setTimeout(()=>{ const el=document.getElementById("searchInput2"); if(el) el.focus(); }, 50);
+}
+
+/* ---------------- DEALS ---------------- */
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const diff = new Date(dateStr) - new Date();
+  return Math.ceil(diff / (1000*60*60*24));
+}
+function formatExpiry(dateStr){
+  if(!dateStr) return null;
+  const days = daysUntil(dateStr);
+  if(days < 0) return null;
+  if(days === 0) return "Expires today";
+  if(days === 1) return "Expires tomorrow";
+  if(days <= 7) return `Expires in ${days} days`;
+  return "Expires " + new Date(dateStr).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+}
+function renderDeals(){
+  const wrap = document.getElementById("dealsList");
+  const active = DISCOUNTS.filter(d => !d.expires_at || daysUntil(d.expires_at) >= 0);
+  if(!active.length){ wrap.innerHTML = `<div class="deal-empty">No active deals right now — check back soon!</div>`; return; }
+  wrap.innerHTML = active.map(d => {
+    const expiry = formatExpiry(d.expires_at);
+    const soon = d.expires_at && daysUntil(d.expires_at) <= 3;
+    return `<div class="deal-card">
+      ${d.image ? `<div class="deal-photo" style="background-image:url('${escapeAttr(d.image)}')"></div>` : ""}
+      <h3>${escapeHtml(d.title)}</h3>
+      ${d.description ? `<p>${escapeHtml(d.description)}</p>` : ""}
+      <div class="deal-meta">
+        ${d.requirements ? `<span class="deal-chip">${escapeHtml(d.requirements)}</span>` : ""}
+        ${d.code ? `<span class="deal-chip">Code: ${escapeHtml(d.code)}</span>` : ""}
+        ${expiry ? `<span class="deal-chip expiry${soon?' soon':''}">${expiry}</span>` : `<span class="deal-chip">No expiration</span>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------------- DEPARTMENT PAGE (dedicated screen) ---------------- */
+function openDeptPage(id, categoryFilter){
+  currentDeptPage = id;
+  document.body.setAttribute("data-view","dept");
+  document.body.setAttribute("data-dept", id);
+  switchView("dept");
+  const d = DEPT_MAP[id];
+  const items = PRODUCTS.filter(p => p.department === id);
+  document.getElementById("deptPageIcon").textContent = d.icon;
+  document.getElementById("deptPageLabel").textContent = d.label;
+  document.getElementById("deptPageCount").textContent = `${items.length} items`;
+
+  const cats = [...new Set(items.map(p => p.category).filter(Boolean))];
+  const chipsHtml = [`<button class="cat-chip${!categoryFilter?' active':''}" onclick="openDeptPage('${id}', null)">All</button>`]
+    .concat(cats.map(c => `<button class="cat-chip${categoryFilter===c?' active':''}" onclick="openDeptPage('${id}', '${escAttrJs(c)}')">${escapeHtml(c)}</button>`));
+  document.getElementById("deptPageChips").innerHTML = chipsHtml.join("");
+
+  const body = document.getElementById("deptPageBody");
+  const groups = categoryFilter ? [categoryFilter] : cats;
+  body.innerHTML = groups.map(cat => {
+    const catItems = items.filter(p => p.category === cat);
+    if(!catItems.length) return "";
+    return `<section class="cat-section">
+      <h3>${escapeHtml(cat)}</h3>
+      <div class="grid">${catItems.map(cardHtml).join("")}</div>
+    </section>`;
+  }).join("");
+}
+
+/* ---------------- PRODUCT DETAIL PAGE ---------------- */
+// Remembers where the customer tapped in from (a department page keeps its
+// theme and category filter; search/home return to a neutral background),
+// so the back button feels like going back, not starting over.
+let productReturn = { view: "home" };
+function openProductPage(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return;
+  productReturn = currentView === "dept"
+    ? { view: "dept", deptId: currentDeptPage, bodyView: document.body.getAttribute("data-view"), bodyDept: document.body.getAttribute("data-dept") }
+    : { view: currentView, bodyView: document.body.getAttribute("data-view") };
+  // Borrow the department's color theme for the detail page too, so it doesn't
+  // feel like a jarring jump back to a neutral background and then forward again.
+  document.body.setAttribute("data-view", "dept");
+  document.body.setAttribute("data-dept", p.department);
+  switchView("product");
+  renderProductPage(id);
+}
+function closeProductPage(){
+  if(productReturn.view === "dept"){
+    document.body.setAttribute("data-view", productReturn.bodyView || "dept");
+    document.body.setAttribute("data-dept", productReturn.bodyDept || productReturn.deptId);
+    switchView("dept");
+  } else {
+    document.body.setAttribute("data-view", productReturn.bodyView || "home");
+    switchView(productReturn.view || "home");
+  }
+}
+function renderProductPage(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return;
+  const d = DEPT_MAP[p.department];
+  const media = p.image
+    ? `<div class="pd-media" style="background-image:url('${escapeAttr(p.image)}')"></div>`
+    : `<div class="pd-media">${p.emoji || "🛒"}</div>`;
+  const fav = FAVORITES[p.id] ? "❤️" : "🤍";
+  const outOfStock = p.stock != null && p.stock <= 0;
+  const lowStock = p.stock != null && p.stock > 0 && p.stock <= 5;
+  const chips = [
+    d ? `<span class="pd-chip">${d.icon} ${escapeHtml(d.label)}</span>` : "",
+    p.category ? `<span class="pd-chip">${escapeHtml(p.category)}</span>` : "",
+    lowStock ? `<span class="pd-chip">Only ${p.stock} left</span>` : "",
+  ].filter(Boolean).join("");
+
+  let actionHtml;
+  if(outOfStock){
+    actionHtml = `<div class="pd-action"><button class="btn ghost" disabled>Out of stock</button></div>`;
+  } else if(p.price == null){
+    actionHtml = `<div class="pd-action"><button class="btn ghost" disabled>Ask in store</button></div>`;
+  } else {
+    const qty = CART[p.id] || 0;
+    if(qty > 0){
+      const step = stepFor(p);
+      const editAttr = isWeighted(p) ? ` onclick="openWeightModal(${p.id})"` : "";
+      actionHtml = `<div class="pd-action"><div class="pd-stepper">
+        <button onclick="changeQty(${p.id},${-step}); renderProductPage(${p.id})">−</button>
+        <span${editAttr}>${fmtQty(p, qty)} in cart</span>
+        <button onclick="changeQty(${p.id},${step}); renderProductPage(${p.id})">+</button>
+      </div></div>`;
+    } else {
+      actionHtml = isWeighted(p)
+        ? `<div class="pd-action"><button class="btn" onclick="openWeightModal(${p.id})">Choose weight</button></div>`
+        : `<div class="pd-action"><button class="btn" onclick="bumpAdd(this,${p.id}); setTimeout(()=>renderProductPage(${p.id}),120)">Add to cart</button></div>`;
+    }
+  }
+
+  document.getElementById("productBody").dataset.pid = p.id;
+  document.getElementById("productBody").innerHTML = `
+    ${media}
+    <button class="pd-fav" onclick="toggleFav(${p.id}, this); this.textContent = FAVORITES[${p.id}] ? '❤️' : '🤍'">${fav}</button>
+    <h1>${escapeHtml(p.name)}</h1>
+    ${p.brand ? `<div class="pd-brand">${escapeHtml(p.brand)}</div>` : ""}
+    ${p.price != null ? `<div class="pd-price">$${Number(p.price).toFixed(2)} <span class="pd-unit">${escapeHtml(p.unit && p.unit !== "each" ? p.unit : "each")}</span></div>` : `<div class="pd-price">Ask in store</div>`}
+    <div class="pd-meta">${chips}</div>
+    ${p.description ? `<p class="pd-desc">${escapeHtml(p.description)}</p>` : ""}
+    ${actionHtml}
+  `;
+}
+
+/* ---------------- product cards ---------------- */
+function cardHtml(p){
+  const media = p.image
+    ? `<div class="card-media" style="background-image:url('${escapeAttr(p.image)}')"></div>`
+    : `<div class="card-media">${p.emoji||"🛒"}</div>`;
+  const priceHtml = p.price != null
+    ? `<span class="price">$${Number(p.price).toFixed(2)} <small>${escapeHtml(p.unit||"")}</small></span>`
+    : `<span class="price unknown">Ask in store</span>`;
+  const outOfStock = p.stock != null && p.stock <= 0;
+  const lowStock = p.stock != null && p.stock > 0 && p.stock <= 5;
+  const qty = CART[p.id]||0;
+  let control = "";
+  if(outOfStock){
+    control = `<span class="price unknown">Out of stock</span>`;
+  } else if(p.price != null){
+    if(qty>0){
+      const step = stepFor(p);
+      const editAttr = isWeighted(p) ? ` onclick="event.stopPropagation(); openWeightModal(${p.id})"` : "";
+      control = `<div class="stepper">
+        <button onclick="event.stopPropagation(); changeQty(${p.id},${-step})">−</button>
+        <span class="qtytext"${editAttr}>${fmtQty(p,qty)}</span>
+        <button onclick="event.stopPropagation(); changeQty(${p.id},${step})">+</button>
+      </div>`;
+    } else {
+      control = isWeighted(p)
+        ? `<button class="add-btn" onclick="event.stopPropagation(); openWeightModal(${p.id})">+</button>`
+        : `<button class="add-btn" onclick="event.stopPropagation(); bumpAdd(this,${p.id})">+</button>`;
+    }
+  }
+  const fav = FAVORITES[p.id] ? "❤️" : "🤍";
+  const stockBadge = lowStock ? `<span class="badge">Only ${p.stock} left</span>` : "";
+  return `<div class="card" data-pid="${p.id}" onclick="openProductPage(${p.id})">
+    ${media}
+    ${stockBadge}
+    <button class="fav-btn" onclick="event.stopPropagation(); toggleFav(${p.id}, this)">${fav}</button>
+    <h3>${escapeHtml(p.name)}</h3>
+    ${p.brand ? `<div class="brand">${escapeHtml(p.brand)}</div>` : ""}
+    <div class="price-row">${priceHtml}${control}</div>
+  </div>`;
+}
+
+function bumpAdd(btn, id){
+  // Always called for a fresh add (qty was 0): starts weighted items at 1 lb and
+  // everything else at 1 unit — a sensible default the customer can fine-tune afterward.
+  changeQty(id, 1);
+  btn.classList.add("added"); btn.textContent="✓";
+}
+
+function changeQty(id, delta){
+  const p = PRODUCTS.find(x=>x.id===id);
+  const step = stepFor(p);
+  let next = Math.round(((CART[id]||0)+delta)/step)*step;
+  next = Math.max(0, Math.round(next*100)/100);
+  if(p.stock != null && next > p.stock){
+    next = p.stock;
+    showToast(`Only ${p.stock} ${isWeighted(p)?'lb':''} of ${p.name} in stock`.replace('  ',' '));
+  }
+  if(next<=0) delete CART[id]; else CART[id]=next;
+  saveLocal();
+  refreshAllCardsFor(id);
+  renderCartChrome();
+  renderDrawer();
+}
+
+function refreshAllCardsFor(id){
+  document.querySelectorAll(`.card[data-pid="${id}"]`).forEach(el => {
+    const p = PRODUCTS.find(x=>x.id===id);
+    el.outerHTML = cardHtml(p);
+  });
+  if(currentView === "product" && document.getElementById("productBody").dataset.pid == id) renderProductPage(id);
+}
+
+function toggleFav(id, btn){
+  if(FAVORITES[id]) delete FAVORITES[id]; else FAVORITES[id]=true;
+  saveLocal();
+  if(btn) btn.textContent = FAVORITES[id] ? "❤️" : "🤍";
+}
+
+/* ---------------- weight picker modal ---------------- */
+function openWeightModal(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  weightModalProductId = id;
+  document.getElementById("wmMedia").style.backgroundImage = p.image ? `url('${escapeAttr(p.image)}')` : "none";
+  document.getElementById("wmMedia").textContent = p.image ? "" : (p.emoji||"🛒");
+  document.getElementById("wmName").textContent = p.name;
+  document.getElementById("wmPrice").textContent = `$${Number(p.price).toFixed(2)} ${p.unit||""}` + (p.stock!=null ? ` · ${p.stock} lb in stock` : "");
+  const current = CART[id] || 0;
+  const availableChips = p.stock!=null ? WEIGHT_CHIPS.filter(w=>w<=p.stock) : WEIGHT_CHIPS;
+  document.getElementById("wmChips").innerHTML = availableChips.map(w =>
+    `<button class="wm-chip${current===w?' active':''}" data-w="${w}" onclick="pickWeightChip(${w}, this)">${w} lb</button>`
+  ).join("");
+  const customInput = document.getElementById("wmCustom");
+  if(p.stock!=null) customInput.max = p.stock;
+  customInput.value = (current && !WEIGHT_CHIPS.includes(current)) ? current : "";
+  updateWeightTotal(current || (availableChips[0] || 0));
+  if(!current) document.querySelectorAll(".wm-chip")[0]?.classList.add("active");
+  document.getElementById("wmRemoveBtn").style.display = current>0 ? "block" : "none";
+  document.getElementById("weightModal").classList.add("open");
+  customInput.oninput = () => {
+    document.querySelectorAll(".wm-chip").forEach(c=>c.classList.remove("active"));
+    updateWeightTotal(parseFloat(customInput.value)||0);
+  };
+}
+function pickWeightChip(w, btn){
+  document.querySelectorAll(".wm-chip").forEach(c=>c.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("wmCustom").value = "";
+  updateWeightTotal(w);
+}
+function updateWeightTotal(w){
+  const p = PRODUCTS.find(x=>x.id===weightModalProductId);
+  document.getElementById("wmTotal").textContent = "$"+((p.price||0)*w).toFixed(2);
+  document.getElementById("weightModal").dataset.pendingWeight = w;
+}
+function confirmWeight(){
+  const custom = parseFloat(document.getElementById("wmCustom").value);
+  const activeChip = document.querySelector(".wm-chip.active");
+  let weight = custom > 0 ? custom : (activeChip ? Number(activeChip.dataset.w) : WEIGHT_CHIPS[0]);
+  if(!weight || weight<=0){ showToast("Enter a weight greater than 0."); return; }
+  const p = PRODUCTS.find(x=>x.id===weightModalProductId);
+  if(p.stock != null && weight > p.stock){
+    weight = p.stock;
+    showToast(`Only ${p.stock} lb of ${p.name} in stock — added the max available.`);
+  }
+  CART[weightModalProductId] = Math.round(weight*100)/100;
+  saveLocal();
+  refreshAllCardsFor(weightModalProductId);
+  renderCartChrome(); renderDrawer();
+  closeWeightModal();
+  showToast(`Added ${weight} lb of ${p.name}`);
+}
+function removeFromWeightModal(){
+  delete CART[weightModalProductId];
+  saveLocal();
+  refreshAllCardsFor(weightModalProductId);
+  renderCartChrome(); renderDrawer();
+  closeWeightModal();
+}
+function closeWeightModal(){ document.getElementById("weightModal").classList.remove("open"); weightModalProductId=null; }
+
+/* ---------------- search ---------------- */
+// A small typo-tolerant search: exact and "starts with" matches rank
+// highest, then substring matches anywhere in the name/brand/category,
+// then near-misses (a couple of letters off, like "chiken" -> "chicken").
+// Nothing the customer types ever dead-ends into a blank page — a weak
+// or empty result set falls back to popular picks and related items.
+const POPULAR_TERMS = ["Lamb", "Chicken", "Goat", "Beef", "Rice", "Halal deli"];
+
+function editDistanceWithin(a, b, max){
+  // Cheap bounded Levenshtein: bails out early past `max`, so it stays fast
+  // even scanning the whole catalog on every keystroke.
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({length: b.length + 1}, (_, i) => i);
+  for (let i = 1; i <= a.length; i++){
+    const cur = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++){
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      const v = Math.min(cur[j-1] + 1, prev[j] + 1, prev[j-1] + cost);
+      cur.push(v);
+      if (v < rowMin) rowMin = v;
+    }
+    if (rowMin > max) return max + 1; // this row can only get worse — stop early
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function wordScore(word, query){
+  if (word === query) return 100;
+  if (word.startsWith(query)) return 90 - Math.min(20, word.length - query.length);
+  if (word.includes(query)) return 70;
+  const maxDist = query.length <= 4 ? 1 : query.length <= 7 ? 2 : 3;
+  const d = editDistanceWithin(word, query, maxDist);
+  if (d <= maxDist) return 55 - d * 12; // a typo still scores well enough to clear the results threshold below
+  return 0;
+}
+function matchScore(p, query){
+  const fields = [
+    [p.name || "", 1], [p.brand || "", 0.7], [p.category || "", 0.6], [p.subcategory || "", 0.5],
+  ];
+  let best = 0;
+  for (const [text, weight] of fields){
+    const words = text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    for (const w of words) best = Math.max(best, wordScore(w, query) * weight);
+    // also credit a match against the whole phrase, so "ground beef" scores on "beef ground" too
+    best = Math.max(best, wordScore(text.toLowerCase(), query) * weight * 0.9);
+  }
+  return best;
+}
+function searchProducts(query){
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const words = q.split(/\s+/).filter(Boolean);
+  const scored = PRODUCTS.filter(p => p.active !== false).map(p => {
+    const score = words.reduce((sum, w) => sum + matchScore(p, w), 0) / words.length;
+    return { p, score };
+  }).filter(x => x.score >= 38).sort((a,b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
+  return scored;
+}
+function spotlightItems(n){
+  // A stable "pick of the day" rather than truly random, so the same
+  // items don't reshuffle every time someone taps back into Search.
+  // Prefer items with a real price (one-tap to add) over "Ask in store" ones.
+  const priced = PRODUCTS.filter(p => p.active !== false && p.price != null && (p.image || p.emoji));
+  const pool = priced.length >= n ? priced : PRODUCTS.filter(p => p.active !== false && (p.image || p.emoji));
+  const seed = new Date().toISOString().slice(0,10).split("-").reduce((s,x)=>s+Number(x),0);
+  const shuffled = pool.map((p,i) => ({p, k: ((i+1)*2654435761 + seed*40503) % 2147483647}))
+    .sort((a,b) => a.k - b.k).map(x => x.p);
+  return shuffled.slice(0, n);
+}
+function showFavorites(){
+  switchView("search");
+  const ids = Object.keys(FAVORITES).map(Number);
+  const items = PRODUCTS.filter(p => ids.includes(p.id));
+  renderSearchResults(items.map(p=>({p})), "Saved items", { isFavorites: true });
+}
+function searchChipHtml(term){
+  return `<button class="search-chip" onclick="setSearchQuery('${escAttrJs(term)}')">${escapeHtml(term)}</button>`;
+}
+function setSearchQuery(term){
+  const el = document.getElementById(currentView === "search" ? "searchInput2" : "searchInput");
+  if (el) el.value = term;
+  onSearch(currentView === "search");
+}
+function browseHtml(){
+  const items = spotlightItems(10);
+  return `
+    <div class="search-browse">
+      <div class="search-chips">${POPULAR_TERMS.map(searchChipHtml).join("")}</div>
+      ${items.length ? `<div class="section-head" style="padding:16px 0 8px;"><h2>You might like</h2></div><div class="row-scroller">${items.map(cardHtml).join("")}</div>` : ""}
+    </div>`;
+}
+function onSearch(fromSecondary){
+  const q = (fromSecondary ? document.getElementById("searchInput2").value : document.getElementById("searchInput").value);
+  if(!fromSecondary){ switchView("search"); document.getElementById("searchInput2").value = q; }
+  if(!q.trim()){ renderSearchResults([], "", { browse: true }); return; }
+  const results = searchProducts(q);
+  renderSearchResults(results, `Results for "${q.trim()}"`, { query: q.trim() });
+}
+function renderSearchResults(scored, label, opts){
+  opts = opts || {};
+  const wrap = document.getElementById("searchResults");
+  if (opts.browse) { wrap.innerHTML = browseHtml(); return; }
+  if (opts.isFavorites && !scored.length) {
+    wrap.innerHTML = `<div class="search-empty">No saved items yet.<br>Tap the ♥ on anything you like.</div>${browseHtml()}`; return;
+  }
+  const items = scored.map(x => x.p);
+  if (!items.length) {
+    // A near-miss search still gets something useful: a few related items
+    // instead of a dead end, plus a nudge to try another word.
+    const related = spotlightItems(8);
+    wrap.innerHTML = `
+      <div class="search-empty">No exact matches for "${escapeHtml(opts.query || "")}". Here's what's popular instead:</div>
+      <div class="row-scroller">${related.map(cardHtml).join("")}</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="section-head" style="padding:14px 0 8px;"><h2>${label}</h2><span class="count">${items.length} item${items.length===1?"":"s"}</span></div><div class="grid">${items.map(cardHtml).join("")}</div>`;
+}
+
+/* ---------------- cart ---------------- */
+function renderCartChrome(){
+  const lines = cartLines();
+  const count = lines.length;
+  const subtotal = lines.reduce((s,{p,qty})=>s+p.price*qty,0);
+  ["cartDotTop","cartDotTab"].forEach(id=>{
+    const el = document.getElementById(id);
+    el.style.display = count>0 ? "flex" : "none";
+    el.textContent = count;
+  });
+  const bar = document.getElementById("cartBar");
+  bar.classList.toggle("show", count>0);
+  document.getElementById("cartBarCount").textContent = count;
+  document.getElementById("cartBarSub").textContent = "$"+subtotal.toFixed(2);
+}
+function cartLines(){
+  return Object.entries(CART).map(([id,qty])=>{
+    const p = PRODUCTS.find(x=>x.id===Number(id));
+    return p ? {p,qty} : null;
+  }).filter(Boolean);
+}
+function renderDrawer(){
+  const wrap = document.getElementById("drawerItems");
+  const lines = cartLines();
+  wrap.innerHTML = lines.length ? lines.map(({p,qty})=>{
+    const step = stepFor(p);
+    const editAttr = isWeighted(p) ? ` onclick="openWeightModal(${p.id})" style="cursor:pointer;"` : "";
+    return `<div class="drawer-item">
+      <div class="meta"><div class="name">${escapeHtml(p.name)}</div><div class="unit">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div></div>
+      <div class="stepper"><button onclick="changeQty(${p.id},${-step})">−</button><span class="qtytext"${editAttr}>${fmtQty(p,qty)}</span><button onclick="changeQty(${p.id},${step})">+</button></div>
+    </div>`;
+  }).join("") : `<div class="empty-state"><div class="big">🧺</div>Your cart is empty.<br>Find something delicious above.</div>`;
+  const subtotal = lines.reduce((s,{p,qty})=>s+p.price*qty,0);
+  const tax = lines.reduce((s,{p,qty})=>s + p.price*qty*(p.is_food===false ? 0.08 : 0.03), 0);
+  document.getElementById("sumSubtotal").textContent = "$"+subtotal.toFixed(2);
+  document.getElementById("sumTax").textContent = "$"+tax.toFixed(2);
+  document.getElementById("sumTotal").textContent = "$"+(subtotal+tax).toFixed(2);
+}
+function openCart(){ document.getElementById("drawer").classList.add("open"); document.getElementById("overlay").classList.add("open"); renderDrawer(); }
+function closeCart(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("overlay").classList.remove("open"); }
+function openCheckoutModal(){
+  if(!cartLines().length){ showToast("Your cart is empty."); return; }
+  buildPickupSlots();
+  appliedPromo = null;
+  document.getElementById("promoInput").value = "";
+  document.getElementById("promoMsg").textContent = "";
+  if(CUSTOMER){
+    if(!document.getElementById("custName").value.trim()) document.getElementById("custName").value = CUSTOMER.name || "";
+    if(!document.getElementById("custEmail").value.trim()) document.getElementById("custEmail").value = CUSTOMER.email || "";
+    if(!document.getElementById("custPhone").value.trim()) document.getElementById("custPhone").value = CUSTOMER.phone || "";
+  }
+  document.getElementById("checkoutModal").classList.add("open");
+}
+
+/* ---------------- pickup time slots (store time) ---------------- */
+const STORE_TZ = "America/New_York";
+const OPEN_MIN = 11*60, LAST_PICKUP_MIN = 18*60;   // open 11:00 AM; last pickup slot 6:00 PM (meat counter closes at 6)
+const CLOSED_WEEKDAY = 1;                          // Monday
+function etParts(date){
+  const f = new Intl.DateTimeFormat("en-US",{timeZone:STORE_TZ,year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",weekday:"short",hour12:false});
+  const o = {}; f.formatToParts(date).forEach(p=>{ o[p.type]=p.value; });
+  const wd = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(o.weekday);
+  return { y:+o.year, m:+o.month, d:+o.day, h:(+o.hour)%24, min:+o.minute, wd };
+}
+function etWallToInstant(y,m,d,h,min){
+  const guess = Date.UTC(y,m-1,d,h,min);
+  const p = etParts(new Date(guess));
+  const asUTC = Date.UTC(p.y,p.m-1,p.d,p.h,p.min);
+  return new Date(guess - (asUTC - guess));
+}
+function buildPickupSlots(){
+  const sel = document.getElementById("pickupSlot");
+  const opts = [`<option value="">As soon as possible (about 45 min)</option>`];
+  const nowD = new Date(), p = etParts(nowD);
+  const earliestMin = Math.ceil((p.h*60 + p.min + 30)/30)*30;      // at least ~30 min from now, on the half hour
+  let added = 0;
+  for(let dayOffset=0; dayOffset<4 && added<14; dayOffset++){
+    const base = etWallToInstant(p.y,p.m,p.d+dayOffset,12,0);        // noon that day, to read its weekday safely
+    const bp = etParts(base);
+    if(bp.wd === CLOSED_WEEKDAY) continue;
+    const label = dayOffset===0 ? "Today" : (dayOffset===1 ? "Tomorrow" : ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][bp.wd]);
+    for(let t = Math.max(OPEN_MIN, dayOffset===0 ? earliestMin : 0); t <= LAST_PICKUP_MIN && added<14; t += 30){
+      const inst = etWallToInstant(bp.y,bp.m,bp.d,Math.floor(t/60),t%60);
+      const txt = inst.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZone:STORE_TZ});
+      opts.push(`<option value="${inst.toISOString()}">${label} ${txt}</option>`);
+      added++;
+    }
+  }
+  sel.innerHTML = opts.join("");
+}
+function closeCheckoutModal(){ document.getElementById("checkoutModal").classList.remove("open"); }
+
+let appliedPromo = null; // { code, amount } — re-checked for real at checkout, never trusted as final
+async function applyPromo(){
+  const input = document.getElementById("promoInput");
+  const msg = document.getElementById("promoMsg");
+  const code = input.value.trim();
+  if(!code){ appliedPromo = null; msg.textContent = ""; return; }
+  const subtotal = cartLines().reduce((s,{p,qty})=>s+p.price*qty,0);
+  msg.style.color = "var(--muted)"; msg.textContent = "Checking…";
+  try{
+    const res = await fetch("/.netlify/functions/validate-promo", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ code, subtotal }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "That code isn't valid.");
+    appliedPromo = { code: data.code, amount: data.amount };
+    msg.style.color = "#2E7D53";
+    msg.textContent = `✓ ${data.title} — $${data.amount.toFixed(2)} off (applied at payment)`;
+  }catch(e){ appliedPromo = null; msg.style.color = "#b3262d"; msg.textContent = e.message; }
+}
+
+async function submitCheckout(){
+  const name = document.getElementById("custName").value.trim();
+  const phone = document.getElementById("custPhone").value.trim();
+  const email = document.getElementById("custEmail").value.trim();
+  if(!name || !phone){ showToast("Please add your name and phone number."); return; }
+  const payBtn = document.getElementById("payBtn");
+  payBtn.disabled = true; payBtn.textContent = "Redirecting…";
+  const items = cartLines().map(({p,qty})=>({id:p.id, qty}));
+  try{
+    const res = await fetch("/.netlify/functions/create-checkout-session", {
+      method:"POST", headers:{"Content-Type":"application/json", ...(CUSTOMER_TOKEN ? {"x-customer-token":CUSTOMER_TOKEN} : {})},
+      body: JSON.stringify({ items, name, phone, email, requested_pickup: document.getElementById("pickupSlot").value || null, substitution_pref: document.getElementById("subPref").value,
+        promo_code: appliedPromo ? appliedPromo.code : (document.getElementById("promoInput").value.trim() || undefined) }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Unable to start checkout");
+    try{ localStorage.setItem("mhm_pending_phone", phone); }catch(e){}
+    window.location.href = data.url;
+  }catch(e){ showToast(e.message); payBtn.disabled=false; payBtn.textContent="Continue to payment"; }
+}
+
+async function handlePaymentReturn(){
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get("session_id");
+  if(params.get("payment")==="authorized" && sessionId){
+    try{
+      const res = await fetch(`/.netlify/functions/verify-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+      const data = await res.json();
+      if(data.authorized){
+        CART={}; saveLocal(); renderCartChrome(); renderHomePreviews();
+        showToast(`Order ${data.orderCode||""} confirmed! Changed your mind? You can request a cancellation from the Orders tab for the next 5 minutes.`);
+        try{
+          const phone = localStorage.getItem("mhm_pending_phone") || "";
+          if(data.orderCode && phone) rememberOrder(data.orderCode, phone);
+        }catch(e){}
+      }
+    }catch(e){ console.error(e); }
+    window.history.replaceState({}, "", window.location.pathname);
+  } else if(params.get("payment")==="cancelled"){
+    showToast("Checkout cancelled — your cart is still saved.");
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}
+
+/* ---------------- my orders (remembered on this device) ---------------- */
+function rememberOrder(orderCode, phone){
+  let list = [];
+  try{ list = JSON.parse(localStorage.getItem("mhm_my_orders")||"[]"); }catch(e){ list = []; }
+  list = list.filter(o => o.order_code !== orderCode);
+  list.unshift({ order_code: orderCode, phone });
+  list = list.slice(0, 20); // keep the most recent 20 on this device
+  try{ localStorage.setItem("mhm_my_orders", JSON.stringify(list)); }catch(e){}
+}
+/* ---------------- customer accounts (optional — guest checkout still works) ---------------- */
+let CUSTOMER_TOKEN = null, CUSTOMER = null, acctMode = "signin";
+function loadCustomerFromStorage(){
+  try{ CUSTOMER_TOKEN = localStorage.getItem("mhm_customer_token") || null; CUSTOMER = JSON.parse(localStorage.getItem("mhm_customer")||"null"); }
+  catch(e){ CUSTOMER_TOKEN = null; CUSTOMER = null; }
+}
+function saveCustomerSession(token, info){
+  CUSTOMER_TOKEN = token; CUSTOMER = info;
+  try{ localStorage.setItem("mhm_customer_token", token); localStorage.setItem("mhm_customer", JSON.stringify(info)); }catch(e){}
+}
+function clearCustomerSession(){
+  CUSTOMER_TOKEN = null; CUSTOMER = null;
+  try{ localStorage.removeItem("mhm_customer_token"); localStorage.removeItem("mhm_customer"); }catch(e){}
+}
+function closeModalById(id){ document.getElementById(id).classList.remove("open"); }
+
+function openAccountArea(){
+  if(CUSTOMER_TOKEN){ switchView("account"); renderAccountSection(); }
+  else { openAccountModal("signin"); }
+}
+function openAccountModal(mode){
+  acctMode = mode;
+  document.getElementById("acctEmail").value = mode==="edit" ? (CUSTOMER && CUSTOMER.email || "") : "";
+  document.getElementById("acctPassword").value = "";
+  document.getElementById("acctName").value = mode==="edit" ? (CUSTOMER && CUSTOMER.name || "") : "";
+  document.getElementById("acctPhone").value = mode==="edit" ? (CUSTOMER && CUSTOMER.phone || "") : "";
+  document.getElementById("acctMsg").textContent = "";
+  applyAccountMode();
+  document.getElementById("accountModal").classList.add("open");
+}
+function applyAccountMode(){
+  const signup = acctMode==="signup", edit = acctMode==="edit";
+  document.getElementById("acctTitle").textContent = edit ? "Edit profile" : (signup ? "Create account" : "Sign in");
+  document.getElementById("acctSignupFields").style.display = (signup||edit) ? "block" : "none";
+  document.getElementById("acctEmailWrap").style.display = edit ? "none" : "block";
+  document.getElementById("acctPasswordWrap").style.display = edit ? "none" : "block";
+  document.getElementById("acctSubmitBtn").textContent = edit ? "Save changes" : (signup ? "Create account" : "Sign in");
+  document.getElementById("acctToggleBtn").style.display = edit ? "none" : "block";
+  document.getElementById("acctToggleBtn").textContent = signup ? "Already have an account? Sign in" : "Don't have an account? Create one";
+  document.getElementById("acctForgotBtn").style.display = edit ? "none" : "block";
+  document.getElementById("acctPassword").setAttribute("autocomplete", signup ? "new-password" : "current-password");
+}
+function toggleAccountMode(){ acctMode = acctMode==="signup" ? "signin" : "signup"; document.getElementById("acctMsg").textContent=""; applyAccountMode(); }
+
+async function submitAccountForm(){
+  const msg = document.getElementById("acctMsg"); msg.style.color = "#b3262d";
+  const btn = document.getElementById("acctSubmitBtn"); const original = btn.textContent;
+  try{
+    if(acctMode==="edit"){
+      btn.disabled = true; btn.textContent = "Saving…";
+      const res = await fetch("/.netlify/functions/customer-me", {
+        method:"PATCH", headers:{"Content-Type":"application/json", "x-customer-token":CUSTOMER_TOKEN},
+        body: JSON.stringify({ name: document.getElementById("acctName").value.trim(), phone: document.getElementById("acctPhone").value.trim() }),
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || "Unable to save changes");
+      saveCustomerSession(CUSTOMER_TOKEN, data);
+      closeModalById("accountModal"); showToast("Profile updated"); renderAccountSection();
+      return;
+    }
+    const email = document.getElementById("acctEmail").value.trim();
+    const password = document.getElementById("acctPassword").value;
+    if(!email || !password){ msg.textContent = "Enter your email and password."; return; }
+    btn.disabled = true; btn.textContent = acctMode==="signup" ? "Creating…" : "Signing in…";
+    const path = acctMode==="signup" ? "customer-signup" : "customer-login";
+    const body = acctMode==="signup"
+      ? { email, password, name: document.getElementById("acctName").value.trim(), phone: document.getElementById("acctPhone").value.trim() }
+      : { email, password };
+    const res = await fetch(`/.netlify/functions/${path}`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Something went wrong");
+    saveCustomerSession(data.token, { email:data.email, name:data.name||"", phone:data.phone||"" });
+    // Merge account favorites into local favorites — account is the source of truth
+    // across devices, local is the source of truth for this session's new likes.
+    if(Array.isArray(data.favorites)) data.favorites.forEach(id => { FAVORITES[id] = true; });
+    saveLocal(); renderHomePreviews(); if(currentView==="dept") renderDeptPageBody();
+    closeModalById("accountModal");
+    showToast(acctMode==="signup" ? `Welcome, ${data.name || "there"}!` : "Signed in");
+    renderAccountSection();
+    if(currentView==="orders") renderMyOrders();
+  }catch(e){ msg.textContent = e.message; }
+  btn.disabled = false; btn.textContent = original;
+}
+function signOutCustomer(){
+  clearCustomerSession();
+  switchView("home");
+  showToast("Signed out");
+}
+function renderAccountSection(){
+  const el = document.getElementById("accountSection");
+  if(!el) return;
+  if(CUSTOMER_TOKEN && CUSTOMER){
+    el.innerHTML = `<div class="ma-header">
+      <div class="ma-avatar">${escapeHtml((CUSTOMER.name||CUSTOMER.email||"?")[0].toUpperCase())}</div>
+      <div class="ma-name">${escapeHtml(CUSTOMER.name || "My Account")}</div>
+      <div class="ma-email">${escapeHtml(CUSTOMER.email)}</div>
+    </div>
+    <div class="ma-menu">
+      <button class="ma-row" onclick="switchView('orders')"><span class="ma-ic">🧾</span><span>My Orders</span><span class="ma-arr">›</span></button>
+      <button class="ma-row" onclick="switchView('search'); showFavorites()"><span class="ma-ic">❤️</span><span>My Favorites</span><span class="ma-arr">›</span></button>
+      <button class="ma-row" onclick="openBuyAgain()"><span class="ma-ic">🔁</span><span>Buy Again</span><span class="ma-arr">›</span></button>
+      <button class="ma-row" onclick="switchView('support')"><span class="ma-ic">💬</span><span>Support & Inquiries</span><span class="ma-arr">›</span></button>
+      <button class="ma-row" onclick="openAccountModal('edit')"><span class="ma-ic">👤</span><span>Edit Profile</span><span class="ma-arr">›</span></button>
+      <button class="ma-row danger" onclick="signOutCustomer()"><span class="ma-ic">🚪</span><span>Sign Out</span></button>
+    </div>`;
+  } else {
+    el.innerHTML = `<div class="acct-prompt">
+      <div class="ma-avatar" style="margin:0 auto 10px;background:var(--brand);color:#fff;">👤</div>
+      <div style="font-weight:800;font-size:1.1rem;">My Makka Account</div>
+      <div style="color:var(--muted);font-size:.88rem;margin-top:4px;line-height:1.4;">Sign in to see your order history, favorites, and quickly reorder.</div>
+      <button class="btn" style="margin-top:14px;width:100%;" onclick="openAccountModal('signin')">Sign in or create account</button>
+      <button class="btn ghost" style="margin-top:8px;width:100%;" onclick="switchView('orders')">Track a guest order</button>
+    </div>`;
+  }
+}
+
+function openForgotModal(){
+  closeModalById("accountModal");
+  document.getElementById("forgotEmail").value = document.getElementById("acctEmail").value.trim();
+  document.getElementById("forgotMsg").textContent = "";
+  document.getElementById("forgotModal").classList.add("open");
+}
+async function submitForgotPassword(){
+  const email = document.getElementById("forgotEmail").value.trim();
+  const msg = document.getElementById("forgotMsg");
+  if(!email){ msg.style.color="#b3262d"; msg.textContent = "Enter your email."; return; }
+  msg.style.color = "var(--muted)"; msg.textContent = "Sending…";
+  try{
+    const res = await fetch("/.netlify/functions/customer-forgot-password", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ email }) });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Something went wrong");
+    msg.style.color = "#2E7D53"; msg.textContent = data.message;
+  }catch(e){ msg.style.color="#b3262d"; msg.textContent = e.message; }
+}
+
+let resetCtx = null;
+function checkForPasswordResetLink(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("reset"), email = params.get("email");
+  if(!token || !email) return;
+  resetCtx = { token, email };
+  document.getElementById("resetPassword").value = "";
+  document.getElementById("resetMsg").textContent = "";
+  document.getElementById("resetModal").classList.add("open");
+  // clean the link out of the address bar so a refresh/share doesn't resubmit it
+  const url = new URL(window.location.href); url.searchParams.delete("reset"); url.searchParams.delete("email");
+  window.history.replaceState({}, "", url.toString());
+}
+async function submitResetPassword(){
+  if(!resetCtx) return;
+  const newPassword = document.getElementById("resetPassword").value;
+  const msg = document.getElementById("resetMsg"); msg.style.color = "#b3262d";
+  if(newPassword.length < 8){ msg.textContent = "Password must be at least 8 characters."; return; }
+  try{
+    const res = await fetch("/.netlify/functions/customer-reset-password", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ email: resetCtx.email, token: resetCtx.token, new_password: newPassword }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Unable to reset your password");
+    closeModalById("resetModal"); resetCtx = null;
+    showToast("Password updated — sign in with your new password.");
+    openAccountModal("signin");
+    document.getElementById("acctEmail").value = "";
+  }catch(e){ msg.textContent = e.message; }
+}
+
+let myOrdersBusy = false;
+async function renderMyOrders(silent){
+  const wrap = document.getElementById("myOrdersList");
+  let list = [];
+  try{ list = JSON.parse(localStorage.getItem("mhm_my_orders")||"[]"); }catch(e){ list = []; }
+  if(!list.length && !CUSTOMER_TOKEN){ wrap.innerHTML = `<div class="deal-empty">No orders yet on this device.<br>Your pickup orders will show up here.</div>`; return; }
+  if(myOrdersBusy) return; myOrdersBusy = true;
+  if(!silent) wrap.innerHTML = `<div class="deal-empty">Loading your orders…</div>`;
+  try{
+    const guestResults = await Promise.all(list.map(async o => {
+      try{
+        const res = await fetch(`/.netlify/functions/order-status?order_code=${encodeURIComponent(o.order_code)}&phone=${encodeURIComponent(o.phone)}`);
+        if(!res.ok) return null;
+        const data = await res.json();
+        data._phone = o.phone;
+        return data;
+      }catch(e){ return null; }
+    }));
+    let acctResults = [];
+    if(CUSTOMER_TOKEN){
+      try{
+        const res = await fetch("/.netlify/functions/customer-orders", { headers:{"x-customer-token":CUSTOMER_TOKEN} });
+        if(res.ok){ acctResults = (await res.json()).map(o => ({ ...o, _phone: o.customer_phone || "" })); }
+      }catch(e){ /* account orders are additive — a hiccup here shouldn't block guest orders from showing */ }
+    }
+    // merge, de-duplicated by order_code (an order placed while signed in appears in both lists)
+    const byCode = new Map();
+    [...acctResults, ...guestResults.filter(Boolean)].forEach(o => { if(o && o.order_code) byCode.set(o.order_code, o); });
+    const merged = [...byCode.values()].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+    merged.forEach(o => { o._exp = Date.now() + (o.cancel_seconds_left||0)*1000; });
+
+    const cards = merged.map(orderCardHtml).join("");
+    if(currentView !== "orders") return;
+    wrap.innerHTML = cards || `<div class="deal-empty">No orders yet.<br>Your pickup orders will show up here.</div>`;
+    tickCancel();
+  } finally { myOrdersBusy = false; }
+}
+/* refresh the Orders tab while it's open so decisions show up on their own */
+setInterval(() => { if(currentView === "orders" && !document.hidden && !document.getElementById("requestModal").classList.contains("open")) renderMyOrders(true); }, 20000);
+/* live countdown on the cancel button */
+setInterval(tickCancel, 1000);
+function tickCancel(){
+  document.querySelectorAll("[data-cxl-exp]").forEach(el => {
+    const left = Math.round((Number(el.dataset.cxlExp) - Date.now())/1000);
+    if(left <= 0){ const box = el.closest(".cxl-box"); if(box) box.remove(); return; }
+    el.textContent = Math.floor(left/60) + ":" + String(left%60).padStart(2,"0");
+  });
+}
+const ORDER_STATUS_LABEL = {
+  "Awaiting Payment":"Awaiting payment", "New":"Order received", "Preparing":"Being prepared",
+  "Ready for Pickup":"Ready for pickup!", "Completed":"Picked up", "Cancelled":"Cancelled",
+  "Abandoned":"Not completed", "Paid - Preparing":"Being prepared"
+};
+function requestLine(text, color){ return `<div style="font-size:.84rem;margin-top:8px;padding:9px 11px;border-radius:10px;background:rgba(0,0,0,.05);color:${color||"inherit"};line-height:1.4;">${text}</div>`; }
+function orderCardHtml(o){
+  const cancelled = o.status==="Cancelled";
+  const label = ORDER_STATUS_LABEL[o.status] || o.status;
+  const ready = o.status==="Ready for Pickup";
+  const when = o.pickup_time || o.requested_pickup;
+  const whenTxt = when ? new Date(when).toLocaleString("en-US",{weekday:"short",hour:"numeric",minute:"2-digit",timeZone:STORE_TZ}) : null;
+  const changes = (o.items||[]).filter(i=>i.pick_status==="unavailable"||i.pick_status==="substituted").map(i=>
+    i.pick_status==="unavailable"
+      ? `<div style="font-size:.82rem;color:#b3262d;margin-top:4px;">✕ ${escapeHtml(i.name)} — not available</div>`
+      : `<div style="font-size:.82rem;color:#8a5b00;margin-top:4px;">⇄ ${escapeHtml(i.name)} → ${escapeHtml(i.substitute?i.substitute.name:"substitute")}</div>`
+  ).join("");
+  const showUpdated = o.adjusted_total!=null && Number(o.adjusted_total)!==Number(o.total) && (o.status==="Ready for Pickup"||o.status==="Completed");
+
+  // ---- cancellation / refund: buttons + where each request stands ----
+  let req = "";
+  const code = escapeHtml(o.order_code), ph = escapeHtml(o._phone||"");
+  if(o.cancel_request_status==="pending"){
+    req += requestLine("⏳ <b>Cancellation requested.</b> The store will review it shortly. Your order is on hold until they reply.", "#8a5b00");
+  } else if(o.cancel_request_status==="approved"){
+    req += requestLine("✓ <b>Cancellation approved.</b> Your card hold or payment is being released — it can take a few days to show on your statement." + (o.cancel_decision_note?` “${escapeHtml(o.cancel_decision_note)}”`:""), "#2E7D53");
+  } else if(o.cancel_request_status==="denied"){
+    req += requestLine("<b>Cancellation wasn't approved.</b> Your order is continuing." + (o.cancel_decision_note?` “${escapeHtml(o.cancel_decision_note)}”`:"") + " Please call the store with any questions.", "#b3262d");
+  } else if(o.can_request_cancel){
+    req += `<div class="cxl-box" style="margin-top:10px;"><button class="btn ghost" style="width:100%;padding:11px 14px;" data-code="${code}" data-phone="${ph}" onclick="openRequestModal('cancel', this)">Request cancellation · <span data-cxl-exp="${o._exp}">${Math.floor(o.cancel_seconds_left/60)}:${String(o.cancel_seconds_left%60).padStart(2,"0")}</span> left</button></div>`;
+  }
+  if(o.refund_request_status==="pending"){
+    req += requestLine("⏳ <b>Refund requested.</b> The store reviews every refund before anything is sent — they'll update this page.", "#8a5b00");
+  } else if(o.refund_request_status==="approved"){
+    req += requestLine(`✓ <b>Refund approved${o.refund_approved_amount!=null?` — $${Number(o.refund_approved_amount).toFixed(2)}`:""}.</b> It can take 5–10 days to appear on your statement.` + (o.refund_decision_note?` “${escapeHtml(o.refund_decision_note)}”`:""), "#2E7D53");
+  } else if(o.refund_request_status==="denied"){
+    req += requestLine("<b>Refund wasn't approved.</b>" + (o.refund_decision_note?` “${escapeHtml(o.refund_decision_note)}”`:"") + " Please call the store if you'd like to talk it through.", "#b3262d");
+  } else if(o.can_request_refund){
+    req += `<div style="margin-top:10px;"><button class="btn ghost" style="width:100%;padding:11px 14px;" data-code="${code}" data-phone="${ph}" onclick="openRequestModal('refund', this)">Request a refund</button></div>`;
+  }
+
+  return `<div class="deal-card"${ready?' style="border-left-color:#2E7D53;"':(cancelled?' style="border-left-color:#999;opacity:.85;"':'')}>
+    <h3>${escapeHtml(o.order_code)}</h3>
+    ${o.notes ? `<p>${escapeHtml(o.notes)}</p>` : ""}
+    ${changes}
+    <div class="deal-meta" style="margin-top:10px;">
+      <span class="deal-chip expiry${ready?'':' soon'}"${ready?' style="background:#2E7D53;color:#fff;"':(cancelled?' style="background:#999;color:#fff;"':'')}>${escapeHtml(label)}</span>
+      ${cancelled ? "" : (whenTxt ? `<span class="deal-chip">${o.pickup_time?"Pickup":"Requested pickup"}: ${whenTxt}</span>` : `<span class="deal-chip">Pickup: as soon as possible</span>`)}
+      <span class="deal-chip">${showUpdated?"Updated total":"Total"}: $${Number(showUpdated?o.adjusted_total:(o.total||0)).toFixed(2)}</span>
+    </div>
+    ${req}
+  </div>`;
+}
+
+/* ---------------- cancellation / refund request form ---------------- */
+let requestCtx = null;
+function openRequestModal(type, btn){
+  requestCtx = { type, code: btn.dataset.code, phone: btn.dataset.phone };
+  const isCancel = type === "cancel";
+  document.getElementById("rqTitle").textContent = isCancel ? "Cancel this order?" : "Request a refund";
+  document.getElementById("rqIntro").textContent = isCancel
+    ? "Tell us why (optional). The store reviews every cancellation — your order is put on hold until they reply, and you're only refunded once it's approved."
+    : "Tell us what went wrong. The store reviews every refund request before anything is sent, and will update this page with their decision.";
+  document.getElementById("rqLabel").textContent = isCancel ? "Reason (optional)" : "What went wrong?";
+  document.getElementById("rqReason").value = "";
+  document.getElementById("rqSend").textContent = isCancel ? "Send cancellation request" : "Send refund request";
+  document.getElementById("rqSend").disabled = false;
+  document.getElementById("requestModal").classList.add("open");
+}
+function closeRequestModal(){ document.getElementById("requestModal").classList.remove("open"); }
+async function submitRequest(){
+  if(!requestCtx) return;
+  const reason = document.getElementById("rqReason").value.trim();
+  if(requestCtx.type === "refund" && reason.length < 5){ showToast("Please tell us what went wrong."); return; }
+  const btn = document.getElementById("rqSend"); btn.disabled = true; btn.textContent = "Sending…";
+  try{
+    const res = await fetch("/.netlify/functions/order-request", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ order_code: requestCtx.code, phone: requestCtx.phone, type: requestCtx.type, reason }),
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error || "Couldn't send your request");
+    closeRequestModal();
+    showToast("Request sent — the store will review it.");
+  }catch(e){ showToast(e.message); btn.disabled = false; btn.textContent = "Try again"; }
+  renderMyOrders(true);
+}
+
+function saveLocal(){ try{ localStorage.setItem("mhm_cart", JSON.stringify(CART)); localStorage.setItem("mhm_favs", JSON.stringify(FAVORITES)); }catch(e){} }
+function restoreLocal(){
+  try{ CART = JSON.parse(localStorage.getItem("mhm_cart")||"{}"); }catch(e){ CART={}; }
+  try{ FAVORITES = JSON.parse(localStorage.getItem("mhm_favs")||"{}"); }catch(e){ FAVORITES={}; }
+  renderCartChrome(); renderDrawer();
+  handlePaymentReturn();
+}
+
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 3000);
+}
+
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeAttr(s){ return escapeHtml(s).replace(/'/g,"\\'"); }
+function escAttrJs(s){ return String(s||"").replace(/'/g,"\\'"); }
+
+if("serviceWorker" in navigator){ window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+
+init();
+loadTheme();
+loadCustomerFromStorage();
+checkForPasswordResetLink();
+/* ===== Ask Makka AI shopping assistant ===== */
+let ASK_HISTORY=[];
+function updateAskMakkaVisibility(){
+  // Fail closed — only show Ask Makka when explicitly turned ON in admin
+  const val = SETTINGS && SETTINGS.ask_makka_enabled;
+  const enabled = val === true || val === 'true' || val === 1 || val === '1';
+  const fab = document.getElementById('askMakkaFab');
+  if(fab) fab.style.display = enabled ? '' : 'none';
+}
+function openAskMakka(){document.getElementById('askMakkaPanel').classList.add('open');setTimeout(()=>document.getElementById('askInput').focus(),80)}
+function closeAskMakka(){document.getElementById('askMakkaPanel').classList.remove('open')}
+function askSuggestion(q){document.getElementById('askInput').value=q;sendAskMakka()}
+function askBubble(text,who='bot'){const box=document.getElementById('askMessages'),d=document.createElement('div');d.className='ask-msg '+who;d.textContent=text;box.appendChild(d);box.scrollTop=box.scrollHeight;return d}
+function askProductCards(items){
+ const box=document.getElementById('askMessages'),wrap=document.createElement('div');wrap.className='ask-product-grid';
+ items.slice(0,4).forEach(p=>{const d=document.createElement('div');d.className='ask-product';d.innerHTML=`<b>${escapeHtml(p.name||'Product')}</b><small>${p.price!=null?'$'+Number(p.price).toFixed(2)+(p.unit?' '+escapeHtml(p.unit):''):'Price unavailable'}${p.stock!=null?(Number(p.stock)>0?' · In stock':' · Out of stock'):''}</small><button type="button" ${p.stock!=null&&Number(p.stock)<=0?'disabled':''}>Add to cart</button>`;d.querySelector('button').onclick=()=>{const local=PRODUCTS.find(x=>String(x.id)===String(p.id));if(!local){showToast('Product is refreshing — try again.');return;}if(isWeighted(local))openWeightModal(local.id);else quickAddFromSpotlight(local.id);};wrap.appendChild(d)});
+ box.appendChild(wrap);box.scrollTop=box.scrollHeight;
+}
+async function sendAskMakka(){
+ const el=document.getElementById('askInput'),q=el.value.trim();if(!q)return;
+ askBubble(q,'user');el.value='';
+ const pending=askBubble('Thinking…','bot');
+ const history=ASK_HISTORY.slice(-6);
+ try{
+   const r=await fetch('/.netlify/functions/ask-makka',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history})});
+   const data=await r.json().catch(()=>({}));
+   pending.remove();
+   if(!r.ok) throw new Error(data.error||'Ask Makka is unavailable right now.');
+   askBubble(data.answer,'bot');
+   ASK_HISTORY.push({role:'user',content:q},{role:'assistant',content:data.answer});ASK_HISTORY=ASK_HISTORY.slice(-8);
+   if(data.products&&data.products.length)askProductCards(data.products);
+ }catch(e){pending.remove();askBubble(e.message||'Ask Makka is unavailable right now. Please try again.','bot');}
+}
+</script>
+<button class="ask-makka-fab" id="askMakkaFab" onclick="openAskMakka()"><span>✦</span> Ask Makka</button>
+  <aside class="ask-makka-panel" id="askMakkaPanel" aria-label="Ask Makka shopping assistant">
+    <div class="ask-head"><div class="ask-avatar">M</div><div><b>Ask Makka</b><small>Shopping assistant</small></div><button class="ask-close" onclick="closeAskMakka()">×</button></div>
+    <div class="ask-messages" id="askMessages"><div class="ask-msg bot">Salaam! 👋 I’m Makka Assistant. I can search our live catalog, prices, categories and deals. Try “Show me lamb” or “What do I need for biryani?”</div></div>
+    <div class="ask-chips"><button onclick="askSuggestion('Show me lamb products')">Lamb</button><button onclick="askSuggestion('What sweets do you have?')">Sweets</button><button onclick="askSuggestion('What are the deals?')">Deals</button><button onclick="askSuggestion('Show me seasoning and spices')">Seasoning</button></div>
+    <div class="ask-input"><input id="askInput" placeholder="Ask about products…" onkeydown="if(event.key==='Enter')sendAskMakka()"><button onclick="sendAskMakka()">↑</button></div>
+  </aside>
+</body>
+</html>
