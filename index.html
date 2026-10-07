@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
+    --makka-wine:#C0272D; --makka-wine2:#8C1A1E; --makka-cream:#fffaf3; --makka-gold:#E2A63B;
     --brand:#C0272D; --brand-dark:#8C1A1E; --brand-light:#E5555A;
     --ink:#1E1712; --paper:#F6F3EE; --card:#FFFFFF;
     --gold:#E2A63B; --gold-dark:#B9812A;
@@ -303,24 +304,7 @@
 
   @media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
   @media (min-width:640px){ .tabbar{ display:none; } body{ padding-bottom:20px; } .cart-bar{ bottom:20px; } }
-
-  /* ===== Makka 2026 storefront redesign ===== */
-  :root{--makka-wine:#7a1f2b;--makka-wine2:#5f1420;--makka-cream:#fffaf3;--makka-gold:#d6a84b;}
-  body{background:linear-gradient(180deg,#fffaf4 0,#faf5ed 100%);}
-  .topbar{background:rgba(255,250,244,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(122,31,43,.08);box-shadow:0 6px 24px rgba(76,35,21,.06)}
-  .brandmark .logo{background:var(--makka-wine);width:42px;height:42px;border-radius:14px;display:grid;place-items:center;box-shadow:0 7px 18px rgba(122,31,43,.22)}
-  .brandmark .name{font-family:Georgia,serif;font-size:1.18rem;color:var(--makka-wine);letter-spacing:-.02em}
-  .search-box{background:#fff;border:1px solid rgba(122,31,43,.13);box-shadow:0 5px 18px rgba(58,34,21,.05)}
-  .store-banner{display:none!important}
-  .makka-hero{margin:14px 16px 4px;padding:25px 22px 22px;border-radius:25px;background:radial-gradient(circle at 88% 8%,rgba(255,255,255,.16),transparent 27%),linear-gradient(135deg,var(--makka-wine2),var(--makka-wine));color:#fff;box-shadow:0 18px 38px rgba(122,31,43,.2);position:relative;overflow:hidden}
-  .makka-hero:after{content:'M';position:absolute;right:-5px;bottom:-44px;font:700 150px/1 Georgia,serif;color:rgba(255,255,255,.055)}
-  .makka-kicker{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#f0d9a7;margin-bottom:8px}
-  .makka-hero h1{font:700 2rem/1.04 Georgia,serif;margin:0 0 9px;max-width:430px}.makka-hero p{margin:0 0 17px;opacity:.88;max-width:480px;font-size:.9rem;line-height:1.5}
-  .makka-hero-actions{display:flex;gap:9px;flex-wrap:wrap}.makka-hero button{border:0;border-radius:999px;padding:10px 15px;font-weight:800;cursor:pointer}.makka-hero .primary{background:#fff;color:var(--makka-wine)}.makka-hero .secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
-  .quick-cats{padding-top:13px}.quick-cats>*{border-radius:18px!important}
-  .section-head h2{font-family:Georgia,serif;color:#3a241c}
-  .tabbar{background:rgba(255,252,247,.96);backdrop-filter:blur(18px);border-top:1px solid rgba(122,31,43,.1);box-shadow:0 -8px 30px rgba(55,31,20,.08)}
-  .tab-btn.active{color:var(--makka-wine)!important}
+  /* === Ask Makka AI === */
   .ask-makka-fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:48;border:0;background:var(--makka-wine);color:#fff;border-radius:999px;padding:12px 16px;box-shadow:0 10px 28px rgba(122,31,43,.32);font-weight:800;display:flex;align-items:center;gap:7px;cursor:pointer}
   .ask-makka-panel{position:fixed;right:14px;bottom:calc(140px + env(safe-area-inset-bottom,0px));width:min(390px,calc(100vw - 28px));height:min(570px,calc(100vh - 180px));z-index:60;background:#fffaf5;border:1px solid rgba(122,31,43,.12);border-radius:24px;box-shadow:0 24px 70px rgba(40,20,14,.25);display:none;overflow:hidden;flex-direction:column}.ask-makka-panel.open{display:flex}
   .ask-head{padding:15px 16px;background:linear-gradient(135deg,var(--makka-wine2),var(--makka-wine));color:#fff;display:flex;align-items:center;gap:10px}.ask-avatar{width:38px;height:38px;border-radius:13px;background:#fff;color:var(--makka-wine);display:grid;place-items:center;font:700 20px Georgia,serif}.ask-head b{display:block}.ask-head small{opacity:.78}.ask-close{margin-left:auto;background:transparent;border:0;color:#fff;font-size:24px;cursor:pointer}
@@ -374,19 +358,7 @@
   </header>
 
   <main id="homeView">
-    <div class="store-banner"><img src="banner-sign.jpg" alt="Makka Halal Meat"></div>
-    <section class="makka-hero" aria-label="Welcome to Makka Halal Meat">
-      <div class="makka-kicker">Fresh • Halal • Local</div>
-      <h1>Fresh Halal. Local. Ready.</h1>
-      <p>Premium halal meats, pantry favorites and everyday essentials — prepared with care and ready for pickup.</p>
-      <div class="makka-hero-actions"><button class="primary" onclick="switchView('search')">Shop the store</button><button class="secondary" onclick="openAskMakka()">Ask Makka ✦</button></div>
-    </section>
-    <section class="mock-benefits" aria-label="Store benefits">
-      <div class="mock-benefit"><span>✓</span><div><b>100% Halal</b><small>Trusted products</small></div></div>
-      <div class="mock-benefit"><span>🥩</span><div><b>Fresh Cut</b><small>Prepared with care</small></div></div>
-      <div class="mock-benefit"><span>🛍️</span><div><b>Easy Pickup</b><small>Order ahead</small></div></div>
-    </section>
-
+    <div class="store-banner"><img src="banner-sign.jpg" alt="Makka Halal Meat, Inc. — Goat, Lamb, Beef, Chicken — 404-297-0008"></div>
     <div class="promo-scroller" id="promoScroller"></div>
     <section class="spotlight-section" id="spotlightSection" style="display:none;">
       <div class="section-head" style="padding:16px 16px 6px;"><h2>✨ Featured today</h2></div>
@@ -701,15 +673,6 @@
     </div>
   </div>
 
-
-  <button class="ask-makka-fab" id="askMakkaFab" onclick="openAskMakka()"><span>✦</span> Ask Makka</button>
-  <aside class="ask-makka-panel" id="askMakkaPanel" aria-label="Ask Makka shopping assistant">
-    <div class="ask-head"><div class="ask-avatar">M</div><div><b>Ask Makka</b><small>Shopping assistant</small></div><button class="ask-close" onclick="closeAskMakka()">×</button></div>
-    <div class="ask-messages" id="askMessages"><div class="ask-msg bot">Salaam! 👋 I’m Makka Assistant. I can search our live catalog, prices, categories and deals. Try “Show me lamb” or “What do I need for biryani?”</div></div>
-    <div class="ask-chips"><button onclick="askSuggestion('Show me lamb products')">Lamb</button><button onclick="askSuggestion('What sweets do you have?')">Sweets</button><button onclick="askSuggestion('What are the deals?')">Deals</button><button onclick="askSuggestion('Show me seasoning and spices')">Seasoning</button></div>
-    <div class="ask-input"><input id="askInput" placeholder="Ask about products…" onkeydown="if(event.key==='Enter')sendAskMakka()"><button onclick="sendAskMakka()">↑</button></div>
-  </aside>
-
   <div class="toast" id="toast"></div>
 
 <script>
@@ -717,13 +680,20 @@ const SUPABASE_URL = "https://zbsesllddfjwfsowxlgp.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_fgQoJ3lUEfNIxqbOSxit3Q_FK89Oxn_";
 
 const DEPT_ICONS = {
-  meat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
-  grocery: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
-  household: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>`,
-  beauty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
-  baby: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
+  // Meat — drumstick/leg of meat shape
+  meat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M15.5 3.5a4 4 0 0 1 5 5l-9 9-2 .5.5-2 9-9z"/><path d="M14 5l5 5"/><circle cx="6.5" cy="17.5" r="3.5"/></svg>`,
+  // Grocery — shopping basket
+  grocery: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M5.52 5H21l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.35a2 2 0 0 1-1.96-1.61L5 5H2"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/><path d="M8 5l1-3h6l1 3"/></svg>`,
+  // Household — spray bottle / cleaning
+  household: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M3 22V11l4-4V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3l4 4v11H3z"/><path d="M3 11h14"/><path d="M13 7h5l2 2"/><line x1="9" y1="15" x2="9" y2="18"/><line x1="12" y1="15" x2="12" y2="18"/></svg>`,
+  // Beauty — sparkle / star wand
+  beauty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>`,
+  // Baby — baby bottle
+  baby: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M6 2h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6V2z"/><path d="M6 8v8a6 6 0 0 0 12 0V8"/><line x1="9" y1="2" x2="9" y2="5"/><line x1="15" y1="2" x2="15" y2="5"/><line x1="10" y1="13" x2="14" y2="13"/></svg>`,
+  // Clothing — folded shirt / hanger
   clothing: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>`,
-  candy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M9.5 2.672a.5.5 0 0 1 1 0V4h3V2.672a.5.5 0 0 1 1 0V4h1a2 2 0 0 1 2 2v1h1.328a.5.5 0 0 1 0 1H17v3h1.328a.5.5 0 0 1 0 1H17v3h1.328a.5.5 0 0 1 0 1H17v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1H5.672a.5.5 0 0 1 0-1H7v-3H5.672a.5.5 0 0 1 0-1H7V7H5.672a.5.5 0 0 1 0-1H7V6a2 2 0 0 1 2-2h1V2.672z"/></svg>`,
+  // Candy — lollipop
+  candy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><circle cx="11" cy="9" r="6"/><path d="M11 15l-4 6"/><path d="M8 9a3 3 0 0 1 6 0"/></svg>`,
 };
 const DEPTS = [
   { id:"meat",      label:"Fresh Meat & Poultry", icon:"🥩", tile:"#8C1A1E" },
@@ -2011,25 +1981,39 @@ init();
 loadTheme();
 loadCustomerFromStorage();
 checkForPasswordResetLink();
-/* ===== Ask Makka catalog assistant ===== */
+/* ===== Ask Makka AI shopping assistant ===== */
+let ASK_HISTORY=[];
 function openAskMakka(){document.getElementById('askMakkaPanel').classList.add('open');setTimeout(()=>document.getElementById('askInput').focus(),80)}
 function closeAskMakka(){document.getElementById('askMakkaPanel').classList.remove('open')}
 function askSuggestion(q){document.getElementById('askInput').value=q;sendAskMakka()}
-function askBubble(text,who='bot'){const box=document.getElementById('askMessages'),d=document.createElement('div');d.className='ask-msg '+who;d.textContent=text;box.appendChild(d);box.scrollTop=box.scrollHeight}
-function sendAskMakka(){const el=document.getElementById('askInput'),q=el.value.trim();if(!q)return;askBubble(q,'user');el.value='';setTimeout(()=>{const a=answerAskMakka(q);askBubble(a.text||a,'bot');if(a.hits&&a.hits.length)askProductCards(a.hits)},180)}
-function askProductCards(items){const box=document.getElementById('askMessages'),wrap=document.createElement('div');wrap.className='ask-product-grid';items.slice(0,4).forEach(p=>{const d=document.createElement('div');d.className='ask-product';d.innerHTML=`<b>${escHtml(p.name||'Product')}</b><small>${p.price!=null?'$'+Number(p.price).toFixed(2)+(p.unit?' / '+p.unit:''):'See price in store'}</small><button type="button">Add to cart</button>`;d.querySelector('button').onclick=()=>{if(typeof addToCart==='function')addToCart(p.id);else if(typeof addItem==='function')addItem(p.id);askBubble(`${p.name} added to your cart.`,'bot')};wrap.appendChild(d)});box.appendChild(wrap);box.scrollTop=box.scrollHeight}
-function answerAskMakka(q){
-  const t=q.toLowerCase();
-  if(/deal|special|discount|sale/.test(t)){const ds=(DISCOUNTS||[]).filter(d=>d.active!==false);return ds.length?`Current deals: ${ds.slice(0,5).map(d=>d.title+(d.description?' — '+d.description:'')).join(' • ')}`:'I don’t see an active deal listed right now. Check the Deals tab for the latest offers.'}
-  if(/hour|open|close/.test(t)) return `Store hours: ${SETTINGS.store_hours||'Tuesday–Sunday, 11:00 AM–6:30 PM. Monday closed.'}`;
-  if(/pickup|deliver/.test(t)) return `Orders are for store pickup. ${SETTINGS.store_order_options||'Choose your items, check out, then pick up at the store.'}`;
-  const stop=new Set(['show','me','find','do','you','have','what','are','the','a','an','i','need','want','products','product','items','item','please','some']);
-  const words=t.replace(/[^a-z0-9& ]/g,' ').split(/\s+/).filter(w=>w.length>2&&!stop.has(w));
-  const hits=(PRODUCTS||[]).filter(p=>{const hay=`${p.name||''} ${p.category||''} ${p.department||''} ${p.description||''}`.toLowerCase();return words.length&&words.some(w=>hay.includes(w));}).slice(0,6);
-  if(hits.length) return {text:`I found ${hits.length} match${hits.length===1?'':'es'}. Here are the closest options from the store catalog:`,hits};
-  return `I couldn’t find an exact match for “${q}” in the current catalog. Try the product name, category, or something like “lamb,” “rice,” “sweets,” or “seasoning.”`;
+function askBubble(text,who='bot'){const box=document.getElementById('askMessages'),d=document.createElement('div');d.className='ask-msg '+who;d.textContent=text;box.appendChild(d);box.scrollTop=box.scrollHeight;return d}
+function askProductCards(items){
+ const box=document.getElementById('askMessages'),wrap=document.createElement('div');wrap.className='ask-product-grid';
+ items.slice(0,4).forEach(p=>{const d=document.createElement('div');d.className='ask-product';d.innerHTML=`<b>${escapeHtml(p.name||'Product')}</b><small>${p.price!=null?'$'+Number(p.price).toFixed(2)+(p.unit?' '+escapeHtml(p.unit):''):'Price unavailable'}${p.stock!=null?(Number(p.stock)>0?' · In stock':' · Out of stock'):''}</small><button type="button" ${p.stock!=null&&Number(p.stock)<=0?'disabled':''}>Add to cart</button>`;d.querySelector('button').onclick=()=>{const local=PRODUCTS.find(x=>String(x.id)===String(p.id));if(!local){showToast('Product is refreshing — try again.');return;}if(isWeighted(local))openWeightModal(local.id);else quickAddFromSpotlight(local.id);};wrap.appendChild(d)});
+ box.appendChild(wrap);box.scrollTop=box.scrollHeight;
 }
-
+async function sendAskMakka(){
+ const el=document.getElementById('askInput'),q=el.value.trim();if(!q)return;
+ askBubble(q,'user');el.value='';
+ const pending=askBubble('Thinking…','bot');
+ const history=ASK_HISTORY.slice(-6);
+ try{
+   const r=await fetch('/.netlify/functions/ask-makka',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history})});
+   const data=await r.json().catch(()=>({}));
+   pending.remove();
+   if(!r.ok) throw new Error(data.error||'Ask Makka is unavailable right now.');
+   askBubble(data.answer,'bot');
+   ASK_HISTORY.push({role:'user',content:q},{role:'assistant',content:data.answer});ASK_HISTORY=ASK_HISTORY.slice(-8);
+   if(data.products&&data.products.length)askProductCards(data.products);
+ }catch(e){pending.remove();askBubble(e.message||'Ask Makka is unavailable right now. Please try again.','bot');}
+}
 </script>
+<button class="ask-makka-fab" id="askMakkaFab" onclick="openAskMakka()"><span>✦</span> Ask Makka</button>
+  <aside class="ask-makka-panel" id="askMakkaPanel" aria-label="Ask Makka shopping assistant">
+    <div class="ask-head"><div class="ask-avatar">M</div><div><b>Ask Makka</b><small>Shopping assistant</small></div><button class="ask-close" onclick="closeAskMakka()">×</button></div>
+    <div class="ask-messages" id="askMessages"><div class="ask-msg bot">Salaam! 👋 I’m Makka Assistant. I can search our live catalog, prices, categories and deals. Try “Show me lamb” or “What do I need for biryani?”</div></div>
+    <div class="ask-chips"><button onclick="askSuggestion('Show me lamb products')">Lamb</button><button onclick="askSuggestion('What sweets do you have?')">Sweets</button><button onclick="askSuggestion('What are the deals?')">Deals</button><button onclick="askSuggestion('Show me seasoning and spices')">Seasoning</button></div>
+    <div class="ask-input"><input id="askInput" placeholder="Ask about products…" onkeydown="if(event.key==='Enter')sendAskMakka()"><button onclick="sendAskMakka()">↑</button></div>
+  </aside>
 </body>
 </html>
