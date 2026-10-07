@@ -1985,7 +1985,9 @@ checkForPasswordResetLink();
 /* ===== Ask Makka AI shopping assistant ===== */
 let ASK_HISTORY=[];
 function updateAskMakkaVisibility(){
-  const enabled = !SETTINGS || SETTINGS.ask_makka_enabled === undefined || SETTINGS.ask_makka_enabled === true || String(SETTINGS.ask_makka_enabled||'').toLowerCase() === 'true';
+  // Fail closed — only show Ask Makka when explicitly turned ON in admin
+  const val = SETTINGS && SETTINGS.ask_makka_enabled;
+  const enabled = val === true || val === 'true' || val === 1 || val === '1';
   const fab = document.getElementById('askMakkaFab');
   if(fab) fab.style.display = enabled ? '' : 'none';
 }
