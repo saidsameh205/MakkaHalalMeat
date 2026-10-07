@@ -875,6 +875,7 @@ async function init(){
   renderQuickCats();
   renderPromos();
   renderSpotlight();
+  updateAskMakkaVisibility();
   renderHomePreviews();
   renderDeals();
   restoreLocal();
@@ -1983,6 +1984,11 @@ loadCustomerFromStorage();
 checkForPasswordResetLink();
 /* ===== Ask Makka AI shopping assistant ===== */
 let ASK_HISTORY=[];
+function updateAskMakkaVisibility(){
+  const enabled = !SETTINGS || SETTINGS.ask_makka_enabled === undefined || SETTINGS.ask_makka_enabled === true || String(SETTINGS.ask_makka_enabled||'').toLowerCase() === 'true';
+  const fab = document.getElementById('askMakkaFab');
+  if(fab) fab.style.display = enabled ? '' : 'none';
+}
 function openAskMakka(){document.getElementById('askMakkaPanel').classList.add('open');setTimeout(()=>document.getElementById('askInput').focus(),80)}
 function closeAskMakka(){document.getElementById('askMakkaPanel').classList.remove('open')}
 function askSuggestion(q){document.getElementById('askInput').value=q;sendAskMakka()}

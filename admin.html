@@ -36,8 +36,6 @@
   .media-thumb .cover-btn{ position:absolute; bottom:2px; left:2px; right:2px; background:rgba(0,0,0,.55); color:#fff; border:none; border-radius:3px; font-size:.6rem; cursor:pointer; padding:2px; }
   .media-add-btn{ display:inline-flex; align-items:center; gap:4px; background:#f5f0e8; border:1.5px dashed #c8bdb0; border-radius:8px; padding:6px 12px; font-size:.78rem; color:#776050; cursor:pointer; font-weight:600; }
   .media-add-btn:hover{ border-color:#C0272D; color:#C0272D; }
-  .media-drop-zone{border:1.5px dashed #c8bdb0;border-radius:8px;padding:9px 10px;font-size:.75rem;color:#776050;background:#fffaf4;cursor:pointer;outline:none;text-align:center}
-  .media-drop-zone:hover,.media-drop-zone:focus,.media-drop-zone.dragging{border-color:#C0272D;color:#C0272D;background:#fff3f1}
   th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); font-size:.86rem; }
   th{ background:#f1ece2; }
   input, select{ padding:6px 8px; border-radius:6px; border:1px solid var(--line); font-size:.85rem; width:100%; }
@@ -50,12 +48,6 @@
   .badge.paid{ background:#dff2e2; color:#1d6a37; }
   .badge.new{ background:#fdeecb; color:#8a5b00; }
   .msg{ font-size:.85rem; color:var(--muted); margin-top:8px; }
-
-  /* v23d: roomy editable product fields */
-  #productsTable { min-width: 2350px !important; table-layout:auto !important; }
-  #productsTable td, #productsTable th { vertical-align:top; }
-  #productsTable input, #productsTable textarea, #productsTable select { box-sizing:border-box; }
-  #productsTable textarea.auto-fit-description { overflow:hidden; }
 </style>
 </head>
 <body>
@@ -81,7 +73,6 @@
     <div class="tabs">
       <div class="tab active" data-tab="orders" onclick="showTab('orders')">Orders</div>
       <div class="tab" data-tab="products" onclick="showTab('products')">Products</div>
-      <div class="tab" data-tab="categories" onclick="showTab('categories'); renderCategoryManager()">Categories</div>
       <div class="tab" data-tab="deals" onclick="showTab('deals')">Deals</div>
       <div class="tab" data-tab="team" onclick="showTab('team')">Team</div>
       <div class="tab" data-tab="settings" onclick="showTab('settings')">Site settings</div>
@@ -115,19 +106,6 @@
         <thead><tr><th style="min-width:160px;">Name</th><th style="min-width:90px;">Dept</th><th style="min-width:140px;">Category</th><th style="min-width:280px;">Description</th><th style="min-width:80px;">Price</th><th style="min-width:70px;">Unit</th><th style="min-width:65px;">Stock</th><th colspan="2" style="min-width:220px;">Media Gallery</th><th>Active</th><th>Tax</th><th>Featured</th><th></th></tr></thead>
         <tbody id="productsBody"></tbody>
       </table></div>
-    </section>
-
-    <section class="panel" id="panel-categories">
-      <div class="toolbar">
-        <select id="catDept" style="min-width:180px;">
-          <option value="grocery">Grocery</option><option value="meat">Meat</option><option value="candy">Candy & Sweets</option><option value="household">Household</option><option value="beauty">Beauty</option><option value="baby">Baby</option><option value="clothing">Clothing</option>
-        </select>
-        <input id="newCategoryName" placeholder="New category name" style="min-width:280px;">
-        <button class="btn small" onclick="addCategory()">+ Add category</button>
-        <span class="msg" id="categoriesMsg"></span>
-      </div>
-      <p class="msg">Create, rename, hide/show, reorder, or remove categories. Changes are saved in Site Settings and immediately become available in Product category suggestions.</p>
-      <div id="categoryManager"></div>
     </section>
 
     <section class="panel" id="panel-deals">
@@ -307,28 +285,26 @@ function renderProducts() {
   const dept = document.getElementById("productDeptFilter").value;
   const rows = PRODUCTS.filter((p) => (!dept || p.department === dept) && p.name.toLowerCase().includes(q));
   document.getElementById("productsBody").innerHTML = rows.map(productRow).join("");
-  requestAnimationFrame(()=>document.querySelectorAll("#productsBody input,#productsBody textarea").forEach(fitAdminField));
 }
 function productRow(p) {
   return `<tr data-id="${p.id}">
-    <td><input value="${escAttr(p.name)}" data-field="name" class="auto-fit-text" style="min-width:220px;width:${Math.max(220, Math.min(650, (p.name||'').length * 9 + 36))}px;"></td>
-    <td><input value="${escAttr(p.department)}" data-field="department" class="auto-fit-text" style="min-width:150px;width:${Math.max(150, Math.min(360, (p.department||'').length * 9 + 36))}px;"></td>
+    <td><input value="${escAttr(p.name)}" data-field="name" style="min-width:160px;width:${Math.max(160, Math.min(320, (p.name||'').length * 8 + 24))}px;"></td>
+    <td><input value="${escAttr(p.department)}" data-field="department" style="min-width:90px;width:${Math.max(90, Math.min(160, (p.department||'').length * 8 + 24))}px;"></td>
     <td>
-      <input value="${escAttr(p.category)}" data-field="category" list="cats_${p.id}" placeholder="e.g. Snacks" class="auto-fit-text" style="min-width:220px;width:${Math.max(220, Math.min(500, (p.category||'').length * 9 + 36))}px;">
+      <input value="${escAttr(p.category)}" data-field="category" list="cats_${p.id}" placeholder="e.g. Snacks" style="min-width:140px;width:${Math.max(140, Math.min(260, (p.category||'').length * 8 + 24))}px;">
       <datalist id="cats_${p.id}">${categoryOptions(p.department).map(c=>`<option value="${escAttr(c)}">`).join("")}</datalist>
     </td>
-    <td><textarea data-field="description" rows="4" placeholder="Optional — shown to customers on the item's page" class="auto-fit-description" style="width:620px;min-width:620px;min-height:110px;resize:both;line-height:1.5;font-size:.9rem;white-space:pre-wrap;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escHtml(p.description || "")}</textarea></td>
-    <td><input value="${p.price == null ? "" : p.price}" data-field="price" type="number" step="0.01" style="min-width:110px;width:110px;"></td>
-    <td><input value="${escAttr(p.unit || "")}" data-field="unit" class="auto-fit-text" style="min-width:110px;width:${Math.max(110, Math.min(260, (p.unit||'').length * 9 + 36))}px;"></td>
+    <td><textarea data-field="description" rows="4" placeholder="Optional — shown to customers on the item's page" style="width:340px;min-width:260px;resize:vertical;line-height:1.5;font-size:.85rem;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escHtml(p.description || "")}</textarea></td>
+    <td><input value="${p.price == null ? "" : p.price}" data-field="price" type="number" step="0.01" style="min-width:80px;width:80px;"></td>
+    <td><input value="${escAttr(p.unit || "")}" data-field="unit" style="min-width:70px;width:70px;"></td>
     <td><input value="${p.stock == null ? "" : p.stock}" data-field="stock" type="number" step="1" placeholder="∞" style="min-width:65px;width:65px;"></td>
     <td colspan="2" style="min-width:220px;">
       <div class="media-gallery" id="gallery_${p.id}">
         <div class="media-thumbs" id="thumbs_${p.id}">${renderMediaThumbs(p)}</div>
         <label class="media-add-btn">
           + Add photos / video
-          <input id="mediaInput_${p.id}" type="file" accept="image/*,video/mp4,video/quicktime,video/webm" multiple style="display:none;" onchange="addMediaFiles(${p.id}, this)">
+          <input type="file" accept="image/*,video/mp4,video/quicktime,video/webm" multiple style="display:none;" onchange="addMediaFiles(${p.id}, this)">
         </label>
-        <div class="media-drop-zone" tabindex="0" onclick="document.getElementById('mediaInput_${p.id}').click()" ondragenter="mediaDragEnter(event)" ondragover="mediaDragOver(event)" ondragleave="mediaDragLeave(event)" ondrop="mediaDrop(event,${p.id})" onpaste="mediaPaste(event,${p.id})">Drop photos/videos here • or click here then Ctrl+V / ⌘V to paste</div>
         <div class="msg" id="mediaMsg_${p.id}" style="font-size:.78rem;color:#888;margin-top:4px;"></div>
       </div>
       <input type="hidden" data-field="image" value="${escAttr(p.image || '')}">
@@ -408,25 +384,37 @@ function setCover(productId, idx) {
   saveProductMedia(productId, items);
 }
 
-// Picker, drag/drop, and clipboard paste use the same uploader.
-async function addMediaFiles(productId,input){const files=Array.from(input.files||[]);await addMediaFileList(productId,files);input.value='';}
-function validMediaFile(file){if(!file)return false;const t=String(file.type||'').toLowerCase();return t.startsWith('image/')||['video/mp4','video/quicktime','video/webm'].includes(t);}
-async function addMediaFileList(productId,fileList){
- const files=Array.from(fileList||[]).filter(validMediaFile),msg=document.getElementById('mediaMsg_'+productId);
- if(!files.length){if(msg)msg.textContent='No supported image/video files found.';return;}
- const remaining=MAX_MEDIA-getProductMedia(productId).length;if(remaining<=0){if(msg)msg.textContent=`Max ${MAX_MEDIA} media files per product.`;return;}
- const list=files.slice(0,remaining);if(msg)msg.textContent=`Uploading ${list.length} file${list.length>1?'s':''}…`;let done=0;
- for(const file of list){try{const dataBase64=await fileToBase64(file),isVideo=String(file.type||'').startsWith('video/');
- const result=await api('admin-upload-photo',{method:'POST',body:JSON.stringify({productId,filename:file.name||`pasted-${Date.now()}.${isVideo?'mp4':'png'}`,contentType:file.type||(isVideo?'video/mp4':'image/png'),dataBase64})});
- const current=getProductMedia(productId);current.push({url:result.url,type:isVideo?'video':'image',cover:current.length===0});saveProductMedia(productId,current);done++;if(msg)msg.textContent=`Uploaded ${done} of ${list.length}…`;
- }catch(err){if(msg)msg.textContent=`Error: ${err.message}`;}}
- if(msg&&done===list.length)msg.textContent=`✓ ${done} file${done>1?'s':''} uploaded`;
+// Handle multiple file selection — upload each one
+async function addMediaFiles(productId, input) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  const msgEl = document.getElementById('mediaMsg_' + productId);
+  const existing = getProductMedia(productId);
+  const remaining = MAX_MEDIA - existing.length;
+  if (remaining <= 0) { if (msgEl) msgEl.textContent = `Max ${MAX_MEDIA} media files per product.`; return; }
+  const toUpload = files.slice(0, remaining);
+  if (msgEl) msgEl.textContent = `Uploading ${toUpload.length} file${toUpload.length > 1 ? 's' : ''}…`;
+  let uploaded = 0;
+  for (const file of toUpload) {
+    try {
+      const dataBase64 = await fileToBase64(file);
+      const isVideo = file.type.startsWith('video/');
+      const result = await api('admin-upload-photo', {
+        method: 'POST',
+        body: JSON.stringify({ productId, filename: file.name, contentType: file.type, dataBase64 }),
+      });
+      const current = getProductMedia(productId);
+      current.push({ url: result.url, type: isVideo ? 'video' : 'image', cover: current.length === 0 });
+      saveProductMedia(productId, current);
+      uploaded++;
+      if (msgEl) msgEl.textContent = `Uploaded ${uploaded} of ${toUpload.length}…`;
+    } catch(e) {
+      if (msgEl) msgEl.textContent = `Error: ${e.message}`;
+    }
+  }
+  if (msgEl) msgEl.textContent = uploaded === toUpload.length ? `✓ ${uploaded} file${uploaded > 1 ? 's' : ''} uploaded` : `${uploaded} of ${toUpload.length} uploaded`;
+  input.value = '';
 }
-function mediaDragEnter(e){e.preventDefault();e.stopPropagation();e.currentTarget.classList.add('dragging');}
-function mediaDragOver(e){e.preventDefault();e.stopPropagation();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';e.currentTarget.classList.add('dragging');}
-function mediaDragLeave(e){e.preventDefault();e.stopPropagation();e.currentTarget.classList.remove('dragging');}
-async function mediaDrop(e,id){e.preventDefault();e.stopPropagation();e.currentTarget.classList.remove('dragging');await addMediaFileList(id,Array.from((e.dataTransfer&&e.dataTransfer.files)||[]));}
-async function mediaPaste(e,id){const d=e.clipboardData;if(!d)return;let f=Array.from(d.files||[]);if(!f.length&&d.items)f=Array.from(d.items).filter(x=>x.kind==='file').map(x=>x.getAsFile()).filter(Boolean);f=f.filter(validMediaFile);if(!f.length)return;e.preventDefault();e.stopPropagation();await addMediaFileList(id,f);}
 
 async function uploadPhoto(productId, input) {
   const file = input.files && input.files[0];
@@ -677,7 +665,7 @@ function showActivity(id) {
 
 /* ---------------- Settings ---------------- */
 async function loadSettings() {
-  try { SETTINGS = await api("admin-settings"); renderSettingsForm(); renderCategoryManager(); }
+  try { SETTINGS = await api("admin-settings"); renderSettingsForm(); }
   catch (e) { document.getElementById("settingsMsg").textContent = e.message; }
 }
 const SETTINGS_FIELDS = [
@@ -691,11 +679,19 @@ const SETTINGS_FIELDS = [
   ["deal_title", "Deal-of-the-day label"],
   ["deal_text", "Deal-of-the-day headline"],
   ["deal_price_label", "Deal-of-the-day price text, e.g. $5.99/lb"],
+  ["ask_makka_enabled", "Ask Makka AI available to customers"],
   ["deal_image", "Deal-of-the-day image path or URL"],
 ];
 function renderSettingsForm() {
   const wrap = document.getElementById("settingsForm");
   wrap.innerHTML = SETTINGS_FIELDS.map(([key, label]) => {
+    if (key === "ask_makka_enabled") {
+      return `<label>${label}</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" id="set_${key}" ${SETTINGS[key] === true || String(SETTINGS[key]||'').toLowerCase() === 'true' ? 'checked' : ''} style="width:20px;height:20px;cursor:pointer;">
+          <span style="font-size:.85rem;color:var(--muted);">Turn off to hide Ask Makka from customers instantly.</span>
+        </div>`;
+    }
     if (key === "deal_image") {
       return `
         <label>${label}</label>
@@ -747,26 +743,26 @@ async function uploadSettingImage(key, input) {
 
 async function saveSettings() {
   const patch = {};
-  SETTINGS_FIELDS.forEach(([key]) => { patch[key] = document.getElementById("set_" + key).value; });
+  SETTINGS_FIELDS.forEach(([key]) => {
+    const el = document.getElementById("set_" + key);
+    patch[key] = el.type === "checkbox" ? el.checked : el.value;
+  });
   try { SETTINGS = await api("admin-settings", { method: "PATCH", body: JSON.stringify(patch) }); document.getElementById("settingsMsg").textContent = "Saved."; }
   catch (e) { document.getElementById("settingsMsg").textContent = e.message; }
 }
 
 function escAttr(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;"); }
 
-// Roomy/autofit Admin fields.
-function fitAdminField(el){
- if(!el||['checkbox','file','hidden'].includes(el.type))return;
- if(el.tagName==='TEXTAREA'){el.style.width='620px';el.style.minWidth='520px';el.style.maxWidth='760px';el.style.height='auto';el.style.height=Math.max(110,el.scrollHeight)+'px';return;}
- if(el.tagName!=='INPUT')return;if(['number','date','datetime-local','password'].includes(el.type)){if(!el.style.minWidth)el.style.minWidth='110px';return;}
- const f=el.dataset.field||'',limits={name:[260,650],department:[160,360],category:[220,500],unit:[110,260],staff_notes:[180,500],title:[180,500],requirements:[220,600],code:[120,260],image:[180,520]},mm=limits[f]||[140,520],[minW,maxW]=mm;
- const p=document.createElement('span'),cs=getComputedStyle(el);p.style.cssText='position:absolute;visibility:hidden;white-space:pre;left:-99999px;top:-99999px;';p.style.font=cs.font;p.textContent=el.value||el.placeholder||'';document.body.appendChild(p);const w=p.getBoundingClientRect().width+36;p.remove();el.style.minWidth=minW+'px';el.style.width=Math.max(minW,Math.min(maxW,w))+'px';
-}
-function fitAllAdminFields(){document.querySelectorAll('#app input,#app textarea').forEach(fitAdminField);}
-document.addEventListener('input',e=>{if(e.target.closest('#app'))fitAdminField(e.target);});
-document.addEventListener('change',e=>{if(e.target.closest('#app'))fitAdminField(e.target);});
-document.addEventListener('focusin',e=>{if(e.target.closest('#app'))fitAdminField(e.target);});
-setTimeout(fitAllAdminFields,500);
+// Auto-resize text inputs in the products table as the user types
+document.addEventListener('input', function(e) {
+  const el = e.target;
+  if (el.tagName !== 'INPUT' || el.type === 'number' || el.type === 'checkbox' || el.type === 'file') return;
+  if (!el.closest('.table-scroll')) return;
+  const minW = parseInt(el.style.minWidth) || 80;
+  const maxW = el.dataset.field === 'name' ? 320 : el.dataset.field === 'description' ? 400 : 260;
+  const newW = Math.max(minW, Math.min(maxW, el.value.length * 8 + 24));
+  el.style.width = newW + 'px';
+});
 
 // Preset categories per department — shows as suggestions in the category field.
 // Staff can still type anything custom; these are just quick picks.
@@ -779,34 +775,9 @@ const DEPT_CATEGORIES = {
   baby:      ["Baby Food", "Formula", "Diapers", "Baby Care", "Clothing"],
   clothing:  ["Abayas", "Thobes", "Hijabs", "Kids Clothing", "Accessories"],
 };
-function getCustomCategoryState(){ return (SETTINGS && SETTINGS.custom_categories) || {}; }
 function categoryOptions(dept) {
-  const base = DEPT_CATEGORIES[dept] || [];
-  const custom = getCustomCategoryState()[dept] || [];
-  const names = custom.filter(x=>x && x.active !== false).map(x=>x.name);
-  return [...new Set([...base, ...names])];
+  return DEPT_CATEGORIES[dept] || [];
 }
-function allCategoryRows(dept){
-  const custom=getCustomCategoryState()[dept]||[];
-  const customNames=new Set(custom.map(x=>x.name));
-  return [...(DEPT_CATEGORIES[dept]||[]).filter(n=>!customNames.has(n)).map((name,i)=>({name,active:true,order:i,builtin:true})), ...custom.map((x,i)=>({...x,order:x.order??(100+i),builtin:false}))].sort((a,b)=>(a.order||0)-(b.order||0));
-}
-async function persistCategories(state){
-  SETTINGS = await api("admin-settings", {method:"PATCH",body:JSON.stringify({custom_categories:state})});
-  document.getElementById('categoriesMsg').textContent='Saved.'; renderCategoryManager(); renderProducts();
-}
-function renderCategoryManager(){
-  const wrap=document.getElementById('categoryManager'); if(!wrap)return;
-  const depts=['grocery','meat','candy','household','beauty','baby','clothing'];
-  wrap.innerHTML=depts.map(dept=>`<div style="margin:16px 0;padding:14px;border:1px solid #ddd;border-radius:10px"><h3 style="margin:0 0 10px;text-transform:capitalize">${escHtml(dept)}</h3>${allCategoryRows(dept).map((c,i)=>`<div style="display:flex;gap:8px;align-items:center;margin:7px 0;flex-wrap:wrap"><input value="${escAttr(c.name)}" style="min-width:300px;flex:1" onchange="renameCategory('${dept}',${i},this.value)"><button class="btn small ghost" onclick="moveCategory('${dept}',${i},-1)">↑</button><button class="btn small ghost" onclick="moveCategory('${dept}',${i},1)">↓</button><button class="btn small ghost" onclick="toggleCategory('${dept}',${i})">${c.active===false?'Show':'Hide'}</button><button class="btn small ghost" onclick="deleteCategory('${dept}',${i})">Delete</button></div>`).join('')}</div>`).join('');
-}
-function editableRows(dept){ const state=getCustomCategoryState(); const rows=allCategoryRows(dept).map((x,i)=>({...x,builtin:false,order:i})); state[dept]=rows; return {state,rows}; }
-async function addCategory(){ const dept=document.getElementById('catDept').value; const input=document.getElementById('newCategoryName'); const name=input.value.trim(); if(!name)return; const {state,rows}=editableRows(dept); if(rows.some(x=>x.name.toLowerCase()===name.toLowerCase())){alert('That category already exists.');return;} rows.push({name,active:true,order:rows.length}); state[dept]=rows; input.value=''; await persistCategories(state); }
-async function renameCategory(dept,index,name){ name=name.trim(); if(!name)return renderCategoryManager(); const {state,rows}=editableRows(dept); const old=rows[index].name; rows[index].name=name; state[dept]=rows; await persistCategories(state); if(old!==name && confirm(`Also move products from “${old}” to “${name}”?`)){ for(const p of PRODUCTS.filter(p=>p.department===dept&&p.category===old)){ await api('admin-products',{method:'PATCH',body:JSON.stringify({...p,category:name})}); } await loadProducts(); } }
-async function toggleCategory(dept,index){ const {state,rows}=editableRows(dept); rows[index].active=rows[index].active===false; state[dept]=rows; await persistCategories(state); }
-async function moveCategory(dept,index,dir){ const {state,rows}=editableRows(dept); const j=index+dir; if(j<0||j>=rows.length)return; [rows[index],rows[j]]=[rows[j],rows[index]]; rows.forEach((x,i)=>x.order=i); state[dept]=rows; await persistCategories(state); }
-async function deleteCategory(dept,index){ const {state,rows}=editableRows(dept); const name=rows[index].name; const used=PRODUCTS.filter(p=>p.department===dept&&p.category===name).length; if(used){ alert(`${name} still has ${used} product(s). Rename/move those products first, or rename this category and choose to move them.`); return; } if(!confirm(`Delete category “${name}”?`))return; rows.splice(index,1); rows.forEach((x,i)=>x.order=i); state[dept]=rows; await persistCategories(state); }
-
 function escHtml(s) { return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 </script>
 </body>
