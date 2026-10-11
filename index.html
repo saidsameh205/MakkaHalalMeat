@@ -757,6 +757,7 @@ body.dark .badge-pill{background:#1F2937;}
 .product-detail-qty button{border:1px solid var(--line);border-radius:10px;width:42px;height:42px;font-size:24px;background:#f9fafb}
 .p-card{cursor:pointer}
 .p-card:focus-visible{outline:3px solid var(--brand)}
+.detail-photo-strip{display:flex;gap:8px;overflow-x:auto;padding:12px 14px}.detail-photo-strip button{flex:0 0 72px;width:72px;height:72px;border:2px solid var(--line);border-radius:10px;overflow:hidden}.detail-photo-strip img{width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body data-view="home" data-dept="meat">
@@ -1496,7 +1497,8 @@ function openProductDetail(id){
 }
 function renderProductDetail(){
   const p=PRODUCTS.find(x=>Number(x.id)===detailProductId);if(!p)return;
-  const img=p.image?`<img class="product-detail-image" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">`:`<div class="product-detail-image" style="display:grid;place-items:center;font-size:72px">${escapeHtml(p.emoji||'🛒')}</div>`;
+  const photos=[p.image,...(Array.isArray(p.images)?p.images:[])].filter(Boolean);
+  const img=photos.length?`<img id="detailMainPhoto" class="product-detail-image" src="${escapeHtml(photos[0])}" alt="${escapeHtml(p.name)}">${photos.length>1?`<div class="detail-photo-strip">${photos.map((url,i)=>`<button type="button" onclick="document.getElementById('detailMainPhoto').src=this.querySelector('img').src" aria-label="View product photo ${i+1}"><img src="${escapeHtml(url)}" alt="Product photo ${i+1}"></button>`).join('')}</div>`:''}`:`<div class="product-detail-image" style="display:grid;place-items:center;font-size:72px">${escapeHtml(p.emoji||'🛒')}</div>`;
   const discounted=p.price!=null&&effectivePrice(p)<Number(p.price);
   const price=p.price==null?'Ask in store':`$${effectivePrice(p).toFixed(2)} ${escapeHtml(p.unit||'')}`;
   const stock=p.stock==null?'Available':Number(p.stock)>0?'In stock':'Out of stock';

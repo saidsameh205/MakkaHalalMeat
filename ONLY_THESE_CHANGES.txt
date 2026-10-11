@@ -1,0 +1,7 @@
+Changes in this package ONLY: department dropdown, category dropdown, up to six additional photos per product displayed in full-screen detail view. Existing main photo uploader is unchanged.
+
+1. Supabase SQL Editor: run PRODUCT_PHOTOS_MIGRATION.sql once.
+2. GitHub: replace admin.html and index.html.
+3. Replace netlify/functions/admin-products.js ONLY (no other functions need changing).
+4. Deploy and test a new product and an existing product on a preview site.
+5. Existing product categories are pulled from your current catalog; starter values are also provided.

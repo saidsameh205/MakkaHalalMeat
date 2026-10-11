@@ -71,6 +71,10 @@ function sanitizeProduct(b) {
   if (b.is_food !== undefined) out.is_food = !!b.is_food;
   if (b.price !== undefined) out.price = b.price === null || b.price === '' ? null : Number(b.price);
   if (b.unit !== undefined) out.unit = String(b.unit).slice(0, 20);
+  if (b.images !== undefined) {
+    if (!Array.isArray(b.images) || b.images.length>6 || b.images.some(url=>typeof url!=='string'||url.length>500||!/^https:\/\//.test(url))) throw new Error('Invalid additional photos');
+    out.images=b.images;
+  }
   if (b.image !== undefined) out.image = String(b.image).slice(0, 500);
   if (b.emoji !== undefined) out.emoji = String(b.emoji).slice(0, 10);
   if (b.brand !== undefined) out.brand = String(b.brand).slice(0, 100);
