@@ -1238,17 +1238,19 @@ async function loadPromos(){
     renderPromos(list);
   }catch(e){ document.getElementById("promoListEl").innerHTML=`<div class="empty-state"><p>Error: ${e.message}</p></div>`; }
 }
+let promoRecords=[];
 function renderPromos(list){
+  promoRecords=list;
   const el = document.getElementById("promoListEl");
   if(!list.length){ el.innerHTML=`<div class="empty-state"><h3>No promo codes</h3><p>Create your first code</p></div>`; return; }
-  el.innerHTML = list.map(d=>`<div class="discount-row">
+  el.innerHTML = list.map(d=>`<div class="discount-row" style="cursor:pointer" onclick="openEditPromo(${d.id})" title="Edit discount">
     ${d.image?`<img src="${escH(d.image)}" style="width:50px;height:50px;object-fit:cover;border-radius:8px" alt="">`:""}
     <div class="discount-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
     <div class="discount-info">
       <div class="discount-name">${escH(d.code)}</div>
       <div class="discount-meta">${escH(d.title||"")} · ${d.discount_type==="percent"?d.discount_value+"%":"$"+d.discount_value} off${d.min_order?` · min $${d.min_order}`:""}${d.expires_at?" · exp "+d.expires_at.split("T")[0]:""}</div>
     </div>
-    <div>${d.active!==false?`<span style="color:var(--fresh);font-size:.75rem;font-weight:700;">Active</span>`:`<span style="color:var(--muted);font-size:.75rem;">Off</span>`}</div>
+    <div style="display:flex;gap:6px;align-items:center"><button class="btn-outline" onclick="event.stopPropagation();togglePromo(${d.id},${d.active===false})">${d.active===false?"Turn On":"Turn Off"}</button><button class="btn-outline" onclick="event.stopPropagation();openEditPromo(${d.id})">Edit</button></div>
   </div>`).join("");
 }
 async function loadCatDiscounts(){
@@ -1257,10 +1259,12 @@ async function loadCatDiscounts(){
     renderCatDiscounts(list);
   }catch(e){ document.getElementById("catDiscListEl").innerHTML=`<div class="empty-state"><p>Error: ${e.message}</p></div>`; }
 }
+let catDiscountRecords=[];
 function renderCatDiscounts(list){
+  catDiscountRecords=list;
   const el = document.getElementById("catDiscListEl");
   if(!list.length){ el.innerHTML=`<div class="empty-state"><h3>No category discounts</h3><p>Create one to discount a whole department or category</p></div>`; return; }
-  el.innerHTML = list.map(d=>`<div class="discount-row">
+  el.innerHTML = list.map(d=>`<div class="discount-row" style="cursor:pointer" onclick="openEditCatDiscount(${d.id})" title="Edit category discount">
     ${d.image?`<img src="${escH(d.image)}" style="width:50px;height:50px;object-fit:cover;border-radius:8px" alt="">`:""}
     <div class="discount-icon" style="background:#FFF7ED;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></div>
     <div class="discount-info">
@@ -1269,13 +1273,47 @@ function renderCatDiscounts(list){
     </div>
     <div style="display:flex;gap:6px;align-items:center;">
       ${d.active!==false?`<span style="color:var(--fresh);font-size:.75rem;font-weight:700;">Active</span>`:`<span style="color:var(--muted);font-size:.75rem;">Off</span>`}
-      <button class="btn-outline" style="padding:4px 8px;font-size:.72rem;" onclick="deleteCatDiscount(${d.id})">Delete</button>
+      <button class="btn-outline" onclick="event.stopPropagation();toggleCatDiscount(${d.id},${d.active===false})">${d.active===false?"Turn On":"Turn Off"}</button><button class="btn-outline" onclick="event.stopPropagation();openEditCatDiscount(${d.id})">Edit</button><button class="btn-outline" style="padding:4px 8px;font-size:.72rem;" onclick="event.stopPropagation();deleteCatDiscount(${d.id})">Delete</button>
     </div>
   </div>`).join("");
 }
 let editingPromoId = null;
+let editingCatDiscountId = null;
+let existingPromoImage = "";
+let existingCatImage = "";
+function dateInput(v){return v?String(v).slice(0,10):""}
+function openEditPromo(id){
+  const d=promoRecords.find(x=>Number(x.id)===Number(id));if(!d)return;
+  editingPromoId=d.id;existingPromoImage=d.image||"";
+  document.getElementById("promoModalTitle").textContent="Edit Promo Code";
+  const values={pmCode:d.code||"",pmTitle:d.title||"",pmType:d.discount_type||"percent",pmValue:d.discount_value||"",pmMin:d.min_order||"",pmExpires:dateInput(d.expires_at)};
+  Object.entries(values).forEach(([k,v])=>document.getElementById(k).value=v);
+  document.getElementById("pmActive").checked=d.active!==false;
+  document.getElementById("pmPhoto").value="";
+  const preview=document.getElementById("pmPreview");preview.src=existingPromoImage;preview.style.display=existingPromoImage?"block":"none";
+  openModal("promoModal");
+}
+function openEditCatDiscount(id){
+  const d=catDiscountRecords.find(x=>Number(x.id)===Number(id));if(!d)return;
+  editingCatDiscountId=d.id;existingCatImage=d.image||"";
+  const values={cdDept:d.department||"",cdCat:d.category||"",cdPct:d.percent_off||"",cdLabel:d.label||"",cdExpires:dateInput(d.expires_at)};
+  Object.entries(values).forEach(([k,v])=>document.getElementById(k).value=v);
+  document.getElementById("cdActive").checked=d.active!==false;
+  document.getElementById("cdPhoto").value="";
+  const preview=document.getElementById("cdPreview");preview.src=existingCatImage;preview.style.display=existingCatImage?"block":"none";
+  openModal("catDiscModal");
+}
+async function togglePromo(id,active){
+  try{await api("admin-discounts",{method:"PATCH",body:JSON.stringify({id,active})});await loadPromos();showToast(active?"Promo enabled":"Promo disabled","success")}
+  catch(e){showToast(e.message,"error")}
+}
+async function toggleCatDiscount(id,active){
+  try{await api("admin-category-discounts",{method:"PATCH",body:JSON.stringify({id,active})});await loadCatDiscounts();showToast(active?"Discount enabled":"Discount disabled","success")}
+  catch(e){showToast(e.message,"error")}
+}
+
 function openNewPromo(){
-  editingPromoId = null;
+  editingPromoId = null;existingPromoImage="";
   document.getElementById("promoModalTitle").textContent = "New Promo Code";
   ["pmCode","pmTitle","pmValue","pmMin","pmExpires"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("pmType").value = "percent";
@@ -1292,18 +1330,21 @@ async function savePromo(){
     discount_value:parseFloat(value),
     min_order:document.getElementById("pmMin").value.trim()?parseFloat(document.getElementById("pmMin").value):null,
     expires_at:document.getElementById("pmExpires").value||null,
-    active:document.getElementById("pmActive").checked
+    active:document.getElementById("pmActive").checked,
+    image:existingPromoImage
   };
   try{
     const photo=document.getElementById("pmPhoto").files[0];
     if(photo)payload.image=await uploadImageToSupabase(photo,"deal",{settingKey:"pm_deal"});
-    await api("admin-discounts", {method:"POST", body:JSON.stringify(payload)});
-    showToast("Promo code created ✓","success");
+    if(editingPromoId)payload.id=editingPromoId;
+    await api("admin-discounts", {method:editingPromoId?"PATCH":"POST", body:JSON.stringify(payload)});
+    showToast(editingPromoId?"Promo updated ✓":"Promo code created ✓","success");
     closeModal("promoModal");
     loadPromos();
   }catch(e){ showToast("Save failed: "+e.message,"error"); }
 }
 function openNewCatDiscount(){
+  editingCatDiscountId=null;existingCatImage="";
   ["cdDept","cdCat","cdPct","cdLabel","cdExpires"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("cdActive").checked = true; document.getElementById("cdPhoto").value="";document.getElementById("cdPreview").style.display="none";
   openModal("catDiscModal");
@@ -1317,13 +1358,15 @@ async function saveCatDiscount(){
     percent_off:parseFloat(pct),
     label:document.getElementById("cdLabel").value.trim()||null,
     expires_at:document.getElementById("cdExpires").value||null,
-    active:document.getElementById("cdActive").checked
+    active:document.getElementById("cdActive").checked,
+    image:existingCatImage
   };
   try{
     const photo=document.getElementById("cdPhoto").files[0];
     if(photo)payload.image=await uploadImageToSupabase(photo,"deal",{settingKey:"cd_deal"});
-    await api("admin-category-discounts", {method:"POST", body:JSON.stringify(payload)});
-    showToast("Category discount created ✓","success");
+    if(editingCatDiscountId)payload.id=editingCatDiscountId;
+    await api("admin-category-discounts", {method:editingCatDiscountId?"PATCH":"POST", body:JSON.stringify(payload)});
+    showToast(editingCatDiscountId?"Category discount updated ✓":"Category discount created ✓","success");
     closeModal("catDiscModal");
     loadCatDiscounts();
   }catch(e){ showToast("Save failed: "+e.message,"error"); }

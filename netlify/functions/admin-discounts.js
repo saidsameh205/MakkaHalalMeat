@@ -17,7 +17,7 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'POST') {
       const b = JSON.parse(event.body || '{}');
       const discount = sanitizeDiscount(b);
-      if (!discount.title) throw new Error('title is required');
+      if (!discount.title) discount.title = discount.code || 'Promotion';
       const rows = await supabaseFetch('discounts', {
         method: 'POST',
         headers: { Prefer: 'return=representation' },
