@@ -229,6 +229,10 @@ a{color:var(--brand);text-decoration:none;}
       <label>Admin Password</label>
       <input type="password" id="loginInput" placeholder="Enter admin password" autocomplete="current-password">
     </div>
+    <div class="field">
+      <label>API Token <span style="font-weight:400;color:var(--muted)">(from Netlify env ADMIN_TOKEN)</span></label>
+      <input type="password" id="tokenInput" placeholder="Paste your ADMIN_TOKEN" autocomplete="off">
+    </div>
     <button class="btn-primary" onclick="doLogin()">Sign In</button>
     <p class="login-err" id="loginErr">Incorrect password. Try again.</p>
   </div>
@@ -600,14 +604,50 @@ a{color:var(--brand);text-decoration:none;}
 
     <!-- TEAM / STAFF -->
     <div id="setTabStaff" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-size:.88rem;color:var(--muted);">Manage your team members</div>
-        <button class="btn-new" onclick="openNewStaff()">+ Add Member</button>
+      <div class="card" style="background:#EFF6FF;border:1px solid #BFDBFE;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:.88rem;font-weight:700;color:#1D4ED8;">GIF Staff App</div>
+            <div style="font-size:.78rem;color:#3B82F6;margin-top:2px;">Your team uses this to pick & fulfill grocery orders</div>
+          </div>
+          <a href="gif.html" target="_blank" style="background:#1D4ED8;color:#fff;padding:8px 14px;border-radius:8px;font-size:.82rem;font-weight:700;text-decoration:none;">Open GIF ↗</a>
+        </div>
+      </div>
+
+      <!-- PIN box shown after add/reset -->
+      <div class="card" id="pinBox" style="display:none;border:2px solid var(--brand);margin-bottom:16px;">
+        <div style="font-size:.82rem;color:var(--muted);" id="pinFor"></div>
+        <div style="font-size:2.6rem;font-weight:800;letter-spacing:.25em;margin:8px 0;font-family:monospace;" id="pinBig"></div>
+        <div style="font-size:.78rem;color:var(--muted);">Write this down or tell them now. For security it is <strong>never shown again</strong> — you can always reset it for a new one.</div>
+        <button class="btn-outline" style="margin-top:10px;" onclick="document.getElementById('pinBox').style.display='none'">Done</button>
+      </div>
+
+      <!-- Add staff -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:.88rem;font-weight:700;margin-bottom:12px;">Add a team member</div>
+        <div class="form-grid">
+          <div class="fld"><label>Name <span class="req">*</span></label><input type="text" id="newStaffName" placeholder="e.g. Amina"></div>
+          <div class="fld"><label>PIN (blank = random)</label><input type="text" id="newStaffPin" placeholder="Leave blank" inputmode="numeric" maxlength="8"></div>
+          <div class="fld span2">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="newStaffApprove" style="width:auto;margin:0;">
+              <span>Can approve cancellations & refunds</span>
+            </label>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:4px;">Only enable for managers you trust with refunds</div>
+          </div>
+        </div>
+        <button class="btn-save" style="margin-top:12px;" onclick="addStaffMember()">Add & create PIN</button>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:.88rem;font-weight:700;">Team Members</div>
+        <button class="btn-outline" onclick="loadStaff()">Refresh</button>
       </div>
       <div id="staffListEl">
         <div class="skeleton skel-row"></div>
         <div class="skeleton skel-row"></div>
       </div>
+      <p style="font-size:.75rem;color:var(--muted);margin-top:10px;">Turning someone off or resetting their PIN signs them out of GIF immediately, even mid-shift.</p>
     </div>
 
   </div>
@@ -666,40 +706,6 @@ a{color:var(--brand);text-decoration:none;}
   </div>
 </div>
 
-<div class="modal-overlay" id="staffModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="staffModalTitle">Add Team Member</div>
-    <div class="form-grid">
-      <div class="fld"><label>Name <span class="req">*</span></label><input type="text" id="smName" placeholder="e.g. Ahmed"></div>
-      <div class="fld">
-        <label>Role</label>
-        <select id="smRole">
-          <option value="manager">Manager</option>
-          <option value="butcher">Butcher</option>
-          <option value="cashier">Cashier</option>
-          <option value="stock">Stock / Inventory</option>
-          <option value="delivery">Delivery</option>
-          <option value="owner">Owner</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="fld"><label>Phone</label><input type="tel" id="smPhone" placeholder="404-000-0000"></div>
-      <div class="fld"><label>Email</label><input type="email" id="smEmail" placeholder="name@email.com"></div>
-      <div class="fld span2"><label>Notes</label><input type="text" id="smNotes" placeholder="e.g. Opens on Tuesdays"></div>
-    </div>
-    <div class="toggle-row" style="margin-top:12px;">
-      <div><div class="toggle-label">Active / Working here</div></div>
-      <label class="toggle"><input type="checkbox" id="smActive" checked><span class="toggle-slider"></span></label>
-    </div>
-    <div class="action-row" style="margin-top:16px;">
-      <button class="btn-save" onclick="saveStaff()">Save</button>
-      <button class="btn-outline" onclick="closeModal('staffModal')">Cancel</button>
-      <button class="btn-delete" id="btnDeleteStaff" style="display:none;" onclick="deleteStaff()">Remove</button>
-    </div>
-  </div>
-</div>
-
 <div id="toast" class="toast"></div>
 
 <script>
@@ -712,21 +718,26 @@ const STORAGE_BUCKET = "product-photos"; // Supabase Storage bucket
 // Set your admin password here — change "makka2024" to whatever you want
 const ADMIN_PASSWORD = "makka2024";
 let authed = false;
+let ADMIN_TOKEN = "";
 function doLogin(){
   const pw = document.getElementById("loginInput").value.trim();
+  const tok = document.getElementById("tokenInput").value.trim();
   if(!pw){ showErr("Enter your admin password."); return; }
   if(pw !== ADMIN_PASSWORD){ showErr("Incorrect password."); return; }
+  if(!tok){ showErr("Paste your ADMIN_TOKEN (from Netlify env vars)."); return; }
   authed = true;
-  try{ sessionStorage.setItem("mhm_admin","1"); }catch(e){}
+  ADMIN_TOKEN = tok;
+  try{ sessionStorage.setItem("mhm_admin","1"); sessionStorage.setItem("mhm_admin_token", tok); }catch(e){}
   document.getElementById("loginView").style.display="none";
   document.getElementById("appView").classList.add("show");
   loadAll();
 }
 document.getElementById("loginInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
+document.getElementById("tokenInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
 function showErr(msg){ const el=document.getElementById("loginErr"); el.textContent=msg; el.style.display="block"; }
-function doLogout(){ authed=false; try{sessionStorage.removeItem("mhm_admin");}catch(e){} document.getElementById("appView").classList.remove("show"); document.getElementById("loginView").style.display="flex"; document.getElementById("loginInput").value=""; }
+function doLogout(){ authed=false; ADMIN_TOKEN=""; try{sessionStorage.removeItem("mhm_admin"); sessionStorage.removeItem("mhm_admin_token");}catch(e){} document.getElementById("appView").classList.remove("show"); document.getElementById("loginView").style.display="flex"; document.getElementById("loginInput").value=""; document.getElementById("tokenInput").value=""; }
 // Auto-login if same session
-(function(){ try{ if(sessionStorage.getItem("mhm_admin")==="1"){ authed=true; document.getElementById("loginView").style.display="none"; document.getElementById("appView").classList.add("show"); } }catch(e){} })();
+(function(){ try{ if(sessionStorage.getItem("mhm_admin")==="1"){ const tok=sessionStorage.getItem("mhm_admin_token")||""; if(tok){ authed=true; ADMIN_TOKEN=tok; document.getElementById("loginView").style.display="none"; document.getElementById("appView").classList.add("show"); } } }catch(e){} })();
 
 /* ─── SUPABASE ─── */
 async function sb(path, opts={}){
@@ -740,6 +751,18 @@ async function sb(path, opts={}){
 async function sbAuth(path, opts={}){
   if(!authed) throw new Error("Not authenticated");
   return sb(path, opts);
+}
+
+/* ─── NETLIFY API (for staff / PIN functions) ─── */
+function api(path, opts={}){
+  return fetch(`/.netlify/functions/${path}`, {
+    ...opts,
+    headers: { "Content-Type":"application/json", "x-admin-token": ADMIN_TOKEN, ...(opts.headers||{}) }
+  }).then(async r => {
+    const data = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(data.error || "Request failed");
+    return data;
+  });
 }
 
 /* ─── SUPABASE STORAGE UPLOAD ─── */
@@ -1355,75 +1378,93 @@ async function saveBannerUrl(){
   finally{ btn.disabled=false; btn.textContent="Save Banner"; }
 }
 
-/* ─── STAFF ─── */
-let ALL_STAFF = [];
-let editingStaffId = null;
+/* ─── STAFF / GIF ACCESS ─── */
+let TEAM = [];
 async function loadStaff(){
-  try{
-    ALL_STAFF = await sb("staff?select=*&order=name.asc").catch(()=>[]);
+  const el = document.getElementById("staffListEl");
+  el.innerHTML = `<div style="color:var(--muted);font-size:.85rem;padding:12px 0;">Loading…</div>`;
+  try {
+    TEAM = await api("admin-staff");
     renderStaff();
-  }catch(e){ document.getElementById("staffListEl").innerHTML=`<div class="empty-state"><p>Could not load staff. Make sure a 'staff' table exists in Supabase.</p></div>`; }
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><p style="color:var(--brand);">${escH(e.message)}</p></div>`;
+  }
 }
 function renderStaff(){
   const el = document.getElementById("staffListEl");
-  if(!ALL_STAFF.length){
-    el.innerHTML=`<div class="empty-state"><h3>No team members yet</h3><p>Add your first team member</p></div>`; return;
+  if(!TEAM.length){
+    el.innerHTML=`<div class="empty-state"><h3>No team members yet</h3><p>Add your first team member above</p></div>`; return;
   }
-  const roleColors = {owner:"#8B1A1A",manager:"#1D4ED8",butcher:"#16A34A",cashier:"#92400E",stock:"#6B7280",delivery:"#7C3AED",other:"#374151"};
-  el.innerHTML = ALL_STAFF.map(s=>`
-    <div class="prod-row" onclick="openEditStaff(${s.id})">
-      <div class="prod-thumb" style="background:${roleColors[s.role]||"#374151"};color:#fff;font-size:.9rem;font-weight:700;border-radius:50%;">
-        ${(s.name||"?").charAt(0).toUpperCase()}
-      </div>
-      <div class="prod-info">
-        <div class="prod-name">${escH(s.name||"")}</div>
-        <div class="prod-meta">${escH(s.role||"")}${s.phone?" · "+escH(s.phone):""}</div>
-        ${s.notes?`<div class="prod-meta" style="margin-top:2px;">${escH(s.notes)}</div>`:""}
-      </div>
-      <div>${s.active!==false?`<span style="color:var(--fresh);font-size:.75rem;font-weight:700;">Active</span>`:`<span style="color:var(--muted);font-size:.75rem;">Inactive</span>`}</div>
-    </div>`).join("");
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.84rem;">
+    <thead><tr style="color:var(--muted);font-size:.75rem;">
+      <th style="text-align:left;padding:6px 8px;font-weight:600;">Name</th>
+      <th style="text-align:left;padding:6px 8px;font-weight:600;">Status</th>
+      <th style="text-align:left;padding:6px 8px;font-weight:600;">Can Approve</th>
+      <th style="text-align:left;padding:6px 8px;font-weight:600;">Last Login</th>
+      <th style="padding:6px 8px;"></th>
+    </tr></thead>
+    <tbody id="teamBody">${renderTeamRows()}</tbody>
+  </table>`;
 }
-function openNewStaff(){
-  editingStaffId=null;
-  document.getElementById("staffModalTitle").textContent="Add Team Member";
-  document.getElementById("btnDeleteStaff").style.display="none";
-  ["smName","smPhone","smEmail","smNotes"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("smRole").value="cashier";
-  document.getElementById("smActive").checked=true;
-  openModal("staffModal");
+function renderTeamRows(){
+  return TEAM.map(p => {
+    const locked = p.locked_until && new Date(p.locked_until) > new Date();
+    const last = p.last_login_at ? new Date(p.last_login_at).toLocaleString([],{weekday:"short",hour:"numeric",minute:"2-digit"}) : "Never";
+    return `<tr style="border-top:1px solid var(--line);">
+      <td style="padding:10px 8px;font-weight:600;">${escH(p.name)}</td>
+      <td style="padding:10px 8px;">${p.active?'<span style="color:var(--fresh);font-size:.75rem;font-weight:700;">On</span>':'<span style="color:var(--muted);font-size:.75rem;">Off</span>'}${locked?' <span style="background:#FEF9C3;color:#92400E;font-size:.7rem;font-weight:700;padding:1px 6px;border-radius:10px;">Locked</span>':""}</td>
+      <td style="padding:10px 8px;"><input type="checkbox" style="width:auto;" ${p.can_approve?"checked":""} onchange="setApprove(${p.id},this.checked)"></td>
+      <td style="padding:10px 8px;color:var(--muted);">${escH(last)}</td>
+      <td style="padding:10px 8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn-outline" style="font-size:.75rem;padding:4px 10px;" onclick="resetPin(${p.id})">Reset PIN</button>
+        <button class="btn-outline" style="font-size:.75rem;padding:4px 10px;" onclick="setActive(${p.id},${!p.active})">${p.active?"Turn off":"Turn on"}</button>
+        ${locked?`<button class="btn-outline" style="font-size:.75rem;padding:4px 10px;" onclick="unlockStaff(${p.id})">Unlock</button>`:""}
+        <button class="btn-outline" style="font-size:.75rem;padding:4px 10px;color:var(--brand);border-color:var(--brand);" onclick="removeStaff(${p.id})">Remove</button>
+      </td>
+    </tr>`;
+  }).join("");
 }
-function openEditStaff(id){
-  const s=ALL_STAFF.find(x=>x.id===id); if(!s) return;
-  editingStaffId=id;
-  document.getElementById("staffModalTitle").textContent="Edit Team Member";
-  document.getElementById("btnDeleteStaff").style.display="";
-  document.getElementById("smName").value=s.name||"";
-  document.getElementById("smRole").value=s.role||"other";
-  document.getElementById("smPhone").value=s.phone||"";
-  document.getElementById("smEmail").value=s.email||"";
-  document.getElementById("smNotes").value=s.notes||"";
-  document.getElementById("smActive").checked=s.active!==false;
-  openModal("staffModal");
+function showPin(name, pin, verb){
+  document.getElementById("pinFor").textContent = `${verb} for ${name}:`;
+  document.getElementById("pinBig").textContent = pin;
+  document.getElementById("pinBox").style.display = "block";
+  window.scrollTo({top:0, behavior:"smooth"});
 }
-async function saveStaff(){
-  const name=document.getElementById("smName").value.trim();
-  if(!name){ showToast("Name is required","error"); return; }
-  const payload={name,role:document.getElementById("smRole").value,phone:document.getElementById("smPhone").value.trim()||null,email:document.getElementById("smEmail").value.trim()||null,notes:document.getElementById("smNotes").value.trim()||null,active:document.getElementById("smActive").checked};
-  try{
-    if(editingStaffId){
-      await sb(`staff?id=eq.${editingStaffId}`,{method:"PATCH",headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(payload)});
-    } else {
-      await sb("staff",{method:"POST",headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(payload)});
-    }
-    showToast("Saved ✓","success"); closeModal("staffModal"); loadStaff();
-  }catch(e){ showToast("Save failed: "+e.message,"error"); }
+async function addStaffMember(){
+  const name = document.getElementById("newStaffName").value.trim();
+  const pin = document.getElementById("newStaffPin").value.trim();
+  if(!name){ showToast("Enter a name first.","error"); return; }
+  try {
+    const r = await api("admin-staff",{method:"POST",body:JSON.stringify({name, pin: pin||undefined, can_approve: document.getElementById("newStaffApprove").checked})});
+    showPin(r.staff.name, r.pin, "PIN");
+    document.getElementById("newStaffName").value=""; document.getElementById("newStaffPin").value=""; document.getElementById("newStaffApprove").checked=false;
+    loadStaff();
+  } catch(e){ showToast(e.message,"error"); }
 }
-async function deleteStaff(){
-  if(!editingStaffId||!confirm("Remove this team member?")) return;
-  try{
-    await sb(`staff?id=eq.${editingStaffId}`,{method:"DELETE",headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json"}});
-    showToast("Removed","success"); closeModal("staffModal"); loadStaff();
-  }catch(e){ showToast("Failed: "+e.message,"error"); }
+async function resetPin(id){
+  const name = (TEAM.find(p=>p.id===id)||{}).name||"this person";
+  if(!confirm(`Give ${name} a new PIN? Their old PIN stops working immediately.`)) return;
+  try { const r = await api("admin-staff",{method:"PATCH",body:JSON.stringify({id, reset_pin:true})}); showPin(name, r.pin, "New PIN"); loadStaff(); }
+  catch(e){ showToast(e.message,"error"); }
+}
+async function setActive(id, active){
+  try { await api("admin-staff",{method:"PATCH",body:JSON.stringify({id, active})}); loadStaff(); }
+  catch(e){ showToast(e.message,"error"); }
+}
+async function setApprove(id, can_approve){
+  if(can_approve && !confirm("Let this person approve/deny cancellations & refunds (moves real money)?")){ loadStaff(); return; }
+  try { await api("admin-staff",{method:"PATCH",body:JSON.stringify({id, can_approve})}); loadStaff(); }
+  catch(e){ showToast(e.message,"error"); loadStaff(); }
+}
+async function unlockStaff(id){
+  try { await api("admin-staff",{method:"PATCH",body:JSON.stringify({id, unlock:true})}); loadStaff(); }
+  catch(e){ showToast(e.message,"error"); }
+}
+async function removeStaff(id){
+  const name = (TEAM.find(p=>p.id===id)||{}).name||"this person";
+  if(!confirm(`Remove ${name}? They'll be signed out of GIF immediately.`)) return;
+  try { await api("admin-staff",{method:"DELETE",body:JSON.stringify({id})}); loadStaff(); }
+  catch(e){ showToast(e.message,"error"); }
 }
 
 /* ─── SETTINGS ─── */

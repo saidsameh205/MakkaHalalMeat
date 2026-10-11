@@ -426,6 +426,7 @@ main{max-width:640px;margin:0 auto;}
 .drawer-item .item-name{font-size:.86rem;font-weight:600;}
 .drawer-item .item-unit{font-size:.72rem;color:var(--muted);}
 .drawer-foot{padding:14px 20px;border-top:1px solid var(--line);background:var(--card);}
+.promo-input-row{display:flex;gap:8px;margin-bottom:10px;}
 .totals-row{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted);margin-bottom:4px;}
 .totals-row.grand{font-weight:800;color:var(--fg);font-size:1.02rem;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);}
 .checkout-btn{
@@ -482,6 +483,37 @@ main{max-width:640px;margin:0 auto;}
 .search-box input::placeholder{color:var(--muted2);}
 .search-results{padding:8px 0 40px;}
 .search-empty{text-align:center;color:var(--muted);padding:60px 20px;}
+
+/* ── PRICE BADGES ── */
+.p-sale-badge{
+  position:absolute;top:8px;left:8px;
+  background:var(--brand);color:#fff;
+  font-size:.6rem;font-weight:800;letter-spacing:.05em;
+  padding:2px 7px;border-radius:999px;text-transform:uppercase;
+  z-index:2;
+}
+.p-reduced-badge{
+  position:absolute;top:8px;left:8px;
+  background:#16A34A;color:#fff;
+  font-size:.58rem;font-weight:900;letter-spacing:.04em;
+  padding:2px 7px;border-radius:999px;text-transform:uppercase;
+  z-index:2;
+}
+.p-card-price.sale{color:var(--brand);font-weight:800;}
+.p-card-price.reduced{color:#15803D;font-weight:800;}
+.p-card-orig{font-size:.72rem;color:var(--muted2);text-decoration:line-through;margin-left:2px;align-self:center;}
+/* ── THIS WEEK'S DEALS HOME SECTION ── */
+.deals-home-section{padding:0 16px 8px;}
+.deals-home-empty{text-align:center;color:var(--muted);font-size:.85rem;padding:20px;}
+
+/* ── DEALS SUB-TABS ── */
+.deals-subtab{
+  flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);border-bottom:2px solid transparent;
+  transition:color .15s,border-color .15s;
+}
+.deals-subtab.active{color:var(--brand);border-bottom-color:var(--brand);}
 
 /* ── DEALS ── */
 .deals-list{padding:8px 16px 40px;display:flex;flex-direction:column;gap:10px;}
@@ -722,13 +754,18 @@ body.dark .badge-pill{background:#1F2937;}
       <div class="topbar-brand">
         <div class="topbar-logo">
           <img src="icon-180.png" alt="Makka" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <span class="topbar-logo-fallback" style="display:none;">🥩</span>
+          <span class="topbar-logo-fallback" style="display:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span>
         </div>
-        <div class="topbar-name" id="storeName">Makka Halal Meat<span id="storeHoursTopbar">Open · 11:00 AM–6:30 PM</span></div>
+        <div class="topbar-name" id="storeName">Makka Halal Meat<span id="storeHoursTopbar">Open · Tue–Sun 11 AM–6:30 PM</span></div>
       </div>
       <div class="topbar-right">
-        <button id="translateBtnTop" onclick="openLangModal()" title="Translate">🌐</button>
-        <button id="themeToggleBtn" onclick="toggleTheme()" title="Toggle dark/light mode" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:none;">🌙</button>
+        <button id="translateBtnTop" onclick="openLangModal()" title="Translate" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </button>
+        <button id="themeToggleBtn" onclick="toggleTheme()" title="Toggle dark/light mode" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:none;">
+          <svg id="themeIconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="themeIconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
         <button class="topbar-cart-btn" onclick="openCart()">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           <span class="cart-dot" id="cartDotTop">0</span>
@@ -768,7 +805,7 @@ body.dark .badge-pill{background:#1F2937;}
         <div class="badge-pill-icon">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <span class="badge-pill-text">Open Daily</span>
+        <span class="badge-pill-text">Tue–Sun Open</span>
       </div>
     </div>
 
@@ -793,18 +830,27 @@ body.dark .badge-pill{background:#1F2937;}
     </div>
     <div class="promo-scroll" id="promoScroller"></div>
 
+    <!-- This Week's Deals -->
+    <div id="saleSection" style="display:none;">
+      <div class="sec-head" style="padding-top:16px;">
+        <h2>🔥 This Week's Deals</h2>
+        <button class="see-all" onclick="switchView('deals')">See All ›</button>
+      </div>
+      <div class="row-scroll" id="saleSectionRow"></div>
+    </div>
+
     <!-- product previews per dept -->
     <div id="homePreviews"></div>
 
     <!-- store info -->
     <div class="store-info">
       <h3>Store Information</h3>
-      <div class="si-row"><span class="label">📍 Address</span><span class="val" id="infoAddress">431 N Indian Creek Dr, Clarkston, GA 30021</span></div>
-      <div class="si-row"><span class="label">📞 Phone</span><span class="val" id="infoPhone">404-297-0008</span></div>
-      <div class="si-row"><span class="label">🛍️ Shopping</span><span class="val" id="infoShopping">In-store & online</span></div>
-      <div class="si-row"><span class="label">📦 Orders</span><span class="val" id="infoOrderOptions">Store pickup</span></div>
-      <div class="si-row"><span class="label">🕒 Hours</span><span class="val" id="infoHours">11:00 AM – 6:30 PM</span></div>
-      <div class="si-row"><span class="label">✉️ Email</span><span class="val"><a href="mailto:support@makkahalalmeat.com" style="color:#fff;">support@makkahalalmeat.com</a></span></div>
+      <div class="si-row"><span class="label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Address</span><span class="val" id="infoAddress">431 N Indian Creek Dr, Clarkston, GA 30021</span></div>
+      <div class="si-row"><span class="label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.42 2 2 0 0 1 3.62 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.82-1.82a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg> Phone</span><span class="val" id="infoPhone">404-297-0008</span></div>
+      <div class="si-row"><span class="label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Shopping</span><span class="val" id="infoShopping">In-store &amp; online</span></div>
+      <div class="si-row"><span class="label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Orders</span><span class="val" id="infoOrderOptions">Store pickup</span></div>
+      <div class="si-row"><span class="label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Hours</span><span class="val" id="infoHours">Tue–Sun: 11:00 AM – 6:30 PM<br><small style="opacity:.8;">Closed Monday · Meat counter closes 6:00 PM</small></span></div>
+      <div class="si-row"><span class="label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Email</span><span class="val"><a href="mailto:support@makkahalalmeat.com" style="color:#fff;">support@makkahalalmeat.com</a></span></div>
     </div>
 
     <footer>Prices shown are estimates — weighed items are finalized at pickup.<br>© Makka Halal Meat, Inc. · <a href="privacy.html" style="color:inherit;">Privacy</a> · <a href="terms.html" style="color:inherit;">Terms</a></footer>
@@ -831,13 +877,46 @@ body.dark .badge-pill{background:#1F2937;}
 <div id="dealsView" style="display:none;">
   <header class="topbar">
     <div class="topbar-inner">
-      <button class="back-btn" onclick="switchView('home')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <span style="font-weight:800;font-size:1.02rem;flex:1;padding-left:8px;">Deals & Offers</span>
+      <div class="topbar-brand">
+        <div class="topbar-logo">
+          <img src="icon-180.png" alt="Makka" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <span class="topbar-logo-fallback" style="display:none;">🥩</span>
+        </div>
+        <div class="topbar-name">Deals & Savings</div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-cart-btn" onclick="openCart()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="cart-dot" id="cartDotDeals">0</span>
+        </button>
+      </div>
+    </div>
+    <!-- sub-tabs -->
+    <div style="display:flex;gap:0;border-top:1px solid var(--line);">
+      <button id="dealsTabReduced" class="deals-subtab active" onclick="switchDealsTab('reduced')">Reduced Price</button>
+      <button id="dealsTabSale" class="deals-subtab" onclick="switchDealsTab('sale')">This Week</button>
+      <button id="dealsTabCoupons" class="deals-subtab" onclick="switchDealsTab('coupons')">Coupons</button>
     </div>
   </header>
-  <div class="deals-list" id="dealsList"></div>
+
+  <!-- Reduced Price panel -->
+  <div id="dealsPanelReduced" style="padding:12px 16px 40px;">
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px;">Prices we've lowered — no expiry, just better value.</p>
+    <div class="grid" id="reducedGrid"></div>
+    <div id="reducedEmpty" class="deal-empty" style="display:none;">No reduced items right now — check back soon!</div>
+  </div>
+
+  <!-- Sale panel -->
+  <div id="dealsPanelSale" style="display:none;padding:12px 16px 40px;">
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px;">Limited-time prices. Grab them before they're gone.</p>
+    <div class="grid" id="saleGrid"></div>
+    <div id="saleEmpty" class="deal-empty" style="display:none;">No sale items right now — check back soon!</div>
+  </div>
+
+  <!-- Coupons panel -->
+  <div id="dealsPanelCoupons" style="display:none;">
+    <div class="deals-list" id="dealsList"></div>
+  </div>
 </div>
 
 <!-- ══════════════ CATEGORIES VIEW ══════════════ -->
@@ -896,9 +975,9 @@ body.dark .badge-pill{background:#1F2937;}
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     Search
   </button>
-  <button class="tab-btn" data-tab="orders" onclick="switchView('orders')">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    Orders
+  <button class="tab-btn" data-tab="deals" onclick="switchView('deals')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+    Deals
   </button>
   <button class="tab-btn" onclick="openCart()" data-tab="cart">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -922,7 +1001,14 @@ body.dark .badge-pill{background:#1F2937;}
   </div>
   <div class="drawer-items" id="drawerItems"></div>
   <div class="drawer-foot">
+    <!-- promo code -->
+    <div class="promo-input-row" id="promoInputRow">
+      <input id="promoCodeInput" placeholder="Promo code" style="flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:.84rem;background:var(--bg);color:var(--fg);font-family:inherit;">
+      <button onclick="applyPromoCode()" style="padding:9px 14px;background:var(--brand);color:#fff;border-radius:var(--r-sm);font-size:.84rem;font-weight:700;">Apply</button>
+    </div>
+    <div id="promoMessage" style="font-size:.75rem;margin-bottom:6px;display:none;"></div>
     <div class="totals-row"><span>Subtotal</span><span id="sumSubtotal">$0.00</span></div>
+    <div class="totals-row" id="sumDiscountRow" style="display:none;color:var(--fresh);font-weight:600;"><span id="promoLabel">Promo discount</span><span id="sumDiscount">-$0.00</span></div>
     <div class="totals-row"><span>Estimated tax</span><span id="sumTax">$0.00</span></div>
     <div class="totals-row grand"><span>Total</span><span id="sumTotal">$0.00</span></div>
     <button class="checkout-btn" onclick="openCheckoutModal()">Checkout</button>
@@ -1037,6 +1123,7 @@ const WEIGHT_CHIPS = [0.5, 1, 1.5, 2, 3, 5];
 let PRODUCTS = [];
 let SETTINGS = {};
 let DISCOUNTS = [];
+let CAT_DISCOUNTS = []; // [{department, category, percent_off, label, expires_at}]
 let CART = {};
 let FAVORITES = {};
 let currentView = "home";
@@ -1055,19 +1142,22 @@ async function sb(path){
 async function init(){
   renderSkeleton();
   try{
-    const [products, settingsRows, discounts] = await Promise.all([
+    const [products, settingsRows, discounts, catDiscounts] = await Promise.all([
       sb("products?select=*&active=eq.true&order=sort_order.asc,name.asc"),
       sb("app_settings?key=eq.ui_config&select=value"),
       sb("discounts?select=*&active=eq.true&order=expires_at.asc.nullslast"),
+      sb("category_discounts?select=*&active=eq.true&order=created_at.desc").catch(()=>[]),
     ]);
     PRODUCTS = products;
     SETTINGS = (settingsRows[0] && settingsRows[0].value) || {};
     DISCOUNTS = discounts;
+    CAT_DISCOUNTS = catDiscounts || [];
   }catch(e){ showToast("Couldn't load the catalog — check your connection."); console.error(e); }
   applySettings();
   renderHeroSlider();
   renderCatGrid();
   renderPromos();
+  renderSaleSection();
   renderHomePreviews();
   renderDeals();
   updateAskMakkaVisibility();
@@ -1147,6 +1237,49 @@ function renderPromos(){
   `;
 }
 
+/* ─── THIS WEEK'S DEALS + REDUCED SECTION ─── */
+function renderSaleSection(){
+  const saleItems = PRODUCTS.filter(p =>
+    (p.sale_price != null && Number(p.sale_price) < Number(p.price)) ||
+    (p.is_reduced && p.reduced_price != null && Number(p.reduced_price) < Number(p.price))
+  );
+  const sec = document.getElementById("saleSection");
+  const row = document.getElementById("saleSectionRow");
+  const head = document.querySelector("#saleSection .sec-head h2");
+  if(!saleItems.length){ if(sec) sec.style.display="none"; return; }
+  if(sec) sec.style.display="block";
+  if(row) row.innerHTML = saleItems.map(cardHtml).join("");
+}
+
+/* ─── DEALS TAB SWITCHING ─── */
+function switchDealsTab(tab){
+  ["reduced","sale","coupons"].forEach(t=>{
+    const btn = document.getElementById("dealsTab"+t.charAt(0).toUpperCase()+t.slice(1));
+    const panel = document.getElementById("dealsPanel"+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn) btn.classList.toggle("active", t===tab);
+    if(panel) panel.style.display = t===tab ? "block" : "none";
+  });
+  if(tab==="reduced") renderReducedGrid();
+  if(tab==="sale") renderSaleGrid();
+  if(tab==="coupons") renderDeals();
+}
+function renderReducedGrid(){
+  const items = PRODUCTS.filter(p => p.is_reduced && p.reduced_price != null && Number(p.reduced_price) < Number(p.price));
+  const grid = document.getElementById("reducedGrid");
+  const empty = document.getElementById("reducedEmpty");
+  if(!items.length){ if(grid) grid.innerHTML=""; if(empty) empty.style.display="block"; return; }
+  if(empty) empty.style.display="none";
+  if(grid) grid.innerHTML = items.map(cardHtml).join("");
+}
+function renderSaleGrid(){
+  const items = PRODUCTS.filter(p => p.sale_price != null && Number(p.sale_price) < Number(p.price));
+  const grid = document.getElementById("saleGrid");
+  const empty = document.getElementById("saleEmpty");
+  if(!items.length){ if(grid) grid.innerHTML=""; if(empty) empty.style.display="block"; return; }
+  if(empty) empty.style.display="none";
+  if(grid) grid.innerHTML = items.map(cardHtml).join("");
+}
+
 /* ─── SKELETON ─── */
 function renderSkeleton(){
   document.getElementById("homePreviews").innerHTML = `<div class="grid" style="margin:8px 0;">${'<div class="skel"></div>'.repeat(6)}</div>`;
@@ -1186,6 +1319,7 @@ function switchView(name){
   window.scrollTo(0,0);
   if(name==="search") setTimeout(()=>{ const el=document.getElementById("searchInput2"); if(el) el.focus(); },50);
   if(name==="categories") renderCatGrid();
+  if(name==="deals"){ switchDealsTab("reduced"); }
 }
 
 /* ─── DEALS ─── */
@@ -1241,6 +1375,24 @@ function openDeptPage(id, catFilter){
   }).join("");
 }
 
+/* ─── CATEGORY DISCOUNT HELPER ─── */
+function getCatDiscount(p){
+  if(!CAT_DISCOUNTS.length) return null;
+  return CAT_DISCOUNTS.find(cd => {
+    const deptMatch = !cd.department || cd.department === p.department;
+    const catMatch  = !cd.category   || cd.category  === p.category;
+    const notExpired = !cd.expires_at || new Date(cd.expires_at) > new Date();
+    return deptMatch && catMatch && notExpired;
+  }) || null;
+}
+function effectivePrice(p){
+  if(p.sale_price != null && Number(p.sale_price) < Number(p.price)) return Number(p.sale_price);
+  const cd = getCatDiscount(p);
+  if(cd) return Math.round(Number(p.price) * (1 - cd.percent_off/100) * 100) / 100;
+  if(p.is_reduced && p.reduced_price != null && Number(p.reduced_price) < Number(p.price)) return Number(p.reduced_price);
+  return Number(p.price);
+}
+
 /* ─── PRODUCT CARDS ─── */
 function isWeighted(p){ return !!(p.unit&&p.unit.toLowerCase().includes("lb")); }
 function stepFor(p){ return isWeighted(p)?0.5:1; }
@@ -1253,8 +1405,16 @@ function cardHtml(p){
   const stock = p.stock==null ? "" : Number(p.stock)>0
     ? `<span class="p-card-stock in">In Stock</span>`
     : `<span class="p-card-stock out">Out of Stock</span>`;
+  const hasSale    = p.sale_price != null && Number(p.sale_price) < Number(p.price);
+  const catDisc    = !hasSale ? getCatDiscount(p) : null;
+  const hasReduced = !hasSale && !catDisc && p.is_reduced && p.reduced_price != null && Number(p.reduced_price) < Number(p.price);
+  const hasDiscount = hasSale || !!catDisc || hasReduced;
+  const displayPrice = hasSale ? Number(p.sale_price) : catDisc ? effectivePrice(p) : hasReduced ? Number(p.reduced_price) : Number(p.price);
+  const priceClass = hasSale ? 'sale' : catDisc ? 'sale' : hasReduced ? 'reduced' : '';
   const priceHtml = p.price!=null
-    ? `<span class="p-card-price">$${Number(p.price).toFixed(2)} <small>${escapeHtml(p.unit||"")}</small></span>`
+    ? hasDiscount
+      ? `<span class="p-card-price ${priceClass}">$${displayPrice.toFixed(2)} <small>${escapeHtml(p.unit||"")}</small></span><span class="p-card-orig">$${Number(p.price).toFixed(2)}</span>`
+      : `<span class="p-card-price">$${Number(p.price).toFixed(2)} <small>${escapeHtml(p.unit||"")}</small></span>`
     : `<span class="p-card-price unknown">Ask in store</span>`;
   const qty = CART[p.id]||0;
   let ctrl = "";
@@ -1270,8 +1430,11 @@ function cardHtml(p){
     }
   }
   const fav = FAVORITES[p.id]?"❤️":"🤍";
+  const saleBadge = hasSale ? `<span class="p-sale-badge">Sale</span>`
+    : catDisc ? `<span class="p-sale-badge">${catDisc.percent_off}% Off</span>`
+    : hasReduced ? `<span class="p-reduced-badge">Reduced Price</span>` : "";
   return `<div class="p-card" data-pid="${p.id}">
-    ${img}${stock}</div>
+    ${img}${stock}${saleBadge}</div>
     <button class="p-fav" onclick="toggleFav(${p.id},this)">${fav}</button>
     <div class="p-card-body">
       <div class="p-card-name">${escapeHtml(p.name)}</div>
@@ -1368,6 +1531,37 @@ function renderSearchResults(items,label){
   wrap.innerHTML=`<div style="padding:14px 16px 6px;font-size:1rem;font-weight:800;">${label} <span style="font-size:.76rem;font-weight:500;color:var(--muted)">(${items.length})</span></div><div class="grid">${items.map(cardHtml).join("")}</div>`;
 }
 
+/* ─── PROMO CODES ─── */
+let appliedPromo = null; // {code, discount_type, discount_value, title, min_order}
+
+function calcPromoDiscount(subtotal){
+  if(!appliedPromo) return 0;
+  const min = appliedPromo.min_order || 0;
+  if(subtotal < min) return 0;
+  if(appliedPromo.discount_type === "percent") return Math.round(subtotal * appliedPromo.discount_value / 100 * 100)/100;
+  if(appliedPromo.discount_type === "fixed")   return Math.min(appliedPromo.discount_value, subtotal);
+  return 0;
+}
+
+function applyPromoCode(){
+  const input = document.getElementById("promoCodeInput");
+  const msg   = document.getElementById("promoMessage");
+  const code  = (input.value||"").trim().toUpperCase();
+  if(!code){ showToast("Enter a promo code first."); return; }
+  const match = DISCOUNTS.find(d => d.code && d.code.toUpperCase()===code);
+  if(!match){ msg.textContent="❌ Code not found or expired."; msg.style.color="var(--brand)"; msg.style.display="block"; return; }
+  const subtotal = cartLines().reduce((s,{p,qty})=>s+effectivePrice(p)*qty,0);
+  const min = match.min_order || 0;
+  if(subtotal < min){ msg.textContent=`❌ Minimum order of $${min.toFixed(2)} required.`; msg.style.color="var(--brand)"; msg.style.display="block"; return; }
+  appliedPromo = match;
+  const label = document.getElementById("promoLabel");
+  if(label) label.textContent = match.title || "Promo discount";
+  msg.textContent=`✓ "${match.title||code}" applied!`; msg.style.color="var(--fresh)"; msg.style.display="block";
+  input.value=""; renderDrawer();
+}
+
+function removePromo(){ appliedPromo=null; const msg=document.getElementById("promoMessage"); if(msg){msg.style.display="none";} renderDrawer(); }
+
 /* ─── CART ─── */
 function cartLines(){
   return Object.entries(CART).map(([id,qty])=>{
@@ -1379,7 +1573,7 @@ function renderCartChrome(){
   const lines=cartLines();
   const count=lines.length;
   const subtotal=lines.reduce((s,{p,qty})=>s+p.price*qty,0);
-  ["cartDotTop","cartDotTab"].forEach(id=>{
+  ["cartDotTop","cartDotTab","cartDotDeals"].forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
     el.className=count>0?"cart-dot show":"cart-dot";
@@ -1400,12 +1594,18 @@ function renderDrawer(){
       <div class="meta"><div class="item-name">${escapeHtml(p.name)}</div><div class="item-unit">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div></div>
       <div class="stepper"><button onclick="changeQty(${p.id},${-step})">−</button><span class="qty"${ea}>${fmtQty(p,qty)}</span><button onclick="changeQty(${p.id},${step})">+</button></div>
     </div>`;
-  }).join(""):`<div class="empty-state"><div class="big">🧺</div>Your cart is empty.<br>Find something delicious above.</div>`;
-  const subtotal=lines.reduce((s,{p,qty})=>s+p.price*qty,0);
-  const tax=subtotal*0.03;
+  }).join(""):`<div class="empty-state"><div class="big"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>Your cart is empty.<br>Find something delicious above.</div>`;
+  const subtotal=lines.reduce((s,{p,qty})=>s+effectivePrice(p)*qty,0);
+  const discount=appliedPromo?calcPromoDiscount(subtotal):0;
+  const discounted=Math.max(0,subtotal-discount);
+  const tax=discounted*0.03;
   document.getElementById("sumSubtotal").textContent="$"+subtotal.toFixed(2);
+  const discRow=document.getElementById("sumDiscountRow");
+  if(discRow) discRow.style.display=discount>0?"flex":"none";
+  const discAmt=document.getElementById("sumDiscount");
+  if(discAmt) discAmt.textContent="-$"+discount.toFixed(2);
   document.getElementById("sumTax").textContent="$"+tax.toFixed(2);
-  document.getElementById("sumTotal").textContent="$"+(subtotal+tax).toFixed(2);
+  document.getElementById("sumTotal").textContent="$"+(discounted+tax).toFixed(2);
 }
 function openCart(){document.getElementById("drawer").classList.add("open");document.getElementById("overlay").classList.add("open");renderDrawer();}
 function closeCart(){document.getElementById("drawer").classList.remove("open");document.getElementById("overlay").classList.remove("open");}
@@ -1419,9 +1619,10 @@ async function submitCheckout(){
   if(!name||!phone){showToast("Please add your name and phone number.");return;}
   const payBtn=document.getElementById("payBtn");
   payBtn.disabled=true;payBtn.textContent="Redirecting…";
-  const items=cartLines().map(({p,qty})=>({id:p.id,qty}));
+  const items=cartLines().map(({p,qty})=>({id:p.id,qty,effective_price:effectivePrice(p)}));
+  const promoCode = appliedPromo ? appliedPromo.code : null;
   try{
-    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items,name,phone,email})});
+    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items,name,phone,email,promoCode})});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||"Unable to start checkout");
     window.location.href=data.url;
@@ -1696,8 +1897,10 @@ function stopHeroTimer(){ clearInterval(heroTimer); }
 /* ─── DARK / LIGHT MODE ─── */
 function applyTheme(dark){
   document.body.classList.toggle("dark", dark);
-  const btn = document.getElementById("themeToggleBtn");
-  if(btn) btn.textContent = dark ? "☀️" : "🌙";
+  const moon = document.getElementById("themeIconMoon");
+  const sun  = document.getElementById("themeIconSun");
+  if(moon) moon.style.display = dark ? "none" : "";
+  if(sun)  sun.style.display  = dark ? "" : "none";
 }
 function toggleTheme(){
   const isDark = document.body.classList.contains("dark");
