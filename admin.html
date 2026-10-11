@@ -817,7 +817,7 @@ let deptFilter = "all";
 
 async function loadProducts(){
   try{
-    ALL_PRODUCTS = await sbAuth("products?select=*&order=sort_order.asc,name.asc");
+    ALL_PRODUCTS = await api("admin-products");
     renderProductList();
     renderStats();
     renderDeptFilters();
@@ -1103,10 +1103,10 @@ async function saveProduct(){
     };
 
     if(editingProductId){
-      await sbAuth(`products?id=eq.${editingProductId}`, { method:"PATCH", body:JSON.stringify(payload) });
+      await api("admin-products", { method:"PATCH", body:JSON.stringify({...payload, id: editingProductId}) });
       showToast("Product updated ✓","success");
     } else {
-      await sbAuth("products", { method:"POST", body:JSON.stringify(payload) });
+      await api("admin-products", { method:"POST", body:JSON.stringify(payload) });
       showToast("Product created ✓","success");
     }
     await loadProducts();
@@ -1134,7 +1134,7 @@ async function confirmDeleteProduct(){
   const p = ALL_PRODUCTS.find(x=>x.id===editingProductId);
   if(!confirm(`Delete "${p?.name}"? This cannot be undone.`)) return;
   try{
-    await sbAuth(`products?id=eq.${editingProductId}`, { method:"DELETE" });
+    await api("admin-products", { method:"DELETE", body:JSON.stringify({id: editingProductId}) });
     showToast("Product deleted","success");
     await loadProducts();
     closeEditor();
