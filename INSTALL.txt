@@ -1,12 +1,7 @@
-MAKKA HOMEPAGE MANAGER
-1. Back up your existing admin.html and index.html.
-2. Upload/replace admin.html and index.html at the repository root.
-3. Add netlify/functions/admin-homepage.js (keep your existing _util.js).
-4. Commit changes and wait for Netlify deployment.
-5. Open Makka Admin > Settings > Homepage. Select sections, order departments, and choose featured products; click Save Homepage.
-6. Refresh the customer homepage to see updates.
+Makka Option 3 + Custom Weight + Special Instructions
 
-No new SQL migration is included. This uses your existing public.app_settings row with key ui_config.
-IMPORTANT: If the site reports a database permission error, check app_settings privileges/RLS for the service-role server function.
-The update does not modify products, tax rules, checkout, or your existing categories.
-JavaScript syntax checked, but not tested against the live Supabase/Netlify environment.
+GitHub: replace root index.html and admin.html. Replace netlify/functions/create-checkout-session.js.
+
+The admin file is preserved unchanged from your uploaded admin (2).html.
+Special instructions are saved into each order item for staff. Please verify GIF staff UI renders item.instructions; this package does not replace gif.html.
+Test checkout in Stripe test mode before live deployment.

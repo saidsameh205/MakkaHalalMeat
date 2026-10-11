@@ -59,6 +59,12 @@ exports.handler = async (event) => {
       if (p.stock != null && qty > p.stock) {
         throw new Error(`Only ${p.stock} of "${p.name}" left in stock — please adjust your cart.`);
       }
+      const weighted = /\/lb/i.test(String(p.unit || ''));
+      const minWeight = /goat/i.test(String(p.name || '')) ? 0.25 : 1;
+      if (weighted && (qty < minWeight || (/goat/i.test(String(p.name || '')) && Math.abs(qty * 4 - Math.round(qty * 4)) > 0.00001))) {
+        throw new Error(`Invalid weight for ${p.name}`);
+      }
+      const instructions = weighted && typeof item.instructions === 'string' ? item.instructions.trim().slice(0, 300) : '';
       const lineTotal = p.price * qty;
       // is_food defaults to true (most of this catalog is food) when a product
       // predates the column or was never explicitly set either way.
@@ -76,6 +82,7 @@ exports.handler = async (event) => {
         image: p.image || '',
         emoji: p.emoji || '',
         pick_status: 'pending',
+        instructions,
         tax_rate: taxRate, // snapshotted so a later category change never rewrites this order's tax
       });
       if (p.stock != null) toReserve.push({ id: p.id, qty, currentStock: p.stock });

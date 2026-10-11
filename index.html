@@ -758,6 +758,16 @@ body.dark .badge-pill{background:#1F2937;}
 .p-card{cursor:pointer}
 .p-card:focus-visible{outline:3px solid var(--brand)}
 .detail-photo-strip{display:flex;gap:8px;overflow-x:auto;padding:12px 14px}.detail-photo-strip button{flex:0 0 72px;width:72px;height:72px;border:2px solid var(--line);border-radius:10px;overflow:hidden}.detail-photo-strip img{width:100%;height:100%;object-fit:cover}
+
+/* Makka approved Option 3: calm, minimal category cards */
+.cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cat-tile.cat-modern{aspect-ratio:auto;min-height:146px;background:var(--tile-bg);border:1px solid rgba(90,40,40,.07);box-shadow:none;border-radius:17px;text-align:left;padding:17px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;color:#202124}
+.cat-modern-icon{font-size:29px;line-height:1.3;color:var(--tile-ink)}
+.cat-modern-title{font-size:.88rem;font-weight:800;line-height:1.3}
+.cat-modern-desc{font-size:.69rem;line-height:1.4;color:#62636a;max-width:85%}
+.cat-modern-arrow{position:absolute;right:13px;top:44%;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.75);display:grid;place-items:center;color:var(--tile-ink);font-weight:800}
+.makka-instruction{width:100%;min-height:72px;resize:vertical;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:.86rem}
+.makka-weight-entry{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:1rem}
 </style>
 </head>
 <body data-view="home" data-dept="meat">
@@ -1063,13 +1073,13 @@ body.dark .badge-pill{background:#1F2937;}
     <div class="wm-body">
       <h3 id="wmName"></h3>
       <div class="wm-price" id="wmPrice"></div>
-      <div class="wm-chips" id="wmChips"></div>
+      
       <div class="wm-custom">
-        <span style="font-size:.82rem;font-weight:600;">Custom:</span>
-        <input type="number" id="wmCustom" step="0.25" min="0.25" placeholder="e.g. 2.75">
+        <label for="wmCustom" style="font-size:.82rem;font-weight:700;">Desired weight:</label>
+        <input type="number" id="wmCustom" step="any" min="0.25" placeholder="e.g. 2.75">
         <span style="font-size:.82rem;font-weight:600;">lb</span>
       </div>
-      <div class="wm-total"><span>Estimated total</span><span id="wmTotal">$0.00</span></div>
+      <p id="wmMinHint" style="font-size:.74rem;color:var(--muted);margin-bottom:12px"></p><label for="wmInstructions" style="display:block;font-weight:700;font-size:.83rem;margin-bottom:6px">Special instructions (optional)</label><textarea class="makka-instruction" id="wmInstructions" maxlength="300" placeholder="e.g. Cut into small cubes; remove excess fat"></textarea><div class="wm-total"><span>Estimated total</span><span id="wmTotal">$0.00</span></div>
       <div class="wm-actions">
         <button class="btn-ghost" style="flex:1;" onclick="closeWeightModal()">Cancel</button>
         <button class="btn-solid" style="flex:1;" onclick="confirmWeight()">Add to order</button>
@@ -1260,23 +1270,20 @@ function departmentsInOrder(){
 
 /* ─── CATEGORY GRID ─── */
 function renderCatGrid(){
-  const depts = departmentsInOrder();
-  const html = depts.map(id=>{
-    const d = DEPT_MAP[id];
-    return `<button class="cat-tile" onclick="openDeptPage('${id}')">
-      <img class="cat-tile-img" src="${d.photo||''}" alt="${escapeHtml(d.label)}"
-           onerror="this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='flex';">
-      <div class="cat-tile-overlay"></div>
-      <div class="cat-tile-label">${escapeHtml(d.label)}</div>
-      <div class="cat-tile-emoji" style="display:none;">
-        <span class="cat-tile-emoji-icon">${d.icon}</span>
-        <span class="cat-tile-emoji-label">${escapeHtml(d.label)}</span>
-      </div>
+  const palette=[['#FFF0EF','#831C24'],['#EFF6E9','#365C2F'],['#EAF5FA','#235875'],['#FFF0F2','#852F4D'],['#FFF8E9','#825322'],['#F0EFFF','#4B4486'],['#FFF0EE','#831C24']];
+  const descriptions={meat:'Beef, lamb, chicken & more',grocery:'Everyday essentials',household:'Cleaning & home care',beauty:'Personal care & cosmetics',baby:'Baby food & essentials',clothing:'For the whole family',candy:'Snacks, chocolates & more'};
+  const icons={meat:'🥩',grocery:'🌿',household:'🧴',beauty:'✿',baby:'♡',clothing:'♧',candy:'◇'};
+  const html=departmentsInOrder().map((id,i)=>{
+    const d=DEPT_MAP[id], colors=palette[i%palette.length];
+    return `<button class="cat-tile cat-modern" style="--tile-bg:${colors[0]};--tile-ink:${colors[1]}" onclick="openDeptPage('${id}')">
+      <span class="cat-modern-icon" aria-hidden="true">${icons[id]||d.icon||'◈'}</span>
+      <span class="cat-modern-title">${escapeHtml(d.label)}</span>
+      <span class="cat-modern-desc">${escapeHtml(descriptions[id]||'Explore our selection')}</span>
+      <span class="cat-modern-arrow" aria-hidden="true">→</span>
     </button>`;
-  }).join("");
-  document.getElementById("catGrid").innerHTML = html;
-  const all = document.getElementById("catGridAll");
-  if(all) all.innerHTML = html;
+  }).join('');
+  document.getElementById('catGrid').innerHTML=html;
+  const all=document.getElementById('catGridAll');if(all)all.innerHTML=html;
 }
 
 /* Only allow ordinary HTTPS image URLs in inline background images. */
@@ -1476,7 +1483,7 @@ function effectivePrice(p){
 
 /* ─── PRODUCT CARDS ─── */
 function isWeighted(p){ return !!(p.unit&&p.unit.toLowerCase().includes("lb")); }
-function stepFor(p){ return isWeighted(p)?0.5:1; }
+function stepFor(p){ return isWeighted(p)?(/goat/i.test((p.name||'')+' '+(p.category||''))?.25:.25):1; }
 function fmtQty(p,qty){ return isWeighted(p)?`${qty} lb`:`${qty}`; }
 
 function cardHtml(p){
@@ -1533,7 +1540,7 @@ function openProductDetail(id){
   const p=PRODUCTS.find(x=>Number(x.id)===Number(id));if(!p)return;
   detailScrollY=window.scrollY||document.body.scrollTop||0;
   detailProductId=Number(id);
-  detailSelectedQty=isWeighted(p)?Math.max(1,Number(CART[id])||1):Math.max(1,Number(CART[id])||1);
+  detailSelectedQty=isWeighted(p)?Math.max(meatMin(p),Number(CART[id])||meatMin(p)):Math.max(1,Number(CART[id])||1);
   renderProductDetail();
   const overlay=document.getElementById('productDetailOverlay');overlay.classList.add('open');overlay.scrollTop=0;
   document.body.style.overflow='hidden';
@@ -1556,7 +1563,7 @@ function renderProductDetail(){
     <h3 style="font-size:1rem;margin-top:22px">Description</h3>
     <p class="desc">${escapeHtml(p.description||'More information about this product will be added soon.')}</p>
     ${available?`<div class="product-detail-qty"><strong>${isWeighted(p)?'Weight':'Quantity'}</strong><div style="display:flex;align-items:center;gap:16px"><button onclick="changeDetailQty(-1)" aria-label="Decrease">−</button><strong>${isWeighted(p)?detailSelectedQty+' lb':detailSelectedQty}</strong><button onclick="changeDetailQty(1)" aria-label="Increase">+</button></div></div>`:''}
-    <button class="product-detail-action" ${available?'':'disabled'} onclick="addFromProductDetail()">${available?'Add to Cart':'Unavailable'}</button>
+    <button class="product-detail-action" ${available?'':'disabled'} onclick="addFromProductDetail()">${available?(isWeighted(p)?'Choose weight & instructions':'Add to Cart'):'Unavailable'}</button>
   </div>`;
 }
 function changeDetailQty(direction){
@@ -1572,6 +1579,7 @@ function closeProductDetail(){
 }
 function addFromProductDetail(){
   const p=PRODUCTS.find(x=>Number(x.id)===detailProductId);if(!p||p.price==null||p.stock!=null&&Number(p.stock)<=0)return;
+  if(isWeighted(p)){closeProductDetail();openWeightModal(p.id);return;}
   CART[p.id]=detailSelectedQty;saveLocal();refreshAllCardsFor(p.id);renderCartChrome();renderDrawer();
   closeProductDetail();showToast('Added to cart');
 }
@@ -1599,55 +1607,39 @@ function toggleFav(id,btn){
 }
 
 /* ─── WEIGHT MODAL ─── */
+const MEAT_INSTRUCTIONS_KEY='mhm_meat_instructions';
+let MEAT_INSTRUCTIONS={};try{MEAT_INSTRUCTIONS=JSON.parse(localStorage.getItem(MEAT_INSTRUCTIONS_KEY)||'{}')||{}}catch(e){}
+function meatMin(p){return /goat/i.test((p.name||'')+' '+(p.category||''))?.25:1;}
+function validMeatWeight(p,w){return Number.isFinite(w)&&w>=meatMin(p)&&w<=50&&(!/goat/i.test((p.name||'')+' '+(p.category||''))||Math.abs(w*4-Math.round(w*4))<.00001);}
+function storeMeatInstructions(){try{localStorage.setItem(MEAT_INSTRUCTIONS_KEY,JSON.stringify(MEAT_INSTRUCTIONS))}catch(e){}}
 function openWeightModal(id){
-  const p=PRODUCTS.find(x=>x.id===id);
-  if(!p) return;
-  weightModalProductId=id;
-  const mm=document.getElementById("wmMedia");
-  mm.style.backgroundImage=p.image?`url('${escapeAttr(p.image)}')`:""
-  mm.textContent=p.image?"":(p.emoji||"🛒");
-  document.getElementById("wmName").textContent=p.name;
-  document.getElementById("wmPrice").textContent=`$${Number(p.price).toFixed(2)} ${p.unit||""}`;
-  const cur=CART[id]||0;
-  document.getElementById("wmChips").innerHTML=WEIGHT_CHIPS.map(w=>
-    `<button class="wm-chip${cur===w?" active":""}" onclick="pickWeightChip(${w},this)">${w} lb</button>`
-  ).join("");
-  const ci=document.getElementById("wmCustom");
-  ci.value=(cur&&!WEIGHT_CHIPS.includes(cur))?cur:"";
-  updateWeightTotal(cur||WEIGHT_CHIPS[1]);
-  if(!cur) document.querySelectorAll(".wm-chip")[1]?.classList.add("active");
-  document.getElementById("wmRemoveBtn").style.display=cur>0?"block":"none";
-  document.getElementById("weightModal").classList.add("open");
-  ci.oninput=()=>{document.querySelectorAll(".wm-chip").forEach(c=>c.classList.remove("active"));updateWeightTotal(parseFloat(ci.value)||0);};
-}
-function pickWeightChip(w,btn){
-  document.querySelectorAll(".wm-chip").forEach(c=>c.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById("wmCustom").value="";
-  updateWeightTotal(w);
+ const p=PRODUCTS.find(x=>Number(x.id)===Number(id));if(!p)return;
+ weightModalProductId=p.id;
+ const mm=document.getElementById('wmMedia');mm.style.backgroundImage=p.image?`url('${escapeAttr(p.image)}')`:'';mm.textContent=p.image?'':(p.emoji||'🥩');
+ document.getElementById('wmName').textContent=p.name;
+ document.getElementById('wmPrice').textContent=`$${Number(p.price).toFixed(2)} ${p.unit||''}`;
+ const ci=document.getElementById('wmCustom');ci.min=meatMin(p);ci.value=CART[p.id]||meatMin(p);
+ document.getElementById('wmMinHint').textContent=meatMin(p)===.25?'Minimum 0.25 lb · Goat weights in 0.25 lb increments':'Minimum 1 lb · Enter your preferred weight';
+ document.getElementById('wmInstructions').value=MEAT_INSTRUCTIONS[p.id]||'';
+ document.getElementById('wmRemoveBtn').style.display=CART[p.id]>0?'block':'none';
+ ci.oninput=()=>updateWeightTotal(Number(ci.value));updateWeightTotal(Number(ci.value));
+ document.getElementById('weightModal').classList.add('open');
 }
 function updateWeightTotal(w){
-  const p=PRODUCTS.find(x=>x.id===weightModalProductId);
-  document.getElementById("wmTotal").textContent="$"+((p.price||0)*w).toFixed(2);
-  document.getElementById("weightModal").dataset.pendingWeight=w;
+ const p=PRODUCTS.find(x=>Number(x.id)===Number(weightModalProductId));if(!p)return;
+ document.getElementById('wmTotal').textContent=validMeatWeight(p,w)?'$'+(effectivePrice(p)*w).toFixed(2):'Enter a valid weight';
 }
 function confirmWeight(){
-  const custom=parseFloat(document.getElementById("wmCustom").value);
-  const activeChip=document.querySelector(".wm-chip.active");
-  const weight=custom>0?custom:(activeChip?Number(activeChip.textContent):WEIGHT_CHIPS[1]);
-  if(!weight||weight<=0){showToast("Enter a weight greater than 0.");return;}
-  CART[weightModalProductId]=Math.round(weight*100)/100;
-  saveLocal();refreshAllCardsFor(weightModalProductId);
-  renderCartChrome();renderDrawer();closeWeightModal();
-  const p=PRODUCTS.find(x=>x.id===weightModalProductId);
-  showToast(`Added ${weight} lb of ${p.name}`);
+ const p=PRODUCTS.find(x=>Number(x.id)===Number(weightModalProductId));if(!p)return;
+ const weight=Number(document.getElementById('wmCustom').value);
+ if(!validMeatWeight(p,weight)){showToast(meatMin(p)===.25?'Enter 0.25–50 lb in quarter-pound increments.':'Enter a weight between 1 and 50 lb.');return;}
+ CART[p.id]=Math.round(weight*100)/100;
+ const instructions=document.getElementById('wmInstructions').value.trim().slice(0,300);
+ if(instructions)MEAT_INSTRUCTIONS[p.id]=instructions;else delete MEAT_INSTRUCTIONS[p.id];storeMeatInstructions();
+ saveLocal();refreshAllCardsFor(p.id);renderCartChrome();renderDrawer();closeWeightModal();showToast(`Added ${weight} lb of ${p.name}`);
 }
-function removeFromWeightModal(){
-  delete CART[weightModalProductId];
-  saveLocal();refreshAllCardsFor(weightModalProductId);
-  renderCartChrome();renderDrawer();closeWeightModal();
-}
-function closeWeightModal(){document.getElementById("weightModal").classList.remove("open");weightModalProductId=null;}
+function removeFromWeightModal(){delete CART[weightModalProductId];delete MEAT_INSTRUCTIONS[weightModalProductId];storeMeatInstructions();saveLocal();refreshAllCardsFor(weightModalProductId);renderCartChrome();renderDrawer();closeWeightModal();}
+function closeWeightModal(){document.getElementById('weightModal').classList.remove('open');weightModalProductId=null;}
 
 /* ─── SEARCH ─── */
 function onSearch(fromSecondary){
@@ -1734,7 +1726,7 @@ function renderDrawer(){
     const step=stepFor(p);
     const ea=isWeighted(p)?` onclick="event.stopPropagation();openWeightModal(${p.id})" style="cursor:pointer;"`:""
     return `<div class="drawer-item">
-      <div class="meta"><div class="item-name">${escapeHtml(p.name)}</div><div class="item-unit">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div></div>
+      <div class="meta"><div class="item-name">${escapeHtml(p.name)}</div><div class="item-unit">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div>${isWeighted(p)?`<div class="item-unit">${escapeHtml(MEAT_INSTRUCTIONS[p.id]||'No special instructions')}</div><button style="font-size:.73rem;color:var(--brand);font-weight:700" onclick="openWeightModal(${p.id})">Edit weight / instructions</button>`:''}</div>
       <div class="stepper"><button onclick="changeQty(${p.id},${-step})">−</button><span class="qty"${ea}>${fmtQty(p,qty)}</span><button onclick="changeQty(${p.id},${step})">+</button></div>
     </div>`;
   }).join(""):`<div class="empty-state"><div class="big"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>Your cart is empty.<br>Find something delicious above.</div>`;
@@ -1762,7 +1754,7 @@ async function submitCheckout(){
   if(!name||!phone){showToast("Please add your name and phone number.");return;}
   const payBtn=document.getElementById("payBtn");
   payBtn.disabled=true;payBtn.textContent="Redirecting…";
-  const items=cartLines().map(({p,qty})=>({id:p.id,qty,effective_price:effectivePrice(p)}));
+  const items=cartLines().map(({p,qty})=>({id:p.id,qty,effective_price:effectivePrice(p),instructions:isWeighted(p)?(MEAT_INSTRUCTIONS[p.id]||''):''}));
   const promoCode = appliedPromo ? appliedPromo.code : null;
   try{
     const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items,name,phone,email,promoCode})});
