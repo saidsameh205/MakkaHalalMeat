@@ -603,22 +603,27 @@ a{color:var(--brand);text-decoration:none;}
 /* ─── CONFIG ─── */
 const SUPABASE_URL = "https://zbsesllddfjwfsowxlgp.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_fgQoJ3lUEfNIxqbOSxit3Q_FK89Oxn_";
-const STORAGE_BUCKET = "product-images"; // must exist in Supabase Storage
+const STORAGE_BUCKET = "product-photos"; // Supabase Storage bucket
 
 /* ─── AUTH ─── */
-let ADMIN_TOKEN = null;
+// Set your admin password here — change "makka2024" to whatever you want
+const ADMIN_PASSWORD = "makka2024";
+let authed = false;
 function doLogin(){
   const pw = document.getElementById("loginInput").value.trim();
   if(!pw){ showErr("Enter your admin password."); return; }
-  ADMIN_TOKEN = pw;
-  // verify token works
-  sbAuth("products?select=id&limit=1")
-    .then(()=>{ document.getElementById("loginView").style.display="none"; document.getElementById("appView").classList.add("show"); loadAll(); })
-    .catch(()=>{ ADMIN_TOKEN=null; showErr("Incorrect password."); });
+  if(pw !== ADMIN_PASSWORD){ showErr("Incorrect password."); return; }
+  authed = true;
+  try{ sessionStorage.setItem("mhm_admin","1"); }catch(e){}
+  document.getElementById("loginView").style.display="none";
+  document.getElementById("appView").classList.add("show");
+  loadAll();
 }
 document.getElementById("loginInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
 function showErr(msg){ const el=document.getElementById("loginErr"); el.textContent=msg; el.style.display="block"; }
-function doLogout(){ ADMIN_TOKEN=null; document.getElementById("appView").classList.remove("show"); document.getElementById("loginView").style.display="flex"; document.getElementById("loginInput").value=""; }
+function doLogout(){ authed=false; try{sessionStorage.removeItem("mhm_admin");}catch(e){} document.getElementById("appView").classList.remove("show"); document.getElementById("loginView").style.display="flex"; document.getElementById("loginInput").value=""; }
+// Auto-login if same session
+(function(){ try{ if(sessionStorage.getItem("mhm_admin")==="1"){ authed=true; document.getElementById("loginView").style.display="none"; document.getElementById("appView").classList.add("show"); } }catch(e){} })();
 
 /* ─── SUPABASE ─── */
 async function sb(path, opts={}){
@@ -630,8 +635,8 @@ async function sb(path, opts={}){
   return r.json().catch(()=>[]);
 }
 async function sbAuth(path, opts={}){
-  if(!ADMIN_TOKEN) throw new Error("Not authenticated");
-  return sb(path, { ...opts, headers: {"apikey":SUPABASE_ANON_KEY, "Authorization":`Bearer ${ADMIN_TOKEN}`, "Content-Type":"application/json", "Prefer":"return=representation", ...(opts.headers||{})} });
+  if(!authed) throw new Error("Not authenticated");
+  return sb(path, opts);
 }
 
 /* ─── SUPABASE STORAGE UPLOAD ─── */
