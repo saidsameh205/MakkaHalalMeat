@@ -82,6 +82,7 @@ function sanitizeDiscount(b) {
     out.discount_value = v;
   }
   if (b.expires_at !== undefined) out.expires_at = b.expires_at ? new Date(b.expires_at).toISOString() : null;
+  if (b.min_order !== undefined) out.min_order = b.min_order === null || b.min_order === "" ? null : Number(b.min_order);
   if (b.active !== undefined) out.active = !!b.active;
   return out;
 }

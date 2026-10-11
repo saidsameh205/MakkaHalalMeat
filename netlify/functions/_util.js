@@ -50,6 +50,13 @@ function requireAdmin(event) {
   const configured = process.env.ADMIN_TOKEN;
   const provided = header(event, 'x-admin-token');
   if (!configured) return { ok: false, response: json(500, { error: 'Server is missing the ADMIN_TOKEN environment variable.' }) };
+  if (provided.startsWith('admin1.')) {
+    const session = verifySession(provided, 'admin');
+    if (!session || session.expired || session.sid !== 'owner') {
+      return { ok: false, response: json(401, { error: 'Admin session expired. Please sign in again.' }) };
+    }
+    return { ok: true };
+  }
   if (!safeEqual(provided, configured)) return { ok: false, response: json(401, { error: 'Unauthorized' }) };
   return { ok: true };
 }

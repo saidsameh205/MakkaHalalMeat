@@ -62,7 +62,7 @@ exports.handler = async (event) => {
 // field in the request body can never reach the database.
 function sanitizeProduct(b) {
   const out = {};
-  if (b.id !== undefined) out.id = Number(b.id);
+  // id is used only for the URL filter, not inserted into the update payload.
   if (b.name !== undefined) out.name = String(b.name).slice(0, 200);
   if (b.department !== undefined) out.department = String(b.department).slice(0, 50);
   if (b.category !== undefined) out.category = String(b.category).slice(0, 100);
@@ -78,5 +78,10 @@ function sanitizeProduct(b) {
   if (b.featured !== undefined) out.featured = !!b.featured;
   if (b.sort_order !== undefined) out.sort_order = Number(b.sort_order) || 0;
   if (b.stock !== undefined) out.stock = b.stock === null || b.stock === '' ? null : Number(b.stock);
+  if (b.by_weight !== undefined) out.by_weight = !!b.by_weight;
+  if (b.sale_price !== undefined) out.sale_price = b.sale_price === null || b.sale_price === '' ? null : Number(b.sale_price);
+  if (b.sale_ends_at !== undefined) out.sale_ends_at = b.sale_ends_at || null;
+  if (b.is_reduced !== undefined) out.is_reduced = !!b.is_reduced;
+  if (b.reduced_price !== undefined) out.reduced_price = b.reduced_price === null || b.reduced_price === '' ? null : Number(b.reduced_price);
   return out;
 }

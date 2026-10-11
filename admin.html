@@ -229,10 +229,6 @@ a{color:var(--brand);text-decoration:none;}
       <label>Admin Password</label>
       <input type="password" id="loginInput" placeholder="Enter admin password" autocomplete="current-password">
     </div>
-    <div class="field">
-      <label>API Token <span style="font-weight:400;color:var(--muted)">(from Netlify env ADMIN_TOKEN)</span></label>
-      <input type="password" id="tokenInput" placeholder="Paste your ADMIN_TOKEN" autocomplete="off">
-    </div>
     <button class="btn-primary" onclick="doLogin()">Sign In</button>
     <p class="login-err" id="loginErr">Incorrect password. Try again.</p>
   </div>
@@ -715,29 +711,54 @@ const SUPABASE_ANON_KEY = "sb_publishable_fgQoJ3lUEfNIxqbOSxit3Q_FK89Oxn_";
 const STORAGE_BUCKET = "product-photos"; // Supabase Storage bucket
 
 /* ─── AUTH ─── */
-// Set your admin password here — change "makka2024" to whatever you want
-const ADMIN_PASSWORD = "makka2024";
 let authed = false;
 let ADMIN_TOKEN = "";
-function doLogin(){
-  const pw = document.getElementById("loginInput").value.trim();
-  const tok = document.getElementById("tokenInput").value.trim();
-  if(!pw){ showErr("Enter your admin password."); return; }
-  if(pw !== ADMIN_PASSWORD){ showErr("Incorrect password."); return; }
-  if(!tok){ showErr("Paste your ADMIN_TOKEN (from Netlify env vars)."); return; }
-  authed = true;
-  ADMIN_TOKEN = tok;
-  try{ sessionStorage.setItem("mhm_admin","1"); sessionStorage.setItem("mhm_admin_token", tok); }catch(e){}
-  document.getElementById("loginView").style.display="none";
-  document.getElementById("appView").classList.add("show");
-  loadAll();
+async function doLogin(){
+  const password = document.getElementById("loginInput").value;
+  if(!password){ showErr("Enter your admin password."); return; }
+  const button = document.querySelector("#loginView .btn-primary");
+  button.disabled = true;
+  try {
+    const r = await fetch("/.netlify/functions/admin-login", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password})
+    });
+    const data = await r.json().catch(()=>({}));
+    if(!r.ok || !data.token) throw new Error(data.error || "Sign in failed.");
+    ADMIN_TOKEN = data.token;
+    authed = true;
+    sessionStorage.setItem("mhm_admin_session", data.token);
+    document.getElementById("loginInput").value = "";
+    document.getElementById("loginErr").style.display = "none";
+    document.getElementById("loginView").style.display = "none";
+    document.getElementById("appView").classList.add("show");
+    loadAll();
+  } catch(e) { showErr(e.message); }
+  finally { button.disabled = false; }
 }
-document.getElementById("loginInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
-document.getElementById("tokenInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
-function showErr(msg){ const el=document.getElementById("loginErr"); el.textContent=msg; el.style.display="block"; }
-function doLogout(){ authed=false; ADMIN_TOKEN=""; try{sessionStorage.removeItem("mhm_admin"); sessionStorage.removeItem("mhm_admin_token");}catch(e){} document.getElementById("appView").classList.remove("show"); document.getElementById("loginView").style.display="flex"; document.getElementById("loginInput").value=""; document.getElementById("tokenInput").value=""; }
-// Auto-login if same session
-(function(){ try{ if(sessionStorage.getItem("mhm_admin")==="1"){ const tok=sessionStorage.getItem("mhm_admin_token")||""; if(tok){ authed=true; ADMIN_TOKEN=tok; document.getElementById("loginView").style.display="none"; document.getElementById("appView").classList.add("show"); } } }catch(e){} })();
+document.getElementById("loginInput").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+function showErr(msg){const el=document.getElementById("loginErr");el.textContent=msg;el.style.display="block";}
+function doLogout(){
+  authed=false;ADMIN_TOKEN="";
+  sessionStorage.removeItem("mhm_admin_session");
+  sessionStorage.removeItem("mhm_admin_token");
+  sessionStorage.removeItem("mhm_admin");
+  document.getElementById("appView").classList.remove("show");
+  document.getElementById("loginView").style.display="flex";
+  document.getElementById("loginInput").value="";
+}
+(async function(){
+  const tok = sessionStorage.getItem("mhm_admin_session");
+  if(!tok || !tok.startsWith("admin1.")) return;
+  try {
+    const r = await fetch("/.netlify/functions/admin-products", {headers:{"x-admin-token":tok}});
+    if(!r.ok) throw new Error("Session expired");
+    ADMIN_TOKEN=tok;authed=true;
+    document.getElementById("loginView").style.display="none";
+    document.getElementById("appView").classList.add("show");
+    loadAll();
+  } catch(e) { sessionStorage.removeItem("mhm_admin_session"); }
+})();
 
 /* ─── SUPABASE ─── */
 async function sb(path, opts={}){
@@ -766,26 +787,19 @@ function api(path, opts={}){
 }
 
 /* ─── SUPABASE STORAGE UPLOAD ─── */
-async function uploadImageToSupabase(file, productName){
-  const ext = file.type.split("/")[1]?.replace("jpeg","jpg") || "jpg";
-  const safeName = (productName||"product").toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,40);
-  const filename = `${safeName}-${Date.now()}.${ext}`;
-
-  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${filename}`, {
-    method: "POST",
-    headers: {
-      "apikey": SUPABASE_ANON_KEY,
-      "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-      "Content-Type": file.type,
-      "x-upsert": "true"
-    },
-    body: file
+async function uploadImageToSupabase(file, productName, options={}){
+  if(file.size > 4*1024*1024) throw new Error("Image exceeds 4 MB. Choose a smaller image.");
+  const dataBase64 = await new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload=()=>resolve(String(reader.result).split(",")[1]);
+    reader.onerror=()=>reject(new Error("Could not read photo"));
+    reader.readAsDataURL(file);
   });
-  if(!r.ok){
-    const err = await r.json().catch(()=>({}));
-    throw new Error(err.error || err.message || "Upload failed");
-  }
-  return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${filename}`;
+  const response = await api("admin-upload-photo", {method:"POST", body:JSON.stringify({
+    ...(options.settingKey?{settingKey:options.settingKey}:options.dealId?{dealId:options.dealId}:{productId:options.productId||"new"}),
+    filename:file.name||"photo.jpg",contentType:file.type||"image/jpeg",dataBase64
+  })});
+  return response.url;
 }
 
 /* ─── NAV ─── */
@@ -1068,7 +1082,7 @@ async function saveProduct(){
         // Fake progress animation
         let prog = 0;
         const progInt = setInterval(()=>{ prog = Math.min(prog+15, 85); showUploadProgress(prog); }, 200);
-        imageUrl = await uploadImageToSupabase(currentImageFile, name);
+        imageUrl = await uploadImageToSupabase(currentImageFile, name, {productId:editingProductId||"new"});
         clearInterval(progInt);
         showUploadProgress(100);
         setTimeout(()=>hideUploadProgress(), 500);
@@ -1080,7 +1094,7 @@ async function saveProduct(){
         if(currentImageUrl && currentImageUrl.startsWith("blob:")){
           imageUrl = null; // blob URL won't work after save
         }
-        showToast("Image upload failed — product saved without image. Check Supabase Storage bucket setup.", "error");
+        throw new Error("Photo upload failed: "+uploadErr.message+". Product was not saved.");
       }
     }
 
@@ -1145,7 +1159,7 @@ async function confirmDeleteProduct(){
 let ALL_ORDERS = [];
 async function loadOrders(){
   try{
-    ALL_ORDERS = await sbAuth("orders?select=*&order=created_at.desc&limit=100");
+    ALL_ORDERS = await api("admin-orders");
     renderOrders("all");
   }catch(e){
     document.getElementById("orderListEl").innerHTML=`<div class="empty-state"><p>Error: ${e.message}</p></div>`;
@@ -1161,8 +1175,8 @@ function renderOrders(status){
   if(!list.length){ el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg><h3>No orders</h3><p>Orders will appear here once customers place them</p></div>`; return; }
   el.innerHTML = list.map(o=>{
     const items = (o.items||[]).map(i=>`${i.qty||1}× ${escH(i.name||"")}`).join(" · ");
-    const statusClass = o.status==="ready"?"status-ready":o.status==="completed"?"status-completed":"status-pending";
-    const statusLabel = o.status==="ready"?"Ready for Pickup":o.status==="completed"?"Completed":"Pending";
+    const statusClass = o.status==="Ready for Pickup"?"status-ready":o.status==="Completed"?"status-completed":"status-pending";
+    const statusLabel = o.status==="Ready for Pickup"?"Ready for Pickup":o.status==="Completed"?"Completed":"Pending";
     return `<div class="order-row">
       <div class="order-head">
         <span class="order-code">#${escH(o.order_code||String(o.id))}</span>
@@ -1176,16 +1190,16 @@ function renderOrders(status){
         <div class="order-time">${formatTime(o.created_at)}</div>
       </div>
       <div style="display:flex;gap:6px;">
-        ${o.status!=="ready"&&o.status!=="completed" ? `<button class="btn-outline" style="flex:1;font-size:.78rem;" onclick="updateOrderStatus(${o.id},'ready')">✓ Mark Ready</button>` : ""}
-        ${o.status==="ready" ? `<button class="btn-outline" style="flex:1;font-size:.78rem;border-color:var(--fresh);color:var(--fresh);" onclick="updateOrderStatus(${o.id},'completed')">Complete</button>` : ""}
-        ${o.status==="completed" ? `<span style="font-size:.75rem;color:var(--muted);">Completed ${formatTime(o.updated_at||o.created_at)}</span>` : ""}
+        ${o.status!=="Ready for Pickup"&&o.status!=="Completed" ? `<button class="btn-outline" style="flex:1;font-size:.78rem;" onclick="updateOrderStatus(${o.id},'Ready for Pickup')">✓ Mark Ready</button>` : ""}
+        ${o.status==="Ready for Pickup" ? `<button class="btn-outline" style="flex:1;font-size:.78rem;border-color:var(--fresh);color:var(--fresh);" onclick="updateOrderStatus(${o.id},'Completed')">Complete</button>` : ""}
+        ${o.status==="Completed" ? `<span style="font-size:.75rem;color:var(--muted);">Completed ${formatTime(o.updated_at||o.created_at)}</span>` : ""}
       </div>
     </div>`;
   }).join("");
 }
 async function updateOrderStatus(id, status){
   try{
-    await sbAuth(`orders?id=eq.${id}`, { method:"PATCH", body:JSON.stringify({status}) });
+    await api("admin-order-status", { method:"PATCH", body:JSON.stringify({id,status}) });
     showToast("Order updated ✓","success");
     loadOrders();
   }catch(e){ showToast("Update failed: "+e.message,"error"); }
@@ -1202,7 +1216,7 @@ async function loadDiscounts(){
 }
 async function loadPromos(){
   try{
-    const list = await sbAuth("discounts?select=*&order=expires_at.asc.nullslast");
+    const list = await api("admin-discounts");
     renderPromos(list);
   }catch(e){ document.getElementById("promoListEl").innerHTML=`<div class="empty-state"><p>Error: ${e.message}</p></div>`; }
 }
@@ -1220,7 +1234,7 @@ function renderPromos(list){
 }
 async function loadCatDiscounts(){
   try{
-    const list = await sbAuth("category_discounts?select=*&order=created_at.desc").catch(()=>[]);
+    const list = await api("admin-category-discounts");
     renderCatDiscounts(list);
   }catch(e){ document.getElementById("catDiscListEl").innerHTML=`<div class="empty-state"><p>Error: ${e.message}</p></div>`; }
 }
@@ -1261,7 +1275,7 @@ async function savePromo(){
     active:document.getElementById("pmActive").checked
   };
   try{
-    await sbAuth("discounts", {method:"POST", body:JSON.stringify(payload)});
+    await api("admin-discounts", {method:"POST", body:JSON.stringify(payload)});
     showToast("Promo code created ✓","success");
     closeModal("promoModal");
     loadPromos();
@@ -1284,7 +1298,7 @@ async function saveCatDiscount(){
     active:document.getElementById("cdActive").checked
   };
   try{
-    await sbAuth("category_discounts", {method:"POST", body:JSON.stringify(payload)});
+    await api("admin-category-discounts", {method:"POST", body:JSON.stringify(payload)});
     showToast("Category discount created ✓","success");
     closeModal("catDiscModal");
     loadCatDiscounts();
@@ -1293,7 +1307,7 @@ async function saveCatDiscount(){
 async function deleteCatDiscount(id){
   if(!confirm("Delete this discount?")) return;
   try{
-    await sbAuth(`category_discounts?id=eq.${id}`, {method:"DELETE"});
+    await api("admin-category-discounts", {method:"DELETE", body:JSON.stringify({id})});
     showToast("Deleted ✓","success");
     loadCatDiscounts();
   }catch(e){ showToast("Failed: "+e.message,"error"); }
@@ -1344,8 +1358,8 @@ function setBannerFromUrl(){
 }
 async function loadBannerCurrent(){
   try{
-    const rows = await sb("app_settings?key=eq.ui_config&select=value");
-    if(rows.length){ const c=JSON.parse(rows[0].value||"{}"); if(c.banner_url) setBannerPreview(c.banner_url); }
+    const c = await api("admin-settings");
+    if(c.banner_url) setBannerPreview(c.banner_url);
   }catch(e){}
 }
 async function saveBannerUrl(){
@@ -1359,20 +1373,14 @@ async function saveBannerUrl(){
       const bar  = document.getElementById("bannerProgressBar");
       prog.style.display="block"; bar.style.width="0%";
       let p=0; const iv=setInterval(()=>{ p=Math.min(p+15,85); bar.style.width=p+"%"; },200);
-      url = await uploadImageToSupabase(bannerFile,"banner");
+      url = await uploadImageToSupabase(bannerFile,"banner", {settingKey:"banner"});
       clearInterval(iv); bar.style.width="100%";
       setTimeout(()=>{ prog.style.display="none"; bar.style.width="0%"; },500);
       bannerFile=null; bannerUrl=url;
       setBannerPreview(url);
     }
     if(!url){ showToast("No banner selected","error"); return; }
-    const existing = await sb("app_settings?key=eq.ui_config&select=*").catch(()=>[]);
-    if(existing.length){
-      let cur={}; try{ cur=JSON.parse(existing[0].value); }catch(e){}
-      await sb("app_settings?key=eq.ui_config",{method:"PATCH",headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify({value:JSON.stringify({...cur,banner_url:url})})});
-    } else {
-      await sb("app_settings",{method:"POST",headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify({key:"ui_config",value:JSON.stringify({banner_url:url})})});
-    }
+    await api("admin-settings",{method:"PATCH",body:JSON.stringify({banner_url:url})});
     showToast("Banner saved ✓","success");
   }catch(e){ showToast("Save failed: "+e.message,"error"); }
   finally{ btn.disabled=false; btn.textContent="Save Banner"; }
@@ -1470,10 +1478,7 @@ async function removeStaff(id){
 /* ─── SETTINGS ─── */
 async function loadSettings(){
   try{
-    const rows = await sbAuth("app_settings?select=*");
-    const m = {};
-    rows.forEach(r=>{ try{ m[r.key]=JSON.parse(r.value); }catch(e){ m[r.key]=r.value; } });
-    const c = m.ui_config||{};
+    const c = await api("admin-settings");
     document.getElementById("setName").value  = c.store_name||"";
     document.getElementById("setAddr").value  = c.address||"";
     document.getElementById("setPhone").value = c.phone||"";
@@ -1485,7 +1490,6 @@ async function loadSettings(){
   }catch(e){ showToast("Couldn't load settings","error"); }
 }
 async function saveSettings(){
-  const existing = await sbAuth("app_settings?key=eq.ui_config&select=*").catch(()=>[]);
   const payload = {
     store_name: document.getElementById("setName").value.trim()||undefined,
     address:    document.getElementById("setAddr").value.trim()||undefined,
@@ -1500,13 +1504,7 @@ async function saveSettings(){
   Object.keys(payload).forEach(k=>payload[k]===undefined && delete payload[k]);
 
   try{
-    if(existing.length){
-      let cur = {};
-      try{ cur = JSON.parse(existing[0].value); }catch(e){}
-      await sbAuth(`app_settings?key=eq.ui_config`, {method:"PATCH", body:JSON.stringify({value:JSON.stringify({...cur,...payload})})});
-    } else {
-      await sbAuth("app_settings", {method:"POST", body:JSON.stringify({key:"ui_config",value:JSON.stringify(payload)})});
-    }
+    await api("admin-settings", {method:"PATCH", body:JSON.stringify(payload)});
     showToast("Settings saved ✓","success");
   }catch(e){ showToast("Save failed: "+e.message,"error"); }
 }
