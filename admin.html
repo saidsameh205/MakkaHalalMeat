@@ -379,7 +379,15 @@ a{color:var(--brand);text-decoration:none;}
           </div>
           <div class="fld">
             <label>Category</label>
-            <select id="fldCat"></select>
+            <select id="fldCat" onchange="applyCategoryTaxDefault()"></select>
+          </div>
+          <div class="fld">
+            <label>Tax Type</label>
+            <select id="fldTaxType">
+              <option value="food">Food (3%)</option>
+              <option value="regular">Regular / Non-food (8%)</option>
+            </select>
+            <small style="color:var(--muted)">Category default is applied when you choose a category. You can override it for this product.</small>
           </div>
           <div class="fld span2">
             <label>Description</label>
@@ -506,6 +514,7 @@ a{color:var(--brand);text-decoration:none;}
       <button class="filter-chip active" onclick="switchSettingsTab('store',this)">Store</button>
       <button class="filter-chip" onclick="switchSettingsTab('banner',this)">Banner / GIF</button>
       <button class="filter-chip" onclick="switchSettingsTab('staff',this)">Team</button>
+      <button class="filter-chip" onclick="switchSettingsTab('taxonomy',this)">Departments & Categories</button>
     </div>
 
     <!-- STORE INFO -->
@@ -568,6 +577,22 @@ a{color:var(--brand);text-decoration:none;}
         </div>
       </div>
       <button class="btn-save" onclick="saveSettings()">Save Settings</button>
+    </div>
+
+    <!-- DEPARTMENT & CATEGORY MANAGER -->
+    <div id="setTabTaxonomy" style="display:none;">
+      <div class="card">
+        <div class="card-title">Departments & Categories</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">Manage names, add categories, move categories between departments, and reorder. Renaming also updates existing product assignments. Delete is only allowed when no products or discounts use an entry.</p>
+        <div class="form-grid">
+          <div class="fld"><label>New department</label><input id="taxNewDept" maxlength="50" placeholder="e.g. Bakery"></div>
+          <div class="fld" style="justify-content:end"><button class="btn-new" onclick="taxAddDepartment()">Add Department</button></div>
+          <div class="fld"><label>Department for new category</label><select id="taxDeptSelect"></select></div>
+          <div class="fld"><label>New category</label><input id="taxNewCat" maxlength="100" placeholder="e.g. Bread"></div>
+          <div class="fld span2"><button class="btn-new" onclick="taxAddCategory()">Add Category</button></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">Manage Existing Departments & Categories</div><div id="taxonomyRows">Loading…</div></div>
     </div>
 
     <!-- BANNER / GIF -->
@@ -851,6 +876,7 @@ let deptFilter = "all";
 async function loadProducts(){
   try{
     ALL_PRODUCTS = await api("admin-products");
+    try{ TAXONOMY = await api("admin-taxonomy"); }catch(e){console.warn("Taxonomy not configured",e.message)}
     renderProductList();
     renderStats();
     renderDeptFilters();
@@ -934,14 +960,23 @@ function setSelectChoices(el,values,selected,placeholder){
   vals.forEach(v=>el.add(new Option(v,v)));
   el.value=selected||'';
 }
+let TAXONOMY=[];
 function refreshDepartmentOptions(selected=''){
-  setSelectChoices(document.getElementById('fldDept'),[...DEPARTMENT_STARTERS,...ALL_PRODUCTS.map(p=>p.department)],selected,'Choose department');
+  setSelectChoices(document.getElementById('fldDept'),[...TAXONOMY.filter(t=>t.kind==="department").map(t=>t.name),...ALL_PRODUCTS.map(p=>p.department)],selected,'Choose department');
   refreshCategoryOptions();
+}
+function applyCategoryTaxDefault(){
+  const dept=document.getElementById('fldDept').value,cat=document.getElementById('fldCat').value;
+  const row=TAXONOMY.find(t=>t.kind==='category'&&t.department===dept&&t.name===cat);
+  if(row&&row.tax_is_food!==null&&row.tax_is_food!==undefined){
+    document.getElementById('fldTaxType').value=row.tax_is_food?'food':'regular';
+  }
 }
 function refreshCategoryOptions(selected=''){
   const dept=document.getElementById('fldDept').value;
   const existing=ALL_PRODUCTS.filter(p=>p.department===dept).map(p=>p.category);
-  setSelectChoices(document.getElementById('fldCat'),[...(CATEGORY_STARTERS[dept]||[]),...existing],selected,'Choose category');
+  setSelectChoices(document.getElementById('fldCat'),[...TAXONOMY.filter(t=>t.kind==="category"&&t.department===dept).map(t=>t.name),...existing],selected,'Choose category');
+  if(!editingProductId)applyCategoryTaxDefault();
 }
 let extraPhotoUrls=[];
 let extraPhotoFiles=[];
@@ -983,6 +1018,7 @@ function openEditor(id){
   document.getElementById("fldSort").value = p.sort_order != null ? p.sort_order : "";
   document.getElementById("fldActive").checked = p.active !== false;
   document.getElementById("fldByWeight").checked = !!p.by_weight;
+  document.getElementById("fldTaxType").value = p.is_food===false?"regular":"food";
   document.getElementById("fldSalePrice").value = p.sale_price != null ? p.sale_price : "";
   document.getElementById("fldSaleEnd").value = p.sale_ends_at ? p.sale_ends_at.split("T")[0] : "";
   document.getElementById("fldReduced").checked = !!p.is_reduced;
@@ -1002,6 +1038,7 @@ function openNewProduct(){
   document.getElementById("fldUnit").value = "/lb";
   document.getElementById("fldActive").checked = true;
   document.getElementById("fldByWeight").checked = false;
+  document.getElementById("fldTaxType").value = "food";
   document.getElementById("fldReduced").checked = false;
   refreshDepartmentOptions();extraPhotoUrls=[];extraPhotoFiles=[];renderExtraPhotos();
   setImagePreview(null);
@@ -1174,6 +1211,7 @@ async function saveProduct(){
       sort_order: document.getElementById("fldSort").value.trim() !== "" ? parseInt(document.getElementById("fldSort").value) : null,
       active: document.getElementById("fldActive").checked,
       by_weight: document.getElementById("fldByWeight").checked,
+      is_food: document.getElementById("fldTaxType").value === "food",
       sale_price: document.getElementById("fldSalePrice").value.trim() !== "" ? parseFloat(document.getElementById("fldSalePrice").value) : null,
       sale_ends_at: document.getElementById("fldSaleEnd").value || null,
       is_reduced: document.getElementById("fldReduced").checked,
@@ -1434,13 +1472,56 @@ async function deleteCatDiscount(id){
 
 /* ─── SETTINGS SUB-TABS ─── */
 function switchSettingsTab(t, el){
-  ["store","banner","staff"].forEach(s=>{
+  ["store","banner","staff","taxonomy"].forEach(s=>{
     document.getElementById("setTab"+s.charAt(0).toUpperCase()+s.slice(1)).style.display = s===t?"block":"none";
   });
   document.querySelectorAll("#tab-settings .filter-chip").forEach(c=>c.classList.toggle("active",c===el));
+  if(t==="taxonomy") loadTaxonomy();
   if(t==="staff") loadStaff();
   if(t==="banner") loadBannerCurrent();
 }
+
+
+/* ─── DEPARTMENT & CATEGORY MANAGER ─── */
+async function loadTaxonomy(){
+ const target=document.getElementById('taxonomyRows');target.textContent='Loading…';
+ try{TAXONOMY=await api('admin-taxonomy');renderTaxonomy();}
+ catch(e){target.textContent='Could not load: '+e.message+'. Run TAXONOMY_MIGRATION.sql and deploy admin-taxonomy.js.'}
+}
+function renderTaxonomy(){
+ const root=document.getElementById('taxonomyRows');root.replaceChildren();
+ const sel=document.getElementById('taxDeptSelect');sel.replaceChildren();
+ const departments=TAXONOMY.filter(t=>t.kind==='department');
+ departments.forEach(d=>sel.add(new Option(d.name,d.name)));
+ for(const d of departments){
+  const header=document.createElement('div');header.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px;border-bottom:1px solid #ddd;padding:12px 0';
+  const title=document.createElement('strong');title.textContent=d.name;title.style.flex='1';header.append(title);
+  taxButton(header,'Rename',()=>taxRename(d));taxButton(header,'Order',()=>taxSort(d));taxButton(header,'Delete',()=>taxDelete(d));root.append(header);
+  for(const c of TAXONOMY.filter(t=>t.kind==='category'&&t.department===d.name)){
+   const row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:9px 8px 9px 18px;border-bottom:1px solid #eee';
+   const label=document.createElement('span');label.textContent='↳ '+c.name;label.style.flex='1';row.append(label);
+   taxButton(row,c.tax_is_food===null?'Tax: Not set':(c.tax_is_food?'Tax: Food 3%':'Tax: Regular 8%'),()=>taxSetTax(c));taxButton(row,'Rename',()=>taxRename(c));taxButton(row,'Move',()=>taxMove(c));taxButton(row,'Order',()=>taxSort(c));taxButton(row,'Delete',()=>taxDelete(c));root.append(row);
+  }
+ }
+ if(!departments.length)root.textContent='No departments yet. Add your first department above.';
+}
+function taxButton(parent,label,fn){const b=document.createElement('button');b.className='btn-outline';b.textContent=label;b.style.padding='6px 9px';b.onclick=fn;parent.append(b)}
+async function taxAction(payload){
+ try{await api('admin-taxonomy',{method:'POST',body:JSON.stringify(payload)});await loadProducts();await loadTaxonomy();showToast('Saved ✓','success')}
+ catch(e){showToast('Could not save: '+e.message,'error')}
+}
+function taxAddDepartment(){const name=document.getElementById('taxNewDept').value.trim();if(!name)return showToast('Enter a department name','error');taxAction({action:'add_department',name}).then(()=>{document.getElementById('taxNewDept').value=''})}
+function taxAddCategory(){const name=document.getElementById('taxNewCat').value.trim(),department=document.getElementById('taxDeptSelect').value;if(!name||!department)return showToast('Choose department and enter category','error');taxAction({action:'add_category',name,department}).then(()=>{document.getElementById('taxNewCat').value=''})}
+function taxSetTax(t){
+ const value=prompt('Default tax for '+t.name+'\\nEnter 1 for Food (3%), 2 for Regular (8%), or 0 for No default:',t.tax_is_food===null?'0':t.tax_is_food?'1':'2');
+ if(value===null)return;
+ if(!['0','1','2'].includes(value.trim()))return showToast('Enter 0, 1 or 2','error');
+ taxAction({action:'set_tax',id:t.id,tax_is_food:value.trim()==='0'?null:value.trim()==='1'});
+}
+function taxRename(t){const name=prompt('Rename '+t.name+' to:',t.name);if(name===null||!name.trim()||name.trim()===t.name)return;taxAction({action:'rename',id:t.id,name:name.trim()})}
+function taxMove(t){const options=TAXONOMY.filter(x=>x.kind==='department').map(x=>x.name);const department=prompt('Move '+t.name+' to which department?\n'+options.join(' / '),t.department);if(department===null||department===t.department)return;if(!options.includes(department))return showToast('Enter an existing department name exactly','error');taxAction({action:'move',id:t.id,department})}
+function taxSort(t){const raw=prompt('Sort order for '+t.name+' (lower numbers first):',String(t.sort_order||0));if(raw===null)return;const n=Number(raw);if(!Number.isInteger(n)||n<0||n>100000)return showToast('Enter a number between 0 and 100000','error');taxAction({action:'sort',id:t.id,sort_order:n})}
+function taxDelete(t){if(!confirm('Delete '+t.name+'? This is allowed only if no products or discount rules use it.'))return;taxAction({action:'delete',id:t.id})}
 
 /* ─── BANNER / GIF ─── */
 let bannerFile = null;
