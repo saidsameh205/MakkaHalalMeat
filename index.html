@@ -738,6 +738,25 @@ body.dark .badge-pill{background:#1F2937;}
 
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important;}}
 @media (min-width:640px){.tabbar{display:none;}body{padding-bottom:20px;}.cart-bar{bottom:20px;}.ask-fab{bottom:30px;}}
+
+/* Full-screen product detail page */
+.product-detail-overlay{position:fixed;inset:0;z-index:90;background:var(--card);display:none;overflow-y:auto;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom,0px)}
+.product-detail-overlay.open{display:block}
+.product-detail-panel{max-width:640px;min-height:100%;margin:0 auto;background:var(--card);color:var(--ink);padding:0 0 28px}
+.product-detail-header{position:sticky;top:0;z-index:2;background:var(--card);display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.product-detail-close{background:#f3f4f6;border-radius:50%;width:38px;height:38px;font-size:23px;flex:0 0 auto}
+.product-detail-image{width:100%;height:min(380px,60vh);object-fit:contain;background:#f3f4f6}
+.product-detail-info{padding:20px 18px}
+.product-detail-info h2{font-size:1.4rem;line-height:1.3;margin:4px 0 8px}
+.product-detail-info .meta{font-size:.85rem;color:var(--muted)}
+.product-detail-info .desc{font-size:.94rem;line-height:1.65;white-space:pre-wrap;margin:18px 0}
+.product-detail-price{font-size:1.3rem;font-weight:800;color:var(--brand);margin:16px 0}
+.product-detail-action{background:var(--brand);color:#fff;border-radius:12px;padding:14px 20px;font-size:.95rem;font-weight:700;width:100%;margin-top:12px}
+.product-detail-action:disabled{background:#9ca3af;cursor:not-allowed}
+.product-detail-qty{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+.product-detail-qty button{border:1px solid var(--line);border-radius:10px;width:42px;height:42px;font-size:24px;background:#f9fafb}
+.p-card{cursor:pointer}
+.p-card:focus-visible{outline:3px solid var(--brand)}
 </style>
 </head>
 <body data-view="home" data-dept="meat">
@@ -1095,6 +1114,13 @@ body.dark .badge-pill{background:#1F2937;}
   </div>
 </div>
 
+
+<div class="product-detail-overlay" id="productDetailOverlay" role="dialog" aria-modal="true" aria-label="Product details">
+  <div class="product-detail-panel">
+    <div class="product-detail-header"><button class="product-detail-close" onclick="closeProductDetail()" aria-label="Back to shopping">‹</button><strong>Product Details</strong></div>
+    <div id="productDetailContent"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1210,13 +1236,19 @@ function renderCatGrid(){
   if(all) all.innerHTML = html;
 }
 
+/* Only allow ordinary HTTPS image URLs in inline background images. */
+function safeDealPhoto(url){
+ if(typeof url!=="string"||!/^https:\/\/[a-z0-9.-]+\/[a-z0-9_./%?=&-]+$/i.test(url))return "";
+ return url;
+}
 /* ─── PROMOS ─── */
 function renderPromos(){
   const deal = SETTINGS.deal_text || "Today's best cut, ready for pickup";
   const dealTitle = SETTINGS.deal_title || "Deal of the day";
   const dealPrice = SETTINGS.deal_price_label || "";
+  const dealPhoto = safeDealPhoto(SETTINGS.deal_image);
   document.getElementById("promoScroller").innerHTML = `
-    <div class="promo-card deal">
+    <div class="promo-card deal" ${dealPhoto?`style="background-image:linear-gradient(90deg,rgba(35,5,5,.87),rgba(35,5,5,.2)),url('${dealPhoto}');background-position:center;background-size:cover"`:""}>
       <div><div class="promo-eyebrow">${escapeHtml(dealTitle)}</div>
       <h3>${escapeHtml(deal)}</h3>
       ${dealPrice?`<p>${escapeHtml(dealPrice)}</p>`:"<p>Fresh cuts every morning</p>"}</div>
@@ -1335,11 +1367,13 @@ function formatExpiry(d){
 function renderDeals(){
   const wrap = document.getElementById("dealsList");
   const active = DISCOUNTS.filter(d=>!d.expires_at||daysUntil(d.expires_at)>=0);
-  if(!active.length){ wrap.innerHTML=`<div class="deal-empty">No active deals right now — check back soon!</div>`; return; }
+  if(!active.length && !CAT_DISCOUNTS.length){ wrap.innerHTML=`<div class="deal-empty">No active deals right now — check back soon!</div>`; return; }
   wrap.innerHTML = active.map(d=>{
     const exp = formatExpiry(d.expires_at);
     const soon = d.expires_at && daysUntil(d.expires_at)<=3;
+    const photo=safeDealPhoto(d.image);
     return `<div class="deal-card">
+      ${photo?`<img src="${photo}" alt="" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:12px">`:""}
       <h3>${escapeHtml(d.title)}</h3>
       ${d.description?`<p>${escapeHtml(d.description)}</p>`:""}
       <div class="deal-meta">
@@ -1348,6 +1382,9 @@ function renderDeals(){
         ${exp?`<span class="deal-chip expiry${soon?" soon":""}">${exp}</span>`:`<span class="deal-chip">No expiration</span>`}
       </div>
     </div>`;
+  }).join("") + CAT_DISCOUNTS.filter(d=>!d.expires_at||new Date(d.expires_at)>new Date()).map(d=>{
+    const photo=safeDealPhoto(d.image);
+    return `<div class="deal-card">${photo?`<img src="${photo}" alt="" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:12px">`:""}<h3>${escapeHtml(d.label||d.percent_off+"% off")}</h3><p>${escapeHtml(d.department||"All departments")}${d.category?" · "+escapeHtml(d.category):""}</p><div class="deal-meta"><span class="deal-chip">${Number(d.percent_off)}% off · promotional offer</span></div></div>`;
   }).join("");
 }
 
@@ -1421,21 +1458,21 @@ function cardHtml(p){
   if(p.price!=null){
     if(qty>0){
       const step=stepFor(p);
-      const ea = isWeighted(p)?` onclick="openWeightModal(${p.id})"`:""
+      const ea = isWeighted(p)?` onclick="event.stopPropagation();openWeightModal(${p.id})"`:""
       ctrl=`<div class="stepper"><button onclick="event.stopPropagation();changeQty(${p.id},${-step})">−</button><span class="qty"${ea}>${fmtQty(p,qty)}</span><button onclick="event.stopPropagation();changeQty(${p.id},${step})">+</button></div>`;
     } else {
       ctrl = isWeighted(p)
-        ? `<button class="add-btn" onclick="openWeightModal(${p.id})">+</button>`
-        : `<button class="add-btn" onclick="bumpAdd(this,${p.id})">+</button>`;
+        ? `<button class="add-btn" onclick="event.stopPropagation();openWeightModal(${p.id})">+</button>`
+        : `<button class="add-btn" onclick="event.stopPropagation();bumpAdd(this,${p.id})">+</button>`;
     }
   }
   const fav = FAVORITES[p.id]?"❤️":"🤍";
   const saleBadge = hasSale ? `<span class="p-sale-badge">Sale</span>`
     : catDisc ? `<span class="p-sale-badge">${catDisc.percent_off}% Off</span>`
     : hasReduced ? `<span class="p-reduced-badge">Reduced Price</span>` : "";
-  return `<div class="p-card" data-pid="${p.id}">
+  return `<div class="p-card" data-pid="${p.id}" role="button" tabindex="0" aria-label="View ${escapeAttr(p.name)} details" onclick="if(!event.target.closest('button, .stepper'))openProductDetail(${p.id})" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();openProductDetail(${p.id})}">
     ${img}${stock}${saleBadge}</div>
-    <button class="p-fav" onclick="toggleFav(${p.id},this)">${fav}</button>
+    <button class="p-fav" onclick="event.stopPropagation();toggleFav(${p.id},this)">${fav}</button>
     <div class="p-card-body">
       <div class="p-card-name">${escapeHtml(p.name)}</div>
       ${p.brand?`<div class="p-card-brand">${escapeHtml(p.brand)}</div>`:""}
@@ -1443,6 +1480,57 @@ function cardHtml(p){
     </div>
   </div>`;
 }
+
+
+let detailProductId=null;
+let detailSelectedQty=1;
+let detailScrollY=0;
+function openProductDetail(id){
+  const p=PRODUCTS.find(x=>Number(x.id)===Number(id));if(!p)return;
+  detailScrollY=window.scrollY||document.body.scrollTop||0;
+  detailProductId=Number(id);
+  detailSelectedQty=isWeighted(p)?Math.max(1,Number(CART[id])||1):Math.max(1,Number(CART[id])||1);
+  renderProductDetail();
+  const overlay=document.getElementById('productDetailOverlay');overlay.classList.add('open');overlay.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function renderProductDetail(){
+  const p=PRODUCTS.find(x=>Number(x.id)===detailProductId);if(!p)return;
+  const img=p.image?`<img class="product-detail-image" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">`:`<div class="product-detail-image" style="display:grid;place-items:center;font-size:72px">${escapeHtml(p.emoji||'🛒')}</div>`;
+  const discounted=p.price!=null&&effectivePrice(p)<Number(p.price);
+  const price=p.price==null?'Ask in store':`$${effectivePrice(p).toFixed(2)} ${escapeHtml(p.unit||'')}`;
+  const stock=p.stock==null?'Available':Number(p.stock)>0?'In stock':'Out of stock';
+  const maxQty=p.stock==null?50:Math.min(50,Number(p.stock));
+  const available=p.price!=null&&maxQty>0;
+  document.getElementById('productDetailContent').innerHTML=`${img}<div class="product-detail-info">
+    <p class="meta">${escapeHtml(p.department||'')} ${p.category?' · '+escapeHtml(p.category):''}</p>
+    <h2>${escapeHtml(p.name)}</h2>
+    ${p.brand?`<p class="meta">Brand: ${escapeHtml(p.brand)}</p>`:''}
+    <div class="product-detail-price">${price} ${discounted?`<small style="font-size:.8rem;color:var(--muted);text-decoration:line-through">$${Number(p.price).toFixed(2)}</small>`:''}</div>
+    <p class="meta" style="color:${maxQty<=0?'#dc2626':'#16a34a'}">${stock}</p>
+    <h3 style="font-size:1rem;margin-top:22px">Description</h3>
+    <p class="desc">${escapeHtml(p.description||'More information about this product will be added soon.')}</p>
+    ${available?`<div class="product-detail-qty"><strong>${isWeighted(p)?'Weight':'Quantity'}</strong><div style="display:flex;align-items:center;gap:16px"><button onclick="changeDetailQty(-1)" aria-label="Decrease">−</button><strong>${isWeighted(p)?detailSelectedQty+' lb':detailSelectedQty}</strong><button onclick="changeDetailQty(1)" aria-label="Increase">+</button></div></div>`:''}
+    <button class="product-detail-action" ${available?'':'disabled'} onclick="addFromProductDetail()">${available?'Add to Cart':'Unavailable'}</button>
+  </div>`;
+}
+function changeDetailQty(direction){
+  const p=PRODUCTS.find(x=>Number(x.id)===detailProductId);if(!p)return;
+  const step=stepFor(p),max=p.stock==null?50:Math.min(50,Number(p.stock));
+  detailSelectedQty=Math.max(isWeighted(p)?1:1,Math.min(max,Math.round((detailSelectedQty+direction*step)*100)/100));
+  renderProductDetail();
+}
+function closeProductDetail(){
+  document.getElementById('productDetailOverlay').classList.remove('open');detailProductId=null;
+  document.body.style.overflow='';
+  window.scrollTo(0,detailScrollY);
+}
+function addFromProductDetail(){
+  const p=PRODUCTS.find(x=>Number(x.id)===detailProductId);if(!p||p.price==null||p.stock!=null&&Number(p.stock)<=0)return;
+  CART[p.id]=detailSelectedQty;saveLocal();refreshAllCardsFor(p.id);renderCartChrome();renderDrawer();
+  closeProductDetail();showToast('Added to cart');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&detailProductId!==null)closeProductDetail()});
 
 function bumpAdd(btn,id){changeQty(id,1);btn.classList.add("added");btn.textContent="✓";}
 function changeQty(id,delta){
@@ -1589,7 +1677,7 @@ function renderDrawer(){
   const lines=cartLines();
   wrap.innerHTML=lines.length?lines.map(({p,qty})=>{
     const step=stepFor(p);
-    const ea=isWeighted(p)?` onclick="openWeightModal(${p.id})" style="cursor:pointer;"`:""
+    const ea=isWeighted(p)?` onclick="event.stopPropagation();openWeightModal(${p.id})" style="cursor:pointer;"`:""
     return `<div class="drawer-item">
       <div class="meta"><div class="item-name">${escapeHtml(p.name)}</div><div class="item-unit">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div></div>
       <div class="stepper"><button onclick="changeQty(${p.id},${-step})">−</button><span class="qty"${ea}>${fmtQty(p,qty)}</span><button onclick="changeQty(${p.id},${step})">+</button></div>
@@ -1782,29 +1870,62 @@ const LANGUAGES=[
   {code:"my",flag:"🇲🇲",native:"မြန်မာ",en:"Burmese"},
   {code:"hi",flag:"🇮🇳",native:"हिन्दी",en:"Hindi"},
 ];
-function getLang(){try{return localStorage.getItem("mhm_lang")||"en";}catch(e){return "en";}}
-function setLang(code){try{localStorage.setItem("mhm_lang",code);}catch(e){}}
-function applyLang(code){
-  const btn=document.getElementById("translateBtnTop");
-  if(btn) btn.textContent="🌐 "+code.toUpperCase();
-  if(code!=="en"){
-    const cur=window.location.href;
-    window.location.href=`https://translate.google.com/translate?sl=en&tl=${code}&hl=${code}&u=${encodeURIComponent(cur)}`;
+// In-app interface translations: no Google Translate redirect or third-party proxy.
+const UI_TRANSLATIONS={
+ ar:{'Home':'الرئيسية','Shop':'تسوق','Cart':'السلة','Search':'بحث','Search products':'ابحث عن المنتجات','Categories':'الأقسام','Products':'المنتجات','Deals':'العروض','Add to Cart':'أضف إلى السلة','Add to cart':'أضف إلى السلة','Product Details':'تفاصيل المنتج','Back':'رجوع','Checkout':'الدفع','Order for Pickup':'اطلب للاستلام','Quantity':'الكمية','Description':'الوصف','In Stock':'متوفر','Out of Stock':'غير متوفر','Store Hours':'ساعات العمل','Choose Language':'اختر اللغة','Close':'إغلاق','Your Cart':'سلتك','Continue Shopping':'متابعة التسوق','Subtotal':'المجموع الفرعي','Tax':'الضريبة','Total':'المجموع','Pickup':'استلام','Featured':'مميز'},
+ so:{'Home':'Bogga hore','Shop':'Dukaan','Cart':'Gaari','Search':'Raadi','Search products':'Raadi alaabta','Categories':'Qaybaha','Products':'Alaabta','Deals':'Qiimo-dhimis','Add to Cart':'Ku dar gaariga','Add to cart':'Ku dar gaariga','Product Details':'Faahfaahinta alaabta','Back':'Dib','Checkout':'Bixi','Order for Pickup':'Dalbo oo soo qaado','Quantity':'Tirada','Description':'Sharaxaad','In Stock':'Waa la hayaa','Out of Stock':'Waa dhammaatay','Store Hours':'Saacadaha dukaanka','Choose Language':'Dooro luqad','Close':'Xir','Your Cart':'Gaarigaaga','Continue Shopping':'Sii wad iibsiga','Subtotal':'Wadarta hoose','Tax':'Canshuur','Total':'Wadar','Pickup':'Soo qaadis','Featured':'La soo xulay'},
+ es:{'Home':'Inicio','Shop':'Comprar','Cart':'Carrito','Search':'Buscar','Search products':'Buscar productos','Categories':'Categorías','Products':'Productos','Deals':'Ofertas','Add to Cart':'Añadir al carrito','Add to cart':'Añadir al carrito','Product Details':'Detalles del producto','Back':'Volver','Checkout':'Pagar','Order for Pickup':'Pedir para recoger','Quantity':'Cantidad','Description':'Descripción','In Stock':'Disponible','Out of Stock':'Agotado','Store Hours':'Horario','Choose Language':'Elegir idioma','Close':'Cerrar','Your Cart':'Tu carrito','Continue Shopping':'Seguir comprando','Subtotal':'Subtotal','Tax':'Impuestos','Total':'Total','Pickup':'Recogida','Featured':'Destacado'},
+ fr:{'Home':'Accueil','Shop':'Boutique','Cart':'Panier','Search':'Rechercher','Search products':'Rechercher des produits','Categories':'Catégories','Products':'Produits','Deals':'Promotions','Add to Cart':'Ajouter au panier','Add to cart':'Ajouter au panier','Product Details':'Détails du produit','Back':'Retour','Checkout':'Payer','Order for Pickup':'Commander à emporter','Quantity':'Quantité','Description':'Description','In Stock':'En stock','Out of Stock':'Rupture de stock','Store Hours':'Horaires','Choose Language':'Choisir la langue','Close':'Fermer','Your Cart':'Votre panier','Continue Shopping':'Continuer les achats','Subtotal':'Sous-total','Tax':'Taxes','Total':'Total','Pickup':'Retrait','Featured':'À la une'},
+ am:{'Home':'መነሻ','Shop':'ይግዙ','Cart':'ጋሪ','Search':'ፈልግ','Categories':'ምድቦች','Products':'ምርቶች','Deals':'ቅናሾች','Add to Cart':'ወደ ጋሪ ጨምር','Product Details':'የምርት ዝርዝር','Back':'ተመለስ','Checkout':'ክፍያ','Quantity':'ብዛት','Description':'መግለጫ','Choose Language':'ቋንቋ ይምረጡ','Subtotal':'ንዑስ ድምር','Tax':'ታክስ','Total':'ድምር'},
+ hi:{'Home':'होम','Shop':'खरीदें','Cart':'कार्ट','Search':'खोजें','Categories':'श्रेणियाँ','Products':'उत्पाद','Deals':'ऑफ़र','Add to Cart':'कार्ट में जोड़ें','Product Details':'उत्पाद विवरण','Back':'वापस','Checkout':'भुगतान','Quantity':'मात्रा','Description':'विवरण','Choose Language':'भाषा चुनें','Subtotal':'उप-योग','Tax':'कर','Total':'कुल'},
+ my:{'Home':'ပင်မ','Shop':'စျေးဝယ်','Cart':'ခြင်း','Search':'ရှာဖွေ','Categories':'အမျိုးအစားများ','Products':'ကုန်ပစ္စည်းများ','Deals':'လျှော့စျေး','Add to Cart':'ခြင်းထဲထည့်ရန်','Product Details':'ကုန်ပစ္စည်းအသေးစိတ်','Back':'ပြန်သွား','Checkout':'ငွေရှင်း','Quantity':'အရေအတွက်','Description':'ဖော်ပြချက်','Choose Language':'ဘာသာစကားရွေးပါ','Subtotal':'စုစုပေါင်းခွဲ','Tax':'အခွန်','Total':'စုစုပေါင်း'}
+};
+const UI_ORIGINAL_TEXT=new WeakMap();
+const UI_ORIGINAL_PLACEHOLDER=new WeakMap();
+let uiTranslating=false;
+function getLang(){try{return localStorage.getItem('mhm_lang')||'en'}catch(e){return 'en'}}
+function setLang(code){try{localStorage.setItem('mhm_lang',code)}catch(e){}}
+function translateInterface(){
+ if(uiTranslating)return;uiTranslating=true;
+ try{
+  const lang=getLang(),dict=UI_TRANSLATIONS[lang]||{};
+  document.documentElement.lang=lang;
+  document.documentElement.dir='ltr'; // keep existing shopping layout and numeric prices consistent
+  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const node of nodes){
+   const parent=node.parentElement;if(!parent||parent.closest('script,style,svg,option,[data-no-translate],.p-card-name,.product-detail-panel h2,.product-review'))continue;
+   let original=UI_ORIGINAL_TEXT.get(node);
+   if(original===undefined){original=node.nodeValue;UI_ORIGINAL_TEXT.set(node,original)}
+   const trimmed=original.trim();if(!trimmed)continue;
+   const translated=dict[trimmed];
+   node.nodeValue=translated?original.replace(trimmed,translated):original;
   }
+  document.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(el=>{
+   if(!UI_ORIGINAL_PLACEHOLDER.has(el))UI_ORIGINAL_PLACEHOLDER.set(el,el.getAttribute('placeholder'));
+   const orig=UI_ORIGINAL_PLACEHOLDER.get(el);el.setAttribute('placeholder',dict[orig]||orig);
+  });
+  const btn=document.getElementById('translateBtnTop');if(btn)btn.textContent='🌐 '+lang.toUpperCase();
+ }finally{uiTranslating=false}
 }
+function applyLang(code){if(!LANGUAGES.some(l=>l.code===code))code='en';setLang(code);translateInterface()}
 function renderLangGrid(){
-  const cur=getLang();
-  document.getElementById("langGrid").innerHTML=LANGUAGES.map(l=>`
-    <button class="lang-opt${l.code===cur?" active":""}" onclick="pickLang('${l.code}')">
-      <span class="lang-flag">${l.flag}</span>
-      <span><span class="lang-native">${l.native}</span><span class="lang-en">${l.en}</span></span>
-    </button>`).join("");
+ const cur=getLang();document.getElementById('langGrid').innerHTML=LANGUAGES.map(l=>`
+ <button class="lang-opt${l.code===cur?' active':''}" onclick="pickLang('${l.code}')">
+ <span class="lang-flag">${l.flag}</span><span><span class="lang-native">${l.native}</span><span class="lang-en">${l.en}</span></span></button>`).join('');
 }
-function openLangModal(){renderLangGrid();document.getElementById("langModal").classList.add("open");}
-function closeLangModal(){document.getElementById("langModal").classList.remove("open");}
-function pickLang(code){setLang(code);closeLangModal();applyLang(code);}
-(function(){const btn=document.getElementById("translateBtnTop");if(btn)btn.textContent="🌐 "+getLang().toUpperCase();})();
-
+function openLangModal(){renderLangGrid();document.getElementById('langModal').classList.add('open')}
+function closeLangModal(){document.getElementById('langModal').classList.remove('open')}
+function pickLang(code){closeLangModal();applyLang(code)}
+// Reapply to newly rendered cart, category and product detail UI.
+let translationQueued=false;
+const translationObserver=new MutationObserver(()=>{
+ if(uiTranslating||translationQueued)return;
+ translationQueued=true;requestAnimationFrame(()=>{translationQueued=false;translateInterface()});
+});
+document.addEventListener('DOMContentLoaded',()=>{
+ translateInterface();translationObserver.observe(document.body,{childList:true,subtree:true,characterData:false});
+});
 /* ─── UTILS ─── */
 let toastTimer;
 function showToast(msg){

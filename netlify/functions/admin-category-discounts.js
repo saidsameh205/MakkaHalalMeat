@@ -5,7 +5,7 @@ exports.handler=async event=>{
   if(event.httpMethod==='GET')return json(200,await supabaseFetch('category_discounts?select=*&order=created_at.desc'));
   const b=JSON.parse(event.body||'{}');
   if(event.httpMethod==='POST'){
-   const d={department:b.department||null,category:b.category||null,percent_off:Number(b.percent_off),label:b.label||null,expires_at:b.expires_at||null,active:b.active!==false};
+   const d={department:b.department||null,category:b.category||null,percent_off:Number(b.percent_off),label:b.label||null,image:b.image||"",expires_at:b.expires_at||null,active:b.active!==false};
    if(!Number.isFinite(d.percent_off)||d.percent_off<=0||d.percent_off>100)return json(400,{error:'Invalid percent'});
    const rows=await supabaseFetch('category_discounts',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(d)});
    return json(201,rows[0]);

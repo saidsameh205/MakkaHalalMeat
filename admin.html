@@ -527,6 +527,17 @@ a{color:var(--brand);text-decoration:none;}
             <label>Store Hours (displayed on home)</label>
             <input type="text" id="setHours" placeholder="Tue–Sun: 11 AM – 6:30 PM">
           </div>
+          <div class="fld span2"><label>Featured Deal Title</label><input id="setDealTitle" placeholder="Deal of the Day"></div>
+          <div class="fld span2"><label>Featured Deal Price / Badge</label><input id="setDealPrice" placeholder="e.g. $7.99/lb or 10% OFF (display only)"></div>
+          <div class="fld span2"><label>Featured Deal Photo</label>
+            <div class="img-upload-area" id="dealImageZone" style="min-height:140px" onclick="document.getElementById('dealImageFile').click()">
+              <div id="dealImageHint"><div class="upload-label">Choose or drag a deal photo</div><div class="upload-hint">JPG, PNG, WebP or GIF · max 4 MB</div></div>
+              <img id="dealImagePreview" style="display:none;width:100%;height:190px;object-fit:cover;border-radius:12px" alt="Deal preview">
+            </div>
+            <input type="file" id="dealImageFile" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="selectDealImage(this.files[0])">
+            <button class="btn-outline" type="button" style="margin-top:8px" onclick="clearDealImage()">Remove deal photo</button>
+            <div class="upload-hint" id="dealImageStatus" style="margin-top:6px">Saved when you click Save Settings</div>
+          </div>
           <div class="fld span2">
             <label>Deal Banner Text</label>
             <input type="text" id="setDealText" placeholder="This week's deals & specials">
@@ -662,7 +673,7 @@ a{color:var(--brand);text-decoration:none;}
         <label>Type</label>
         <select id="pmType">
           <option value="percent">Percent off (%)</option>
-          <option value="fixed">Fixed amount ($)</option>
+          <option value="amount">Fixed amount ($)</option>
         </select>
       </div>
       <div class="fld"><label>Value <span class="req">*</span></label><input type="number" id="pmValue" placeholder="10" min="0" step="0.01"></div>
@@ -673,6 +684,7 @@ a{color:var(--brand);text-decoration:none;}
       <div><div class="toggle-label">Active</div></div>
       <label class="toggle"><input type="checkbox" id="pmActive" checked><span class="toggle-slider"></span></label>
     </div>
+    <div class="fld" style="margin-top:12px"><label>Promo Photo (optional)</label><input type="file" id="pmPhoto" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewOfferPhoto('pm',this.files[0])"><img id="pmPreview" style="display:none;width:100%;height:135px;object-fit:cover;border-radius:10px;margin-top:8px" alt="Preview"></div>
     <div class="action-row" style="margin-top:16px;">
       <button class="btn-save" onclick="savePromo()">Save Code</button>
       <button class="btn-outline" onclick="closeModal('promoModal')">Cancel</button>
@@ -695,6 +707,7 @@ a{color:var(--brand);text-decoration:none;}
       <div><div class="toggle-label">Active</div></div>
       <label class="toggle"><input type="checkbox" id="cdActive" checked><span class="toggle-slider"></span></label>
     </div>
+    <div class="fld" style="margin-top:12px"><label>Category Photo (optional)</label><input type="file" id="cdPhoto" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewOfferPhoto('cd',this.files[0])"><img id="cdPreview" style="display:none;width:100%;height:135px;object-fit:cover;border-radius:10px;margin-top:8px" alt="Preview"></div>
     <div class="action-row" style="margin-top:16px;">
       <button class="btn-save" onclick="saveCatDiscount()">Save Discount</button>
       <button class="btn-outline" onclick="closeModal('catDiscModal')">Cancel</button>
@@ -1209,6 +1222,11 @@ function formatTime(iso){
   try{ return new Date(iso).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); }catch(e){ return iso; }
 }
 
+function previewOfferPhoto(kind,file){
+ if(!file)return;
+ if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)||file.size>4*1024*1024){showToast("Photo must be JPG, PNG, WebP or GIF under 4 MB","error");document.getElementById(kind+"Photo").value="";return;}
+ const img=document.getElementById(kind+"Preview");img.src=URL.createObjectURL(file);img.style.display="block";
+}
 /* ─── DISCOUNTS ─── */
 async function loadDiscounts(){
   loadPromos();
@@ -1224,6 +1242,7 @@ function renderPromos(list){
   const el = document.getElementById("promoListEl");
   if(!list.length){ el.innerHTML=`<div class="empty-state"><h3>No promo codes</h3><p>Create your first code</p></div>`; return; }
   el.innerHTML = list.map(d=>`<div class="discount-row">
+    ${d.image?`<img src="${escH(d.image)}" style="width:50px;height:50px;object-fit:cover;border-radius:8px" alt="">`:""}
     <div class="discount-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
     <div class="discount-info">
       <div class="discount-name">${escH(d.code)}</div>
@@ -1242,6 +1261,7 @@ function renderCatDiscounts(list){
   const el = document.getElementById("catDiscListEl");
   if(!list.length){ el.innerHTML=`<div class="empty-state"><h3>No category discounts</h3><p>Create one to discount a whole department or category</p></div>`; return; }
   el.innerHTML = list.map(d=>`<div class="discount-row">
+    ${d.image?`<img src="${escH(d.image)}" style="width:50px;height:50px;object-fit:cover;border-radius:8px" alt="">`:""}
     <div class="discount-icon" style="background:#FFF7ED;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></div>
     <div class="discount-info">
       <div class="discount-name">${escH(d.label||`${d.percent_off}% off`)}</div>
@@ -1259,7 +1279,7 @@ function openNewPromo(){
   document.getElementById("promoModalTitle").textContent = "New Promo Code";
   ["pmCode","pmTitle","pmValue","pmMin","pmExpires"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("pmType").value = "percent";
-  document.getElementById("pmActive").checked = true;
+  document.getElementById("pmActive").checked = true; document.getElementById("pmPhoto").value="";document.getElementById("pmPreview").style.display="none";
   openModal("promoModal");
 }
 async function savePromo(){
@@ -1275,6 +1295,8 @@ async function savePromo(){
     active:document.getElementById("pmActive").checked
   };
   try{
+    const photo=document.getElementById("pmPhoto").files[0];
+    if(photo)payload.image=await uploadImageToSupabase(photo,"deal",{settingKey:"pm_deal"});
     await api("admin-discounts", {method:"POST", body:JSON.stringify(payload)});
     showToast("Promo code created ✓","success");
     closeModal("promoModal");
@@ -1283,7 +1305,7 @@ async function savePromo(){
 }
 function openNewCatDiscount(){
   ["cdDept","cdCat","cdPct","cdLabel","cdExpires"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("cdActive").checked = true;
+  document.getElementById("cdActive").checked = true; document.getElementById("cdPhoto").value="";document.getElementById("cdPreview").style.display="none";
   openModal("catDiscModal");
 }
 async function saveCatDiscount(){
@@ -1298,6 +1320,8 @@ async function saveCatDiscount(){
     active:document.getElementById("cdActive").checked
   };
   try{
+    const photo=document.getElementById("cdPhoto").files[0];
+    if(photo)payload.image=await uploadImageToSupabase(photo,"deal",{settingKey:"cd_deal"});
     await api("admin-category-discounts", {method:"POST", body:JSON.stringify(payload)});
     showToast("Category discount created ✓","success");
     closeModal("catDiscModal");
@@ -1475,6 +1499,29 @@ async function removeStaff(id){
   catch(e){ showToast(e.message,"error"); }
 }
 
+
+/* ─── FEATURED DEAL PHOTO ─── */
+let dealImageFile=null, dealImageUrl="";
+function previewDealImage(url){
+ const img=document.getElementById("dealImagePreview"),hint=document.getElementById("dealImageHint");
+ img.style.display=url?"block":"none";hint.style.display=url?"none":"block";
+ if(url)img.src=url;else img.removeAttribute("src");
+}
+function selectDealImage(file){
+ if(!file)return;
+ if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)||file.size>4*1024*1024){showToast("Use JPG, PNG, WebP or GIF under 4 MB","error");return;}
+ dealImageFile=file;previewDealImage(URL.createObjectURL(file));
+ document.getElementById("dealImageStatus").textContent="Photo selected — click Save Settings";
+}
+function clearDealImage(){dealImageFile=null;dealImageUrl="";previewDealImage("");document.getElementById("dealImageStatus").textContent="Click Save Settings to remove photo";}
+function wireDealDrop(){
+ const z=document.getElementById("dealImageZone");
+ z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("drag-over")});
+ z.addEventListener("dragleave",()=>z.classList.remove("drag-over"));
+ z.addEventListener("drop",e=>{e.preventDefault();z.classList.remove("drag-over");selectDealImage(e.dataTransfer.files[0]);});
+}
+wireDealDrop();
+
 /* ─── SETTINGS ─── */
 async function loadSettings(){
   try{
@@ -1485,6 +1532,9 @@ async function loadSettings(){
     document.getElementById("setTax").value   = c.tax_rate!=null?c.tax_rate:"";
     document.getElementById("setHours").value = c.hours||"";
     document.getElementById("setDealText").value = c.deal_text||"";
+    document.getElementById("setDealTitle").value = c.deal_title||"";
+    document.getElementById("setDealPrice").value = c.deal_price_label||"";
+    dealImageUrl = c.deal_image||""; dealImageFile=null; previewDealImage(dealImageUrl);
     document.getElementById("setAskMakka").checked = !!c.ask_makka_enabled;
     document.getElementById("setOrderAhead").checked = c.order_ahead_enabled!==false;
   }catch(e){ showToast("Couldn't load settings","error"); }
@@ -1496,7 +1546,9 @@ async function saveSettings(){
     phone:      document.getElementById("setPhone").value.trim()||undefined,
     tax_rate:   document.getElementById("setTax").value.trim() !== "" ? parseFloat(document.getElementById("setTax").value) : undefined,
     hours:      document.getElementById("setHours").value.trim()||undefined,
-    deal_text:  document.getElementById("setDealText").value.trim()||undefined,
+    deal_text:  document.getElementById("setDealText").value.trim(),
+    deal_title: document.getElementById("setDealTitle").value.trim(),
+    deal_price_label: document.getElementById("setDealPrice").value.trim(),
     ask_makka_enabled: document.getElementById("setAskMakka").checked,
     order_ahead_enabled: document.getElementById("setOrderAhead").checked,
   };
@@ -1504,7 +1556,14 @@ async function saveSettings(){
   Object.keys(payload).forEach(k=>payload[k]===undefined && delete payload[k]);
 
   try{
+    if(dealImageFile){
+      document.getElementById("dealImageStatus").textContent="Uploading deal photo…";
+      dealImageUrl=await uploadImageToSupabase(dealImageFile,"featured-deal",{settingKey:"featured_deal"});
+      dealImageFile=null;
+    }
+    payload.deal_image=dealImageUrl||"";
     await api("admin-settings", {method:"PATCH", body:JSON.stringify(payload)});
+    document.getElementById("dealImageStatus").textContent="Saved ✓";
     showToast("Settings saved ✓","success");
   }catch(e){ showToast("Save failed: "+e.message,"error"); }
 }
