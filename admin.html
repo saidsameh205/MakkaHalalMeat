@@ -515,6 +515,7 @@ a{color:var(--brand);text-decoration:none;}
       <button class="filter-chip" onclick="switchSettingsTab('banner',this)">Banner / GIF</button>
       <button class="filter-chip" onclick="switchSettingsTab('staff',this)">Team</button>
       <button class="filter-chip" onclick="switchSettingsTab('taxonomy',this)">Departments & Categories</button>
+      <button class="filter-chip" onclick="switchSettingsTab('homepage',this)">Homepage</button>
     </div>
 
     <!-- STORE INFO -->
@@ -593,6 +594,27 @@ a{color:var(--brand);text-decoration:none;}
         </div>
       </div>
       <div class="card"><div class="card-title">Manage Existing Departments & Categories</div><div id="taxonomyRows">Loading…</div></div>
+    </div>
+
+    <!-- HOMEPAGE MANAGER -->
+    <div id="setTabHomepage" style="display:none;">
+      <div class="card">
+        <div class="card-title">Homepage Management</div>
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:14px">Show or hide homepage sections and departments. Use the arrows to change department order. Hiding a department here does not delete products or remove it from Search.</p>
+        <div class="settings-group"><h3>Homepage Sections</h3>
+          <div id="homeSectionControls"></div>
+        </div>
+        <div class="settings-group"><h3>Department Tiles & Product Rows</h3>
+          <div id="homeDepartmentControls">Loading departments…</div>
+        </div>
+        <div class="settings-group"><h3>Featured Products</h3>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:8px">Choose up to 12 active products to highlight on the homepage.</p>
+          <input id="homeFeaturedFilter" placeholder="Filter products by name…" oninput="renderHomeFeaturedChoices()" style="width:100%;margin-bottom:8px">
+          <div id="homeFeaturedChoices" style="max-height:270px;overflow:auto;border:1px solid var(--border);border-radius:10px;padding:10px"></div>
+          <p id="homeFeaturedCount" style="font-size:.8rem;color:var(--muted);margin-top:8px"></p>
+        </div>
+        <button class="btn-save" onclick="saveHomepageSettings()">Save Homepage</button>
+      </div>
     </div>
 
     <!-- BANNER / GIF -->
@@ -1472,15 +1494,81 @@ async function deleteCatDiscount(id){
 
 /* ─── SETTINGS SUB-TABS ─── */
 function switchSettingsTab(t, el){
-  ["store","banner","staff","taxonomy"].forEach(s=>{
+  ["store","banner","staff","taxonomy","homepage"].forEach(s=>{
     document.getElementById("setTab"+s.charAt(0).toUpperCase()+s.slice(1)).style.display = s===t?"block":"none";
   });
   document.querySelectorAll("#tab-settings .filter-chip").forEach(c=>c.classList.toggle("active",c===el));
   if(t==="taxonomy") loadTaxonomy();
+  if(t==="homepage") loadHomepageSettings();
   if(t==="staff") loadStaff();
   if(t==="banner") loadBannerCurrent();
 }
 
+
+
+let HOME_CONFIG={},HOME_DEPARTMENTS=[];
+const homeKey=v=>String(v||'').trim().toLowerCase();
+async function loadHomepageSettings(){
+ const target=document.getElementById('homeDepartmentControls');
+ target.textContent='Loading…';
+ try{
+ const data=await api('admin-homepage');
+ HOME_CONFIG=data.config||{};
+ const names=new Map();
+ [...(data.departments||[]),...ALL_PRODUCTS.map(p=>p.department)].forEach(n=>{if(homeKey(n))names.set(homeKey(n),n)});
+ const order=(HOME_CONFIG.department_order||[]).map(homeKey);
+ HOME_DEPARTMENTS=[...names.keys()].sort((a,b)=>(order.indexOf(a)<0?999:order.indexOf(a))-(order.indexOf(b)<0?999:order.indexOf(b))).map(k=>({key:k,name:names.get(k)}));
+ renderHomepageManager();
+ }catch(e){target.textContent='Could not load: '+e.message;}
+}
+function renderHomepageManager(){
+ const flags=HOME_CONFIG.home_sections||{};
+ const sections=document.getElementById('homeSectionControls');sections.replaceChildren();
+ [['categories','Shop by Category'],['promotions','Promotions'],['deals','This Week’s Deals'],['department_rows','Department Product Rows'],['featured','Featured Products']].forEach(([k,n])=>{
+ const row=document.createElement('label');row.className='toggle-row';row.textContent=n+' ';
+ const c=document.createElement('input');c.type='checkbox';c.dataset.homeSection=k;c.checked=flags[k]!==false;row.append(c);sections.append(row);
+ });
+ const hidden=new Set((HOME_CONFIG.hidden_departments||[]).map(homeKey));
+ const target=document.getElementById('homeDepartmentControls');target.replaceChildren();
+ HOME_DEPARTMENTS.forEach((d,i)=>{
+ const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:12px;padding:9px;border-bottom:1px solid #ddd';
+ const c=document.createElement('input');c.type='checkbox';c.dataset.homeDept=d.key;c.checked=!hidden.has(d.key);
+ const n=document.createElement('span');n.textContent=d.name;n.style.flex='1';
+ const up=document.createElement('button');up.className='btn-outline';up.textContent='↑';up.disabled=i===0;up.onclick=()=>moveHomeDept(i,-1);
+ const down=document.createElement('button');down.className='btn-outline';down.textContent='↓';down.disabled=i===HOME_DEPARTMENTS.length-1;down.onclick=()=>moveHomeDept(i,1);
+ row.append(c,n,up,down);target.append(row);
+ });
+ renderHomeFeatured();
+}
+function moveHomeDept(i,by){
+ HOME_CONFIG.hidden_departments=[...document.querySelectorAll('[data-home-dept]')].filter(c=>!c.checked).map(c=>c.dataset.homeDept);
+ [HOME_DEPARTMENTS[i],HOME_DEPARTMENTS[i+by]]=[HOME_DEPARTMENTS[i+by],HOME_DEPARTMENTS[i]];
+ renderHomepageManager();
+}
+function renderHomeFeatured(){
+ const el=document.getElementById('homeFeaturedChoices');el.replaceChildren();
+ const selected=new Set((HOME_CONFIG.featured_product_ids||[]).map(String));
+ const filter=document.getElementById('homeFeaturedFilter').value.trim().toLowerCase();
+ const matches=ALL_PRODUCTS.filter(p=>p.active!==false&&String(p.name||'').toLowerCase().includes(filter));
+ matches.slice(0,150).forEach(p=>{
+ const row=document.createElement('label');row.style.cssText='display:flex;gap:8px;padding:5px';
+ const c=document.createElement('input');c.type='checkbox';c.checked=selected.has(String(p.id));
+ c.onchange=()=>{
+ const ids=new Set((HOME_CONFIG.featured_product_ids||[]).map(String));
+ if(c.checked){if(ids.size>=12){c.checked=false;showToast('Maximum 12 featured products','error');return;}ids.add(String(p.id));}else ids.delete(String(p.id));
+ HOME_CONFIG.featured_product_ids=[...ids];
+ document.getElementById('homeFeaturedCount').textContent=ids.size+' / 12 selected';
+ };
+ const name=document.createElement('span');name.textContent=p.name||'Unnamed';row.append(c,name);el.append(row);
+ });
+ document.getElementById('homeFeaturedCount').textContent=selected.size+' / 12 selected';
+}
+async function saveHomepageSettings(){
+ const sections={};document.querySelectorAll('[data-home-section]').forEach(c=>sections[c.dataset.homeSection]=c.checked);
+ const config={department_order:HOME_DEPARTMENTS.map(d=>d.key),hidden_departments:[...document.querySelectorAll('[data-home-dept]')].filter(c=>!c.checked).map(c=>c.dataset.homeDept),home_sections:sections,featured_product_ids:HOME_CONFIG.featured_product_ids||[]};
+ try{await api('admin-homepage',{method:'PATCH',body:JSON.stringify(config)});HOME_CONFIG={...HOME_CONFIG,...config};showToast('Homepage saved ✓','success');}
+ catch(e){showToast('Save failed: '+e.message,'error');}
+}
 
 /* ─── DEPARTMENT & CATEGORY MANAGER ─── */
 async function loadTaxonomy(){

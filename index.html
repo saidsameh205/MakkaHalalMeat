@@ -837,6 +837,7 @@ body.dark .badge-pill{background:#1F2937;}
       </div>
     </div>
 
+    <div id="homeCategoriesSection">
     <!-- Shop by Category -->
     <div class="sec-head">
       <h2>Shop by Category</h2>
@@ -844,12 +845,15 @@ body.dark .badge-pill{background:#1F2937;}
     </div>
     <div class="cat-grid" id="catGrid"></div>
 
+    </div>
+    <div id="homePromotionsSection">
     <!-- Promos -->
     <div class="sec-head" style="padding-top:16px;">
       <h2>Promotions</h2>
     </div>
     <div class="promo-scroll" id="promoScroller"></div>
 
+    </div>
     <!-- This Week's Deals -->
     <div id="saleSection" style="display:none;">
       <div class="sec-head" style="padding-top:16px;">
@@ -859,6 +863,7 @@ body.dark .badge-pill{background:#1F2937;}
       <div class="row-scroll" id="saleSectionRow"></div>
     </div>
 
+    <div id="homeFeaturedSection" style="display:none"><div class="sec-head"><h2>⭐ Featured Products</h2></div><div class="row-scroll" id="homeFeaturedProducts"></div></div>
     <!-- product previews per dept -->
     <div id="homePreviews"></div>
 
@@ -1145,6 +1150,25 @@ const DEPTS = [
     photo:"https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=400&q=80" },
 ];
 const DEPT_MAP = Object.fromEntries(DEPTS.map(d=>[d.id,d]));
+function deptKey(value){ return String(value||'').trim().toLowerCase(); }
+function syncDepartments(taxonomy=[]){
+  const rows=Array.isArray(taxonomy)?taxonomy:[];
+  const departmentRows=rows.filter(r=>r.kind==='department');
+  const keys=new Set();
+  const values=[...departmentRows.map(r=>r.name),...PRODUCTS.map(p=>p.department)].filter(Boolean);
+  values.forEach(name=>{
+    const key=deptKey(name);
+    if(!key||keys.has(key))return;
+    keys.add(key);
+    if(!DEPT_MAP[key]){
+      const d={id:key,label:String(name).trim(),icon:'🛍️',tile:'#8C1A1E',photo:''};
+      DEPTS.push(d);DEPT_MAP[key]=d;
+    }else if(departmentRows.some(r=>deptKey(r.name)===key)){
+      DEPT_MAP[key].label=String(name).trim();
+    }
+  });
+  PRODUCTS.forEach(p=>{p.department=deptKey(p.department);});
+}
 const WEIGHT_CHIPS = [0.5, 1, 1.5, 2, 3, 5];
 
 let PRODUCTS = [];
@@ -1169,13 +1193,15 @@ async function sb(path){
 async function init(){
   renderSkeleton();
   try{
-    const [products, settingsRows, discounts, catDiscounts] = await Promise.all([
+    const [products, settingsRows, discounts, catDiscounts, taxonomy] = await Promise.all([
       sb("products?select=*&active=eq.true&order=sort_order.asc,name.asc"),
       sb("app_settings?key=eq.ui_config&select=value"),
       sb("discounts?select=*&active=eq.true&order=expires_at.asc.nullslast"),
       sb("category_discounts?select=*&active=eq.true&order=created_at.desc").catch(()=>[]),
+      sb("store_taxonomy?select=kind,name,sort_order&order=sort_order.asc").catch(()=>[]),
     ]);
     PRODUCTS = products;
+    syncDepartments(taxonomy);
     SETTINGS = (settingsRows[0] && settingsRows[0].value) || {};
     DISCOUNTS = discounts;
     CAT_DISCOUNTS = catDiscounts || [];
@@ -1186,7 +1212,9 @@ async function init(){
   renderPromos();
   renderSaleSection();
   renderHomePreviews();
+  renderFeaturedHome();
   renderDeals();
+  applyHomeSectionVisibility();
   updateAskMakkaVisibility();
   restoreLocal();
 }
@@ -1210,10 +1238,24 @@ function applySettings(){
   if(SETTINGS.store_order_options) document.getElementById("infoOrderOptions").textContent = SETTINGS.store_order_options;
 }
 
+
+function applyHomeSectionVisibility(){
+ const flags=SETTINGS.home_sections||{};
+ const ids={categories:'homeCategoriesSection',promotions:'homePromotionsSection',deals:'saleSection',department_rows:'homePreviews',featured:'homeFeaturedSection'};
+ Object.entries(ids).forEach(([k,id])=>{const el=document.getElementById(id);if(!el)return;if(flags[k]===false)el.style.display='none';else if(k!=='deals'&&k!=='featured')el.style.display='';});
+}
+function renderFeaturedHome(){
+ const el=document.getElementById('homeFeaturedSection'),wrap=document.getElementById('homeFeaturedProducts');
+ if(!el||!wrap)return;
+ const byId=new Map(PRODUCTS.map(p=>[String(p.id),p]));
+ const items=(SETTINGS.featured_product_ids||[]).map(id=>byId.get(String(id))).filter(Boolean);
+ wrap.innerHTML=items.map(cardHtml).join('');
+ el.style.display=items.length&&SETTINGS.home_sections?.featured!==false?'':'none';
+}
 function departmentsInOrder(){
-  const order = SETTINGS.department_order || DEPTS.map(d=>d.id);
-  const hidden = new Set(SETTINGS.hidden_departments || []);
-  return order.filter(d => !hidden.has(d) && DEPT_MAP[d]);
+  const order = [...(Array.isArray(SETTINGS.department_order)?SETTINGS.department_order:[]),...DEPTS.map(d=>d.id)].map(deptKey);
+  const hidden = new Set((SETTINGS.hidden_departments || []).map(deptKey));
+  return [...new Set(order)].filter(d => !hidden.has(d) && DEPT_MAP[d]);
 }
 
 /* ─── CATEGORY GRID ─── */
@@ -1350,6 +1392,7 @@ function switchView(name){
   document.querySelectorAll(".tab-btn").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
   if(name!=="dept") document.body.setAttribute("data-view", name==="home"?"home":"other");
   window.scrollTo(0,0);
+  if(name==="search"){ onSearch(true); }
   if(name==="search") setTimeout(()=>{ const el=document.getElementById("searchInput2"); if(el) el.focus(); },50);
   if(name==="categories") renderCatGrid();
   if(name==="deals"){ switchDealsTab("reduced"); }
@@ -1610,9 +1653,19 @@ function closeWeightModal(){document.getElementById("weightModal").classList.rem
 function onSearch(fromSecondary){
   const q=(fromSecondary?document.getElementById("searchInput2").value:document.getElementById("searchInput").value).trim().toLowerCase();
   if(!fromSecondary){switchView("search");document.getElementById("searchInput2").value=q;}
-  if(!q){renderSearchResults([],"");return;}
+  if(!q){renderSearchDiscovery();return;}
   const items=PRODUCTS.filter(p=>p.name.toLowerCase().includes(q)||(p.brand||"").toLowerCase().includes(q)||(p.category||"").toLowerCase().includes(q));
   renderSearchResults(items,`Results for "${q}"`);
+}
+function renderSearchDiscovery(){
+  const wrap=document.getElementById('searchResults');
+  if(!PRODUCTS.length){wrap.innerHTML='<div class="search-empty">Products will appear here when available.</div>';return;}
+  const depts=departmentsInOrder().filter(id=>PRODUCTS.some(p=>p.department===id));
+  const suggested=[...PRODUCTS].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''))).slice(0,16);
+  wrap.innerHTML=`<div style="padding:18px 16px 4px;font-size:1.08rem;font-weight:800">Explore departments</div>
+    <div style="display:flex;gap:9px;overflow-x:auto;padding:10px 16px 18px">${depts.map(id=>`<button class="see-all" style="flex:none;border:1px solid #ddd;border-radius:22px;padding:10px 14px" onclick="openDeptPage('${id}')">${DEPT_MAP[id].icon} ${escapeHtml(DEPT_MAP[id].label)}</button>`).join('')}</div>
+    <div style="padding:4px 16px 10px;font-size:1.08rem;font-weight:800">Discover products</div>
+    <div class="grid">${suggested.map(cardHtml).join('')}</div>`;
 }
 function renderSearchResults(items,label){
   const wrap=document.getElementById("searchResults");

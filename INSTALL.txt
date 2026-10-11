@@ -1,1 +1,12 @@
-1. Run TAXONOMY_MIGRATION.sql if not previously applied.\n2. Run CATEGORY_TAX_DEFAULT_MIGRATION.sql in Supabase SQL Editor.\n3. Replace admin.html and netlify/functions/admin-taxonomy.js in GitHub.\n4. Keep your existing admin-products.js if it already supports is_food; otherwise use the included version.\n5. Deploy to Netlify and test on a preview. Existing product tax types are not automatically changed when category defaults change.\n
+MAKKA HOMEPAGE MANAGER
+1. Back up your existing admin.html and index.html.
+2. Upload/replace admin.html and index.html at the repository root.
+3. Add netlify/functions/admin-homepage.js (keep your existing _util.js).
+4. Commit changes and wait for Netlify deployment.
+5. Open Makka Admin > Settings > Homepage. Select sections, order departments, and choose featured products; click Save Homepage.
+6. Refresh the customer homepage to see updates.
+
+No new SQL migration is included. This uses your existing public.app_settings row with key ui_config.
+IMPORTANT: If the site reports a database permission error, check app_settings privileges/RLS for the service-role server function.
+The update does not modify products, tax rules, checkout, or your existing categories.
+JavaScript syntax checked, but not tested against the live Supabase/Netlify environment.
