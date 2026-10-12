@@ -769,6 +769,7 @@ body.dark .badge-pill{background:#1F2937;}
 .makka-instruction{width:100%;min-height:72px;resize:vertical;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:.86rem}
 .makka-weight-entry{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:1rem}
 </style>
+<style id="makka-account-style">.makka-account{max-width:640px;margin:0 auto;padding:22px 18px 110px}.makka-account h3{margin:0 0 12px;font-size:1.08rem}.makka-account p{font-size:.84rem;color:var(--muted);line-height:1.5;margin-bottom:14px}.makka-account label{display:block;font-size:.8rem;font-weight:700;margin:10px 0}.makka-account input{display:block;width:100%;margin-top:5px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}.makka-accent-btn{background:var(--brand-dark);color:white;padding:12px 18px;border-radius:10px;font-weight:700;margin-top:10px}.makka-auth-tabs{display:flex;gap:10px;margin:16px 0}.makka-auth-tabs button{flex:1;border:1px solid var(--brand);color:var(--brand);padding:10px;border-radius:9px;font-weight:700}.makka-text-btn{color:var(--brand);font-weight:700;margin-top:16px}.makka-order{border:1px solid var(--line);padding:14px;border-radius:12px;margin:10px 0;background:var(--card)}.makka-order small{display:block;color:var(--muted);margin-top:6px}.store-info a.makka-contact{color:#fff;text-decoration:underline;text-underline-offset:3px}.makka-account-hint{margin-top:12px}</style>
 </head>
 <body data-view="home" data-dept="meat">
 
@@ -778,9 +779,7 @@ body.dark .badge-pill{background:#1F2937;}
   <!-- topbar -->
   <header class="topbar" id="homeHeader">
     <div class="topbar-inner">
-      <button class="topbar-menu" onclick="showToast('Menu coming soon')">
-        <span></span><span></span><span></span>
-      </button>
+
       <div class="topbar-brand">
         <div class="topbar-logo">
           <img src="icon-180.png" alt="Makka" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -986,13 +985,26 @@ body.dark .badge-pill{background:#1F2937;}
 <div id="ordersView" style="display:none;">
   <header class="topbar">
     <div class="topbar-inner">
-      <span style="font-weight:800;font-size:1.02rem;">My Orders</span>
+      <span style="font-weight:800;font-size:1.02rem;">Orders &amp; Account</span>
     </div>
   </header>
-  <div style="text-align:center;padding:60px 20px;color:var(--muted);">
-    <div style="font-size:2.5rem;margin-bottom:12px;">📋</div>
-    <div style="font-weight:700;margin-bottom:6px;">No orders yet</div>
-    <div style="font-size:.84rem;">Your completed orders will appear here.</div>
+  <div class="makka-account" id="makkaAccountPanel">
+    <div id="makkaGuestAccount">
+      <h3>Welcome to Makka</h3><p>Create an account to view your orders and save your favorites. Guest checkout is always available.</p>
+      <div class="makka-auth-tabs"><button type="button" onclick="makkaAuthMode('login')">Sign In</button><button type="button" onclick="makkaAuthMode('signup')">Create Account</button></div>
+      <form id="makkaAuthForm" onsubmit="makkaSubmitAuth(event)">
+        <div id="makkaSignupFields" hidden><label>Your name<input id="makkaAuthName" autocomplete="name" maxlength="60"></label><label>Phone (optional)<input id="makkaAuthPhone" type="tel" autocomplete="tel" maxlength="30"></label></div>
+        <label>Email<input id="makkaAuthEmail" type="email" autocomplete="email" required></label>
+        <label>Password<input id="makkaAuthPassword" type="password" minlength="8" autocomplete="current-password" required></label>
+        <button type="submit" class="makka-accent-btn" id="makkaAuthSubmit">Sign In</button>
+      </form><p class="makka-account-hint">No automatic emails are sent. For password assistance, contact the store.</p>
+    </div>
+    <div id="makkaSignedAccount" hidden>
+      <h3 id="makkaWelcome">My Account</h3>
+      <form onsubmit="makkaSaveProfile(event)"><label>Name<input id="makkaProfileName" autocomplete="name"></label><label>Email<input id="makkaProfileEmail" type="email" disabled></label><label>Phone<input id="makkaProfilePhone" type="tel" autocomplete="tel"></label><button type="submit" class="makka-accent-btn">Save Profile</button></form>
+      <button type="button" class="makka-text-btn" onclick="makkaSignOut()">Sign Out</button>
+      <h3 style="margin-top:22px">My Orders</h3><div id="makkaAccountOrders">Loading orders…</div>
+    </div>
   </div>
 </div>
 
@@ -1014,11 +1026,9 @@ body.dark .badge-pill{background:#1F2937;}
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
     Deals
   </button>
-  <button class="tab-btn" onclick="openCart()" data-tab="cart">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-    Cart
-    <span class="tab-dot" id="cartDotTab">0</span>
-  </button>
+  <button class="tab-btn" onclick="switchView('orders')" data-tab="orders">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-5 16-5 16 0"/></svg>
+    Account &amp; Orders</button>
 </nav>
 
 <!-- ══════════════ CART MINI BAR ══════════════ -->
@@ -1243,7 +1253,9 @@ function applySettings(){
     if(el2) el2.textContent = hrs;
   }
   if(SETTINGS.store_address) document.getElementById("infoAddress").textContent = SETTINGS.store_address;
+  makkaLinkContact();
   if(SETTINGS.store_phone)   document.getElementById("infoPhone").textContent   = SETTINGS.store_phone;
+  makkaLinkContact();
   if(SETTINGS.store_shopping) document.getElementById("infoShopping").textContent = SETTINGS.store_shopping;
   if(SETTINGS.store_order_options) document.getElementById("infoOrderOptions").textContent = SETTINGS.store_order_options;
 }
@@ -1272,11 +1284,11 @@ function departmentsInOrder(){
 function renderCatGrid(){
   const palette=[['#FFF0EF','#831C24'],['#EFF6E9','#365C2F'],['#EAF5FA','#235875'],['#FFF0F2','#852F4D'],['#FFF8E9','#825322'],['#F0EFFF','#4B4486'],['#FFF0EE','#831C24']];
   const descriptions={meat:'Beef, lamb, chicken & more',grocery:'Everyday essentials',household:'Cleaning & home care',beauty:'Personal care & cosmetics',baby:'Baby food & essentials',clothing:'For the whole family',candy:'Snacks, chocolates & more'};
-  const icons={meat:'🥩',grocery:'🌿',household:'🧴',beauty:'✿',baby:'♡',clothing:'♧',candy:'◇'};
+  const icons={meat:'🥩',grocery:'',household:'',beauty:'✿',baby:'',clothing:'♧',candy:'◇'};
   const html=departmentsInOrder().map((id,i)=>{
     const d=DEPT_MAP[id], colors=palette[i%palette.length];
     return `<button class="cat-tile cat-modern" style="--tile-bg:${colors[0]};--tile-ink:${colors[1]}" onclick="openDeptPage('${id}')">
-      <span class="cat-modern-icon" aria-hidden="true">${icons[id]||d.icon||'◈'}</span>
+      ${icons[id] ? `<span class="cat-modern-icon" aria-hidden="true">${icons[id]}</span>` : ''}
       <span class="cat-modern-title">${escapeHtml(d.label)}</span>
       <span class="cat-modern-desc">${escapeHtml(descriptions[id]||'Explore our selection')}</span>
       <span class="cat-modern-arrow" aria-hidden="true">→</span>
@@ -1379,7 +1391,7 @@ function renderHomePreviews(){
     const sec = document.createElement("div");
     sec.innerHTML = `
       <div class="sec-head" style="padding-top:18px;">
-        <h2>${d.icon} ${d.label}</h2>
+        <h2>${['grocery','baby','household'].includes(id)?'':d.icon+' '}${d.label}</h2>
         <button class="see-all" onclick="openDeptPage('${id}')">See all (${items.length}) ›</button>
       </div>
       <div class="row-scroll" id="rowhome-${id}"></div>
@@ -1403,6 +1415,7 @@ function switchView(name){
   if(name==="search") setTimeout(()=>{ const el=document.getElementById("searchInput2"); if(el) el.focus(); },50);
   if(name==="categories") renderCatGrid();
   if(name==="deals"){ switchDealsTab("reduced"); }
+  if(name==="orders") makkaRefreshAccount();
 }
 
 /* ─── DEALS ─── */
@@ -1757,7 +1770,7 @@ async function submitCheckout(){
   const items=cartLines().map(({p,qty})=>({id:p.id,qty,effective_price:effectivePrice(p),instructions:isWeighted(p)?(MEAT_INSTRUCTIONS[p.id]||''):''}));
   const promoCode = appliedPromo ? appliedPromo.code : null;
   try{
-    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items,name,phone,email,promoCode})});
+    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",...(localStorage.getItem("makka_customer_token")?{"x-customer-token":localStorage.getItem("makka_customer_token")}:{})},body:JSON.stringify({items,name,phone,email,promoCode,customerToken:localStorage.getItem("makka_customer_token")||undefined})});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||"Unable to start checkout");
     window.location.href=data.url;
@@ -2086,6 +2099,18 @@ function toggleTheme(){
 
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
 init();
+
+/* Customer accounts: use existing protected Netlify endpoints; no automatic emails. */
+let makkaMode='login';
+function makkaAuthMode(mode){makkaMode=mode;document.getElementById('makkaSignupFields').hidden=mode!=='signup';document.getElementById('makkaAuthSubmit').textContent=mode==='signup'?'Create Account':'Sign In';document.getElementById('makkaAuthPassword').autocomplete=mode==='signup'?'new-password':'current-password';}
+async function makkaAccountFetch(endpoint,method='GET',body){const token=localStorage.getItem('makka_customer_token');const res=await fetch('/.netlify/functions/'+endpoint,{method,headers:{'Content-Type':'application/json',...(token?{'x-customer-token':token}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await res.json();if(!res.ok)throw new Error(data.error||'Request failed');return data;}
+async function makkaSubmitAuth(ev){ev.preventDefault();try{const body={email:document.getElementById('makkaAuthEmail').value.trim(),password:document.getElementById('makkaAuthPassword').value};if(makkaMode==='signup'){body.name=document.getElementById('makkaAuthName').value.trim();body.phone=document.getElementById('makkaAuthPhone').value.trim();}const result=await makkaAccountFetch(makkaMode==='signup'?'customer-signup':'customer-login','POST',body);localStorage.setItem('makka_customer_token',result.token);document.getElementById('makkaAuthPassword').value='';showToast('Signed in successfully');makkaRefreshAccount();}catch(e){showToast(e.message);}}
+async function makkaRefreshAccount(){const token=localStorage.getItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=!!token;document.getElementById('makkaSignedAccount').hidden=!token;if(!token)return;try{const profile=await makkaAccountFetch('customer-me');document.getElementById('makkaWelcome').textContent='Welcome, '+(profile.name||'customer');document.getElementById('makkaProfileName').value=profile.name||'';document.getElementById('makkaProfileEmail').value=profile.email||'';document.getElementById('makkaProfilePhone').value=profile.phone||'';const orders=await makkaAccountFetch('customer-orders');document.getElementById('makkaAccountOrders').innerHTML=Array.isArray(orders)&&orders.length?orders.map(o=>`<div class="makka-order"><strong>${escapeHtml(o.order_code||'Order')}</strong> · ${escapeHtml(o.status||'')}<small>${escapeHtml((o.items||[]).map(i=>i.name).join(', '))}</small><small>Total: $${Number(o.total||0).toFixed(2)}</small></div>`).join(''):'No account orders yet. Guest orders may not appear here.';}catch(e){if(/session|token|unauthoriz|sign in/i.test(e.message)){makkaSignOut();}else showToast(e.message);}}
+async function makkaSaveProfile(ev){ev.preventDefault();try{await makkaAccountFetch('customer-me','PATCH',{name:document.getElementById('makkaProfileName').value.trim(),phone:document.getElementById('makkaProfilePhone').value.trim()});showToast('Profile saved');makkaRefreshAccount();}catch(e){showToast(e.message);}}
+function makkaSignOut(){localStorage.removeItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=false;document.getElementById('makkaSignedAccount').hidden=true;showToast('Signed out');}
+function makkaLinkContact(){const addr=document.getElementById('infoAddress'),phone=document.getElementById('infoPhone');if(addr){const a=addr.textContent.trim();if(a){const link=document.createElement('a');link.className='makka-contact';link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a);link.target='_blank';link.rel='noopener noreferrer';link.textContent=a;addr.replaceChildren(link);}}if(phone){const n=phone.textContent.trim();if(n){const link=document.createElement('a');link.className='makka-contact';link.href='tel:'+n.replace(/[^+0-9]/g,'');link.textContent=n;phone.replaceChildren(link);}}}
+document.addEventListener('DOMContentLoaded',makkaLinkContact);
+
 </script>
 </body>
 </html>
