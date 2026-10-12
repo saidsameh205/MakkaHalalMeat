@@ -770,8 +770,9 @@ body.dark .badge-pill{background:#1F2937;}
 .makka-weight-entry{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:1rem}
 
 /* 2026-10 homepage refresh */
-.makka-static-logo{margin:18px auto 8px;width:126px;height:126px;border-radius:50%;background:#a00000;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 8px 26px rgba(110,0,0,.13)}
-.makka-static-logo img{width:100%;height:100%;object-fit:contain}
+.makka-static-logo{margin:20px auto 12px;width:min(460px,calc(100% - 40px));padding:12px;border-radius:22px;background:linear-gradient(135deg,#9d1712,#6e110e);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 10px 28px rgba(110,0,0,.16)}
+.makka-static-logo img{display:block;width:100%;height:auto;aspect-ratio:1520/560;object-fit:contain;border-radius:14px}
+@media(max-width:380px){.makka-static-logo{width:calc(100% - 28px);padding:8px;border-radius:16px}.makka-static-logo img{border-radius:10px}}
 .feature-bottom{margin:26px 16px 92px}
 .feature-bottom .sec-head{padding-left:0;padding-right:0}
 .feature-showcase{position:relative;min-height:155px;border:1px solid var(--line);border-radius:20px;background:var(--card);box-shadow:var(--shadow-md);overflow:hidden}
@@ -808,6 +809,33 @@ body.dark .badge-pill{background:#1F2937;}
 .feature-showcase .feature-slide p{font-size:.95rem;line-height:1.55;color:#6c6262}
 .feature-dots{bottom:17px}
 @media(max-width:520px){.feature-showcase .feature-slide{padding:24px 20px 48px;gap:15px;min-height:200px}.feature-card-art{width:76px;height:76px;flex-basis:76px;border-radius:18px}.feature-card-art svg{width:44px;height:44px}.feature-showcase .feature-slide h3{font-size:1.13rem}.feature-showcase .feature-slide p{font-size:.81rem}}
+/* 2026 storefront refresh — rotating benefits only */
+.feature-bottom{margin-top:34px}
+.feature-showcase{isolation:isolate;min-height:222px;border-radius:22px;border:1px solid #e9d8d4;background:#fff;box-shadow:0 16px 38px rgba(43,24,20,.10),0 2px 8px rgba(43,24,20,.04)}
+.feature-showcase::before{content:"";position:absolute;z-index:-1;inset:0 auto 0 0;width:7px;background:linear-gradient(180deg,#a91620,#e5a54d)}
+.feature-showcase::after{content:"";position:absolute;z-index:-1;width:260px;height:260px;border-radius:50%;right:-125px;top:-145px;border:42px solid rgba(166,29,38,.045);pointer-events:none}
+.feature-showcase .feature-slide{min-height:222px;padding:30px 38px 48px;gap:24px}
+.feature-card-art{width:92px;height:92px;flex-basis:92px;border-radius:23px;background:linear-gradient(145deg,#a91d28,#74131e);color:#fff;box-shadow:0 9px 22px rgba(130,24,33,.19);transform:rotate(-4deg)}
+.feature-card-art svg{width:48px;height:48px;transform:rotate(4deg)}
+.feature-card-copy{position:relative}
+.feature-kicker{display:inline-block;font-size:.68rem;font-weight:850;letter-spacing:.12em;color:#a51d29;margin-bottom:5px}
+.feature-showcase .feature-slide h3{font-size:clamp(1.24rem,3.4vw,1.75rem);letter-spacing:-.035em;line-height:1.15;color:#251c1c;margin:4px 0 10px}
+.feature-showcase .feature-slide p{font-size:.91rem;line-height:1.55;color:#625a5a;max-width:390px}
+.feature-showcase .feature-slide:nth-child(2) .feature-card-art{background:linear-gradient(145deg,#376a5b,#17493d);box-shadow:0 9px 22px rgba(23,73,61,.17)}
+.feature-showcase .feature-slide:nth-child(2) .feature-kicker{color:#286454}
+.feature-showcase .feature-slide:nth-child(3) .feature-card-art{background:linear-gradient(145deg,#bc7730,#92501d);box-shadow:0 9px 22px rgba(146,80,29,.17)}
+.feature-showcase .feature-slide:nth-child(3) .feature-kicker{color:#9c5b22}
+.feature-showcase .feature-slide:nth-child(4) .feature-card-art{background:linear-gradient(145deg,#3f608b,#273d62);box-shadow:0 9px 22px rgba(39,61,98,.17)}
+.feature-showcase .feature-slide:nth-child(4) .feature-kicker{color:#385b87}
+.feature-showcase .feature-dots{bottom:17px;gap:9px}
+.feature-showcase .feature-dots button{width:7px;height:7px;background:#c9c4c3;transition:width .2s,background .2s}
+.feature-showcase .feature-dots button.active{width:25px;border-radius:10px;background:#a91d28}
+body.dark .feature-showcase{background:#211b1d;border-color:#554248;box-shadow:0 14px 34px rgba(0,0,0,.3)}
+body.dark .feature-showcase::after{border-color:rgba(255,255,255,.035)}
+body.dark .feature-showcase .feature-slide h3{color:#f9f4f3}
+body.dark .feature-showcase .feature-slide p{color:#d4c7c5}
+body.dark .feature-showcase .feature-kicker,body.dark .feature-showcase .feature-slide:nth-child(n) .feature-kicker{color:#f5c7a8}
+@media(max-width:520px){.feature-showcase,.feature-showcase .feature-slide{min-height:204px}.feature-showcase .feature-slide{padding:24px 19px 43px;gap:15px}.feature-card-art{width:68px;height:68px;flex-basis:68px;border-radius:18px}.feature-card-art svg{width:36px;height:36px}.feature-kicker{font-size:.57rem;letter-spacing:.07em}.feature-showcase .feature-slide h3{font-size:1.13rem;margin:4px 0 7px}.feature-showcase .feature-slide p{font-size:.78rem;line-height:1.48}.feature-showcase::after{width:170px;height:170px;right:-100px;top:-100px;border-width:27px}}
 </style>
 <style id="makka-account-style">.makka-account{max-width:640px;margin:0 auto;padding:22px 18px 110px}.makka-account h3{margin:0 0 12px;font-size:1.08rem}.makka-account p{font-size:.84rem;color:var(--muted);line-height:1.5;margin-bottom:14px}.makka-account label{display:block;font-size:.8rem;font-weight:700;margin:10px 0}.makka-account input{display:block;width:100%;margin-top:5px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}.makka-accent-btn{background:var(--brand-dark);color:white;padding:12px 18px;border-radius:10px;font-weight:700;margin-top:10px}.makka-auth-tabs{display:flex;gap:10px;margin:16px 0}.makka-auth-tabs button{flex:1;border:1px solid var(--brand);color:var(--brand);padding:10px;border-radius:9px;font-weight:700}.makka-text-btn{color:var(--brand);font-weight:700;margin-top:16px}.makka-order{border:1px solid var(--line);padding:14px;border-radius:12px;margin:10px 0;background:var(--card)}.makka-order small{display:block;color:var(--muted);margin-top:6px}.store-info a.makka-contact{color:#fff;text-decoration:underline;text-underline-offset:3px}.makka-account-hint{margin-top:12px}</style>
 <style id="makka-account-history-style">
@@ -886,7 +914,7 @@ body.dark .btn-solid,body.dark .checkout-btn,body.dark .makka-accent-btn,body.da
 
   <main id="homeMain">
     <!-- Static Makka logo, no hero slideshow -->
-    <div class="makka-static-logo"><img src="icon-180.png" alt="Makka Halal Meat logo" loading="eager"></div>
+    <div class="makka-static-logo"><img src="banner-sign.jpg" alt="Makka Halal Meat — Goat, Lamb, Beef, Chicken — 404-297-0008" loading="eager"></div>
 
     <!-- search bar -->
     <div class="search-wrap" style="padding:12px 16px 4px;">
