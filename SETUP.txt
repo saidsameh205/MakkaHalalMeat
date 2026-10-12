@@ -1,0 +1,19 @@
+MAKKA HALAL MEAT — ONLY CHANGED FILES
+
+This ZIP is a patch, NOT the full website. Upload the contents into the existing GitHub repository, preserving the folder paths shown here. Do not delete other existing files.
+
+index.html                                (repository root; replace)
+netlify/functions/translate-content.js   (add)
+netlify/functions/_promotion-pricing.js  (replace)
+netlify/functions/preview-promotion.js   (replace)
+netlify/functions/create-checkout-session.js (replace)
+
+Keep your existing netlify/functions/_util.js, Stripe webhook, order/staff functions, assets, and other site files.
+
+GOOGLE TRANSLATION: Enable Google Cloud Translation Basic (v2), billing, and set GOOGLE_TRANSLATE_API_KEY in Netlify environment variables for Functions. Redeploy. The public translation endpoint currently has no rate limiting; set API quotas/budget safeguards before going live.
+
+PROMOTIONS: No separate promotion API key. Existing Supabase connection and tables products, discounts, category_discounts are required, along with the existing _util.js. Stripe secret and existing webhook are also required for checkout. Confirm the Supabase schema has all columns used by these functions, including discounts.min_order.
+
+TEST BEFORE PRODUCTION: category discounts, sale/reduced prices, promo code and minimum spend, displayed total/tax vs Stripe amount, out-of-stock behavior, payment authorization and stock rollback, language switching and dark-mode contrast. These checks are not live integration tests.
+
+IMPORTANT: The source files were supplied individually, not as a full repository. Other dependencies and deployed Supabase schema have not been independently checked.

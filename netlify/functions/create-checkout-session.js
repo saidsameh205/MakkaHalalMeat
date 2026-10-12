@@ -1,6 +1,8 @@
 const Stripe = require('stripe');
 const { json, supabaseFetch, restoreStock, round2, FOOD_TAX_RATE, NONFOOD_TAX_RATE, verifySession } = require('./_util');
 
+const {getOffers,priceCart}=require('./_promotion-pricing');
+
 const SUBSTITUTION_CHOICES = ['substitute', 'call', 'skip'];
 
 // Shared by this function and validate-promo.js so the checkout screen's
@@ -43,7 +45,7 @@ exports.handler = async (event) => {
     if (!items.length) throw new Error('Your cart is empty');
 
     const ids = items.map((i) => Number(i.id)).filter(Number.isFinite);
-    const qs = `products?id=in.(${ids.join(',')})&select=id,name,price,unit,image,emoji,active,stock,is_food`;
+    const qs = `products?id=in.(${ids.join(',')})&select=id,name,price,unit,image,emoji,active,stock,is_food,department,category,sale_price,is_reduced,reduced_price`;
     const catalog = await supabaseFetch(qs);
     const byId = Object.fromEntries(catalog.map((p) => [p.id, p]));
 
@@ -51,6 +53,7 @@ exports.handler = async (event) => {
     const lineDescriptions = [];
     const orderItems = []; // what we store on the order: a snapshot, so later price/name edits never rewrite history
     const toReserve = [];
+    const pricingLines=[];
 
     for (const item of items) {
       const p = byId[Number(item.id)];
@@ -66,6 +69,7 @@ exports.handler = async (event) => {
       }
       const instructions = weighted && typeof item.instructions === 'string' ? item.instructions.trim().slice(0, 300) : '';
       const lineTotal = p.price * qty;
+      pricingLines.push({...p,qty});
       // is_food defaults to true (most of this catalog is food) when a product
       // predates the column or was never explicitly set either way.
       const isFood = p.is_food !== false;
@@ -90,26 +94,21 @@ exports.handler = async (event) => {
     if (subtotal <= 0) throw new Error('No valid priced items in cart');
     subtotal = round2(subtotal);
 
-    // Promo code (optional). Looked up and applied here — never trust a
-    // discount amount the browser sends — so a tampered client can't grant
-    // itself a bigger discount than the code actually allows. The discount
-    // is split proportionally across food/non-food (by their pre-discount
-    // share of the cart) so tax is still computed on what was actually paid
-    // for each, not on the full pre-discount amount.
-    let discountCode = null, discountAmount = 0;
-    const rawCode = String(body.promo_code || '').trim();
-    if (rawCode) {
-      const deal = await lookupPromo(rawCode);
-      if (!deal) throw new Error("That code isn't valid or has expired.");
-      discountAmount = computeDiscount(deal, subtotal);
-      if (discountAmount > 0) discountCode = deal.code;
-    }
-    const foodShare = subtotal > 0 ? foodSubtotal / subtotal : 0;
-    const discountFood = round2(discountAmount * foodShare);
-    const discountNonfood = round2(discountAmount - discountFood); // remainder, so the split always adds up exactly
-    foodSubtotal = round2(foodSubtotal - discountFood);
-    nonfoodSubtotal = round2(nonfoodSubtotal - discountNonfood);
-    subtotal = round2(subtotal - discountAmount);
+    // Server-authoritative best offer PER ITEM: department/sale OR promo code, never stacked.
+    const rawCode=String(body.promo_code||body.promoCode||'').trim().slice(0,50);
+    const priced=priceCart(pricingLines,await getOffers(rawCode),rawCode);
+    const discountCode=priced.code;
+    const discountAmount=priced.discount;
+    subtotal=priced.subtotal;
+    foodSubtotal=0; nonfoodSubtotal=0;
+    priced.lines.forEach((l,i)=>{
+      const amount=round2(l.netCents/100);
+      if(l.is_food!==false)foodSubtotal=round2(foodSubtotal+amount);
+      else nonfoodSubtotal=round2(nonfoodSubtotal+amount);
+      orderItems[i].discount_amount=round2(l.savingCents/100);
+      orderItems[i].discount_source=l.source;
+      orderItems[i].final_line_total=amount;
+    });
 
     // Optional pickup time the customer asked for (blank = as soon as possible).
     let requestedPickup = null;
@@ -189,7 +188,8 @@ exports.handler = async (event) => {
         subtotal,
         tax,
         total,
-        ...(discountCode ? { discount_code: discountCode, discount_amount: discountAmount } : {}),
+        ...(discountAmount>0 ? { discount_amount: discountAmount } : {}),
+        ...(discountCode ? { discount_code: discountCode } : {}),
         ...(customerId ? { customer_id: customerId } : {}),
         stripe_session_id: session.id,
         status: 'Awaiting Payment',

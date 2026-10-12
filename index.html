@@ -768,6 +768,46 @@ body.dark .badge-pill{background:#1F2937;}
 .cat-modern-arrow{position:absolute;right:13px;top:44%;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.75);display:grid;place-items:center;color:var(--tile-ink);font-weight:800}
 .makka-instruction{width:100%;min-height:72px;resize:vertical;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:.86rem}
 .makka-weight-entry{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:1rem}
+
+/* 2026-10 homepage refresh */
+.makka-static-logo{margin:18px auto 8px;width:126px;height:126px;border-radius:50%;background:#a00000;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 8px 26px rgba(110,0,0,.13)}
+.makka-static-logo img{width:100%;height:100%;object-fit:contain}
+.feature-bottom{margin:26px 16px 92px}
+.feature-bottom .sec-head{padding-left:0;padding-right:0}
+.feature-showcase{position:relative;min-height:155px;border:1px solid var(--line);border-radius:20px;background:var(--card);box-shadow:var(--shadow-md);overflow:hidden}
+.feature-slide{display:none;padding:28px 22px 42px;text-align:center;animation:featureFade .45s ease}
+.feature-slide.active{display:block}
+.feature-slide h3{font-size:1.25rem;font-weight:800;color:var(--brand);margin:0 0 10px}
+.feature-slide p{font-size:.91rem;color:var(--muted);margin:0}
+.feature-dots{position:absolute;bottom:15px;left:0;right:0;display:flex;justify-content:center;gap:9px}
+.feature-dots button{width:8px;height:8px;padding:0;border-radius:50%;background:#c9c9c9;border:0}
+.feature-dots button.active{background:var(--brand)}
+@keyframes featureFade{from{opacity:.4}to{opacity:1}}
+/* Separate promotional carousel; at most 12 active campaigns */
+.promo-carousel{position:relative;overflow:hidden;margin:0 16px;border-radius:20px}
+.promo-carousel .store-promo{min-height:210px;width:100%;box-sizing:border-box;display:none;margin:0}
+.promo-carousel .store-promo.active{display:flex}
+.promo-carousel-dots{display:flex;justify-content:center;gap:7px;padding:12px 4px}
+.promo-carousel-dots button{width:8px;height:8px;border-radius:50%;background:#c6c6c6;border:0;padding:0;cursor:pointer}
+.promo-carousel-dots button.active{background:var(--brand)}
+.store-promo{min-height:190px}
+@media(prefers-reduced-motion:reduce){.feature-slide{animation:none}}
+
+/* Refined home layout: no repeated department product rows */
+#homePreviews{display:none!important}
+/* Premium rotating store-benefit cards (5-second timer retained) */
+.feature-bottom{margin-top:38px}
+.feature-showcase{min-height:215px;background:linear-gradient(135deg,#fff 0%,#fff8f6 100%);border:1px solid #eddcda;border-radius:24px;box-shadow:0 12px 34px rgba(75,20,20,.08)}
+.feature-showcase .feature-slide{padding:28px 32px 48px;min-height:215px;box-sizing:border-box;align-items:center;gap:26px;text-align:left}
+.feature-showcase .feature-slide.active{display:flex}
+.feature-card-art{width:112px;height:112px;flex:0 0 112px;border-radius:24px;background:linear-gradient(145deg,#fce9e7,#f6d8d4);display:flex;align-items:center;justify-content:center;color:#a71922}
+.feature-card-art svg{width:60px;height:60px}
+.feature-card-copy{flex:1;min-width:0}
+.feature-kicker{font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#a71922}
+.feature-showcase .feature-slide h3{font-size:1.42rem;color:#221b1b;margin:7px 0}
+.feature-showcase .feature-slide p{font-size:.95rem;line-height:1.55;color:#6c6262}
+.feature-dots{bottom:17px}
+@media(max-width:520px){.feature-showcase .feature-slide{padding:24px 20px 48px;gap:15px;min-height:200px}.feature-card-art{width:76px;height:76px;flex-basis:76px;border-radius:18px}.feature-card-art svg{width:44px;height:44px}.feature-showcase .feature-slide h3{font-size:1.13rem}.feature-showcase .feature-slide p{font-size:.81rem}}
 </style>
 <style id="makka-account-style">.makka-account{max-width:640px;margin:0 auto;padding:22px 18px 110px}.makka-account h3{margin:0 0 12px;font-size:1.08rem}.makka-account p{font-size:.84rem;color:var(--muted);line-height:1.5;margin-bottom:14px}.makka-account label{display:block;font-size:.8rem;font-weight:700;margin:10px 0}.makka-account input{display:block;width:100%;margin-top:5px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}.makka-accent-btn{background:var(--brand-dark);color:white;padding:12px 18px;border-radius:10px;font-weight:700;margin-top:10px}.makka-auth-tabs{display:flex;gap:10px;margin:16px 0}.makka-auth-tabs button{flex:1;border:1px solid var(--brand);color:var(--brand);padding:10px;border-radius:9px;font-weight:700}.makka-text-btn{color:var(--brand);font-weight:700;margin-top:16px}.makka-order{border:1px solid var(--line);padding:14px;border-radius:12px;margin:10px 0;background:var(--card)}.makka-order small{display:block;color:var(--muted);margin-top:6px}.store-info a.makka-contact{color:#fff;text-decoration:underline;text-underline-offset:3px}.makka-account-hint{margin-top:12px}</style>
 <style id="makka-account-history-style">
@@ -782,6 +822,34 @@ body.dark .badge-pill{background:#1F2937;}
 .makka-history-header h3{margin:0}.makka-history-header span{font-size:.72rem;color:var(--muted)}
 .makka-orders-scroll{max-height:min(65vh,640px);overflow-y:auto;overscroll-behavior:contain;padding:2px 8px 8px 2px;scrollbar-width:thin}
 .makka-orders-scroll .makka-order{margin:0 0 12px}
+</style>
+
+<style id="makka-dark-contrast-fix">
+/* Dark theme: readable foregrounds on all app surfaces */
+body.dark{color-scheme:dark;--bg:#101827;--fg:#F9FAFB;--ink:#F9FAFB;--card:#1F2937;--card-bg:#1F2937;--paper:#101827;--line:#475569;--line-strong:#64748B;--muted:#CBD5E1;--muted2:#AAB8CA}
+body.dark .topbar,body.dark .tabbar,body.dark .drawer,body.dark .drawer-foot,body.dark .drawer-head,body.dark .deptpage-header,body.dark .feature-showcase,body.dark .p-card,body.dark .deal-card,body.dark .badge-pill,body.dark .lang-sheet,body.dark .lang-opt,body.dark .makka-account,body.dark .makka-order,body.dark .makka-profile-settings,body.dark .makka-profile-settings-btn,body.dark .makka-panel,body.dark .mp-head,body.dark .mp-input-bar,body.dark .mp-quick-btn,body.dark .mp-prod-card{background:#1F2937;color:#F9FAFB;border-color:#475569}
+body.dark .p-card-name,body.dark .p-card-price,body.dark .p-card-brand,body.dark .p-card-price small,body.dark .p-card-orig,body.dark .p-card-body,body.dark .badge-pill-text,body.dark .sec-head h2,body.dark .deptpage-title,body.dark .cat-section h3,body.dark .feature-showcase .feature-slide h3,body.dark .feature-showcase .feature-slide p,body.dark .makka-account h3,body.dark .makka-account p,body.dark .makka-account label,body.dark .makka-account-heading,body.dark .makka-order,body.dark .mp-head-name,body.dark .mp-prod-name,body.dark .mp-prod-price,body.dark .lang-sheet h3,body.dark .lang-native,body.dark .lang-en,body.dark .drawer-item .item-name,body.dark .drawer-head strong,body.dark .totals-row.grand{color:#F9FAFB}
+body.dark .p-card-brand,body.dark .p-card-price small,body.dark .p-card-orig,body.dark .feature-showcase .feature-slide p,body.dark .lang-en,body.dark .lang-sheet p,body.dark .drawer-item .item-unit,body.dark .totals-row,body.dark .makka-order small,body.dark .makka-account-subtitle{color:#CBD5E1}
+body.dark .search-box,body.dark .search-box input,body.dark .mp-input-bar input,body.dark .modal input,body.dark .makka-account input,body.dark .makka-instruction,body.dark .makka-weight-entry,body.dark #langSearch,body.dark .promo-input-row input,body.dark .wm-custom input{background:#111827!important;color:#F9FAFB!important;border-color:#64748B!important}
+body.dark input::placeholder,body.dark textarea::placeholder{color:#CBD5E1!important;opacity:1}
+body.dark .modal,body.dark .modal-pad,body.dark .product-detail-overlay,body.dark .product-detail-panel,body.dark .product-detail-header,body.dark .product-detail-info{background:#1F2937;color:#F9FAFB}
+body.dark .product-detail-info h2,body.dark .product-detail-info .desc,body.dark .product-detail-info .meta{color:#F9FAFB}
+body.dark .product-detail-qty button,body.dark .back-btn,body.dark .drawer-close,body.dark .stepper button,body.dark .wm-chip,body.dark .cat-chip,body.dark .btn-ghost{background:#334155;color:#F9FAFB;border-color:#64748B}
+body.dark .cat-chip.active,body.dark .wm-chip.active{background:var(--brand);color:#FFF;border-color:var(--brand)}
+body.dark .mp-bubble.bot{background:#334155;color:#F9FAFB}
+body.dark .mp-quick-btn,body.dark .mp-prod-card{color:#F9FAFB}
+body.dark .lang-opt.active{background:#4A1C28;border-color:#F87171}
+body.dark .lang-opt .lang-native,body.dark .lang-opt .lang-en{color:#F9FAFB}
+body.dark .deal-chip{background:#334155;color:#F9FAFB}
+body.dark .p-card-stock{background:#111827}
+body.dark .p-card-stock.in{color:#86EFAC}
+body.dark .p-card-stock.out{color:#FCA5A5}
+body.dark .feature-kicker{color:#FCA5A5}
+body.dark .p-card-price.sale{color:#FDA4AF}
+body.dark .p-card-price.reduced{color:#86EFAC}
+body.dark .cat-modern-title,body.dark .cat-modern-desc{color:#202124} /* pastel category tiles remain light */
+body.dark .store-info,body.dark .promo-card,body.dark .store-promo{color:#FFF} /* branded dark panels */
+body.dark .btn-solid,body.dark .checkout-btn,body.dark .makka-accent-btn,body.dark .add-btn,body.dark .product-detail-action{color:#FFF}
 </style>
 </head>
 <body data-view="home" data-dept="meat">
@@ -817,39 +885,8 @@ body.dark .badge-pill{background:#1F2937;}
   </header>
 
   <main id="homeMain">
-    <!-- hero slideshow -->
-    <div class="hero" id="heroSlider">
-      <!-- slides injected by renderHeroSlider() -->
-      <div class="hero-dots" id="heroDots"></div>
-    </div>
-
-    <!-- feature badges -->
-    <div class="badges" id="badgesRow">
-      <div class="badge-pill">
-        <div class="badge-pill-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </div>
-        <span class="badge-pill-text">Fresh Halal Meat</span>
-      </div>
-      <div class="badge-pill">
-        <div class="badge-pill-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        </div>
-        <span class="badge-pill-text">Wide Variety</span>
-      </div>
-      <div class="badge-pill">
-        <div class="badge-pill-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <span class="badge-pill-text">Local Pickup Only</span>
-      </div>
-      <div class="badge-pill">
-        <div class="badge-pill-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <span class="badge-pill-text">Tue–Sun Open</span>
-      </div>
-    </div>
+    <!-- Static Makka logo, no hero slideshow -->
+    <div class="makka-static-logo"><img src="icon-180.png" alt="Makka Halal Meat logo" loading="eager"></div>
 
     <!-- search bar -->
     <div class="search-wrap" style="padding:12px 16px 4px;">
@@ -885,9 +922,20 @@ body.dark .badge-pill{background:#1F2937;}
       <div class="row-scroll" id="saleSectionRow"></div>
     </div>
 
-    <div id="homeFeaturedSection" style="display:none"><div class="sec-head"><h2>⭐ Featured Products</h2></div><div class="row-scroll" id="homeFeaturedProducts"></div></div>
+    <div id="homeFeaturedSection" style="display:none"><div class="sec-head"><h2>Featured Items</h2></div><div class="row-scroll" id="homeFeaturedProducts"></div></div>
     <!-- product previews per dept -->
-    <div id="homePreviews"></div>
+    <!-- Department product rows intentionally omitted; browse through category cards. -->
+    <div id="homePreviews" hidden></div>
+    <section class="feature-bottom" aria-label="Why shop with Makka Halal Meat">
+      <div class="sec-head"><h2>Why Shop With Us</h2></div>
+      <div class="feature-showcase" id="featureShowcase" aria-label="Store benefits slideshow" aria-live="off">
+        <article class="feature-slide active"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 52s-21-12-21-27c0-7 5-12 12-12 4 0 7 2 9 6 2-4 5-6 9-6 7 0 12 5 12 12 0 15-21 27-21 27Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M23 31h18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Quality you can trust</span><h3>Fresh Halal Meat</h3><p>Quality halal cuts prepared for your order with care.</p></div></article>
+        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="10" y="13" width="19" height="19" rx="4" stroke="currentColor" stroke-width="3"/><rect x="35" y="13" width="19" height="19" rx="4" stroke="currentColor" stroke-width="3"/><rect x="10" y="38" width="19" height="16" rx="4" stroke="currentColor" stroke-width="3"/><rect x="35" y="38" width="19" height="16" rx="4" stroke="currentColor" stroke-width="3"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Everything in one place</span><h3>Wide Variety</h3><p>Shop groceries, everyday essentials, and more in one order.</p></div></article>
+        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 56s19-17 19-32a19 19 0 1 0-38 0c0 15 19 32 19 32Z" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="24" r="7" stroke="currentColor" stroke-width="3"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Convenient local shopping</span><h3>Local Pickup Only</h3><p>Order online and collect your groceries at our Clarkston store.</p></div></article>
+        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="23" stroke="currentColor" stroke-width="3"/><path d="M32 18v15l11 7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Plan your pickup</span><h3>Open Tuesday–Sunday</h3><p>11:00 AM–6:30 PM. Meat counter closes at 6:00 PM.</p></div></article>
+        <div class="feature-dots" id="featureDots"><button class="active" aria-label="Feature 1" onclick="showFeature(0)"></button><button aria-label="Feature 2" onclick="showFeature(1)"></button><button aria-label="Feature 3" onclick="showFeature(2)"></button><button aria-label="Feature 4" onclick="showFeature(3)"></button></div>
+      </div>
+    </section>
 
     <!-- store info -->
     <div class="store-info">
@@ -1158,7 +1206,7 @@ body.dark .badge-pill{background:#1F2937;}
     <div class="lang-handle"></div>
     <h3>🌐 Choose Language</h3>
     <p>Translate the app into your preferred language</p>
-    <div class="lang-grid" id="langGrid"></div>
+    <input id="langSearch" type="search" placeholder="Search languages…" aria-label="Search languages" oninput="renderLangGrid(this.value)" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;margin-bottom:12px;font-size:16px"><div class="lang-grid" id="langGrid" style="max-height:46vh;overflow-y:auto"></div>
   </div>
 </div>
 
@@ -1249,11 +1297,10 @@ async function init(){
     CAT_DISCOUNTS = catDiscounts || [];
   }catch(e){ showToast("Couldn't load the catalog — check your connection."); console.error(e); }
   applySettings();
-  renderHeroSlider();
+  startFeatureRotation();
   renderCatGrid();
   renderPromos();
   renderSaleSection();
-  renderHomePreviews();
   renderFeaturedHome();
   renderDeals();
   applyHomeSectionVisibility();
@@ -1286,7 +1333,7 @@ function applySettings(){
 function applyHomeSectionVisibility(){
  const flags=SETTINGS.home_sections||{};
  const ids={categories:'homeCategoriesSection',promotions:'homePromotionsSection',deals:'saleSection',department_rows:'homePreviews',featured:'homeFeaturedSection'};
- Object.entries(ids).forEach(([k,id])=>{const el=document.getElementById(id);if(!el)return;if(flags[k]===false)el.style.display='none';else if(k!=='deals'&&k!=='featured')el.style.display='';});
+ Object.entries(ids).forEach(([k,id])=>{const el=document.getElementById(id);if(!el)return;if(flags[k]===false)el.style.display='none';else if(k!=='deals'&&k!=='featured'&&k!=='promotions')el.style.display='';});
 }
 function renderFeaturedHome(){
  const el=document.getElementById('homeFeaturedSection'),wrap=document.getElementById('homeFeaturedProducts');
@@ -1326,31 +1373,41 @@ function safeDealPhoto(url){
  return url;
 }
 /* ─── PROMOS ─── */
+let promotionSlideIndex=0,promotionTimer=null;
+function showPromotion(i){
+ const slides=[...document.querySelectorAll('#promoScroller .store-promo')];
+ const dots=[...document.querySelectorAll('#promotionDots button')];
+ if(!slides.length)return;
+ promotionSlideIndex=(i+slides.length)%slides.length;
+ slides.forEach((el,j)=>el.classList.toggle('active',j===promotionSlideIndex));
+ dots.forEach((el,j)=>{el.classList.toggle('active',j===promotionSlideIndex);el.setAttribute('aria-current',j===promotionSlideIndex?'true':'false')});
+}
 function renderPromos(){
-  const deal = SETTINGS.deal_text || "Today's best cut, ready for pickup";
-  const dealTitle = SETTINGS.deal_title || "Deal of the day";
-  const dealPrice = SETTINGS.deal_price_label || "";
-  const dealPhoto = safeDealPhoto(SETTINGS.deal_image);
-  document.getElementById("promoScroller").innerHTML = `
-    <div class="promo-card deal" ${dealPhoto?`style="background-image:linear-gradient(90deg,rgba(35,5,5,.87),rgba(35,5,5,.2)),url('${dealPhoto}');background-position:center;background-size:cover"`:""}>
-      <div><div class="promo-eyebrow">${escapeHtml(dealTitle)}</div>
-      <h3>${escapeHtml(deal)}</h3>
-      ${dealPrice?`<p>${escapeHtml(dealPrice)}</p>`:"<p>Fresh cuts every morning</p>"}</div>
-      <button class="promo-cta" onclick="openDeptPage('meat')">Shop now</button>
-    </div>
-    <div class="promo-card pickup">
-      <div><div class="promo-eyebrow">Free pickup</div>
-      <h3>Order ahead, skip the line</h3>
-      <p>We'll have it ready when you arrive.</p></div>
-      <button class="promo-cta" onclick="switchView('home')">Learn more</button>
-    </div>
-    <div class="promo-card halal">
-      <div><div class="promo-eyebrow">100% Halal</div>
-      <h3>Freshly cut, every day</h3>
-      <p>Sourced to halal standards.</p></div>
-      <button class="promo-cta" onclick="openDeptPage('meat')">Explore</button>
-    </div>
-  `;
+ const section=document.getElementById('homePromotionsSection');
+ const scroller=document.getElementById('promoScroller');
+ if(!section||!scroller)return;
+ if(promotionTimer){clearInterval(promotionTimer);promotionTimer=null;}
+ const configured=Array.isArray(SETTINGS.store_promotions)?SETTINGS.store_promotions:[];
+ const now=Date.now();
+ const promos=configured.filter(p=>p&&p.active===true&&(!p.starts_at||Date.parse(p.starts_at)<=now)&&(!p.ends_at||Date.parse(p.ends_at)>=now)).slice(0,12);
+ scroller.classList.add('promo-carousel');
+ scroller.innerHTML=promos.map((p,i)=>{
+   const img=safeDealPhoto(p.image_url||p.image);
+   const title=escapeHtml(String(p.title||'Store promotion'));
+   const desc=escapeHtml(String(p.description||''));
+   const dept=deptKey(String(p.department||''));
+   const action=DEPT_MAP[dept]?`openDeptPage('${dept}')`:`switchView('categories')`;
+   return `<div class="promo-card store-promo ${i===0?'active':''}" ${img?`style="background-image:linear-gradient(90deg,rgba(35,5,5,.86),rgba(35,5,5,.24)),url('${img}');background-size:cover;background-position:center"`:''}><div><div class="promo-eyebrow">Store promotion</div><h3>${title}</h3><p>${desc}</p></div><button class="promo-cta" onclick="${action}">Shop now</button></div>`;
+ }).join('');
+ const existing=document.getElementById('promotionDots');if(existing)existing.remove();
+ if(promos.length>1){
+  const dots=document.createElement('div');dots.id='promotionDots';dots.className='promo-carousel-dots';
+  dots.innerHTML=promos.map((_,i)=>`<button type="button" aria-label="Promotion ${i+1}" onclick="showPromotion(${i})" class="${i===0?'active':''}"></button>`).join('');
+  scroller.after(dots);
+  promotionSlideIndex=0;
+  promotionTimer=setInterval(()=>{if(!document.hidden)showPromotion(promotionSlideIndex+1)},5000);
+ }
+ section.style.display=promos.length?'':'none';
 }
 
 /* ─── THIS WEEK'S DEALS + REDUCED SECTION ─── */
@@ -1713,21 +1770,15 @@ function calcPromoDiscount(subtotal){
   return 0;
 }
 
-function applyPromoCode(){
-  const input = document.getElementById("promoCodeInput");
-  const msg   = document.getElementById("promoMessage");
-  const code  = (input.value||"").trim().toUpperCase();
-  if(!code){ showToast("Enter a promo code first."); return; }
-  const match = DISCOUNTS.find(d => d.code && d.code.toUpperCase()===code);
-  if(!match){ msg.textContent="❌ Code not found or expired."; msg.style.color="var(--brand)"; msg.style.display="block"; return; }
-  const subtotal = cartLines().reduce((s,{p,qty})=>s+effectivePrice(p)*qty,0);
-  const min = match.min_order || 0;
-  if(subtotal < min){ msg.textContent=`❌ Minimum order of $${min.toFixed(2)} required.`; msg.style.color="var(--brand)"; msg.style.display="block"; return; }
-  appliedPromo = match;
-  const label = document.getElementById("promoLabel");
-  if(label) label.textContent = match.title || "Promo discount";
-  msg.textContent=`✓ "${match.title||code}" applied!`; msg.style.color="var(--fresh)"; msg.style.display="block";
-  input.value=""; renderDrawer();
+async function applyPromoCode(){
+ const input=document.getElementById('promoCodeInput');const msg=document.getElementById('promoMessage');
+ const code=(input.value||'').trim().toUpperCase();if(!code){showToast('Enter a promo code first.');return;}
+ try{
+  const r=await fetch('/.netlify/functions/preview-promotion',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,items:cartLines().map(({p,qty})=>({id:p.id,qty}))})});
+  const d=await r.json();if(!r.ok)throw new Error(d.error||'Invalid code');
+  appliedPromo={code:d.code,title:'Promo code '+d.code};
+  msg.textContent='Code accepted. The better discount on each item will be applied.';msg.style.color='var(--fresh)';msg.style.display='block';input.value='';renderDrawer();
+ }catch(e){appliedPromo=null;msg.textContent=e.message;msg.style.color='var(--brand)';msg.style.display='block';renderDrawer();}
 }
 
 function removePromo(){ appliedPromo=null; const msg=document.getElementById("promoMessage"); if(msg){msg.style.display="none";} renderDrawer(); }
@@ -1766,7 +1817,7 @@ function renderDrawer(){
     </div>`;
   }).join(""):`<div class="empty-state"><div class="big"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>Your cart is empty.<br>Find something delicious above.</div>`;
   const subtotal=lines.reduce((s,{p,qty})=>s+effectivePrice(p)*qty,0);
-  const discount=appliedPromo?calcPromoDiscount(subtotal):0;
+  const discount=0; // authoritative discount preview below
   const discounted=Math.max(0,subtotal-discount);
   const tax=discounted*0.03;
   document.getElementById("sumSubtotal").textContent="$"+subtotal.toFixed(2);
@@ -1776,6 +1827,23 @@ function renderDrawer(){
   if(discAmt) discAmt.textContent="-$"+discount.toFixed(2);
   document.getElementById("sumTax").textContent="$"+tax.toFixed(2);
   document.getElementById("sumTotal").textContent="$"+(discounted+tax).toFixed(2);
+  refreshPromotionPreview(lines);
+}
+let promoPreviewSerial=0;
+async function refreshPromotionPreview(lines){
+ const serial=++promoPreviewSerial;
+ if(!lines.length)return;
+ try{
+  const r=await fetch('/.netlify/functions/preview-promotion',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:appliedPromo?.code||'',items:lines.map(({p,qty})=>({id:p.id,qty}))})});
+  const d=await r.json();if(!r.ok||serial!==promoPreviewSerial)return;
+  const row=document.getElementById('sumDiscountRow');row.style.display=d.discount>0?'flex':'none';
+  document.getElementById('promoLabel').textContent=appliedPromo?'Best available discounts':'Automatic discounts';
+  document.getElementById('sumSubtotal').textContent='$'+Number(d.gross).toFixed(2);
+  document.getElementById('sumDiscount').textContent='-$'+Number(d.discount).toFixed(2);
+  const tax=d.items.reduce((s,item)=>{const p=PRODUCTS.find(p=>p.id===item.id);return s+Number(item.net)*(p?.is_food===false?.08:.03)},0);
+  document.getElementById('sumTax').textContent='$'+tax.toFixed(2);
+  document.getElementById('sumTotal').textContent='$'+(Number(d.subtotal)+tax).toFixed(2);
+ }catch(e){console.warn('Promotion preview unavailable',e);}
 }
 function openCart(){document.getElementById("drawer").classList.add("open");document.getElementById("overlay").classList.add("open");renderDrawer();}
 function closeCart(){document.getElementById("drawer").classList.remove("open");document.getElementById("overlay").classList.remove("open");}
@@ -1967,47 +2035,63 @@ const UI_ORIGINAL_PLACEHOLDER=new WeakMap();
 let uiTranslating=false;
 function getLang(){try{return localStorage.getItem('mhm_lang')||'en'}catch(e){return 'en'}}
 function setLang(code){try{localStorage.setItem('mhm_lang',code)}catch(e){}}
+const EXTRA_LANGUAGES=[{"code": "af", "native": "Afrikaans", "en": "Afrikaans"}, {"code": "sq", "native": "Albanian", "en": "Albanian"}, {"code": "az", "native": "Azerbaijani", "en": "Azerbaijani"}, {"code": "eu", "native": "Basque", "en": "Basque"}, {"code": "bn", "native": "Bengali", "en": "Bengali"}, {"code": "bs", "native": "Bosnian", "en": "Bosnian"}, {"code": "bg", "native": "Bulgarian", "en": "Bulgarian"}, {"code": "ca", "native": "Catalan", "en": "Catalan"}, {"code": "ceb", "native": "Cebuano", "en": "Cebuano"}, {"code": "zh-CN", "native": "Chinese Simplified", "en": "Chinese Simplified"}, {"code": "zh-TW", "native": "Chinese Traditional", "en": "Chinese Traditional"}, {"code": "hr", "native": "Croatian", "en": "Croatian"}, {"code": "cs", "native": "Czech", "en": "Czech"}, {"code": "da", "native": "Danish", "en": "Danish"}, {"code": "nl", "native": "Dutch", "en": "Dutch"}, {"code": "et", "native": "Estonian", "en": "Estonian"}, {"code": "fi", "native": "Finnish", "en": "Finnish"}, {"code": "gl", "native": "Galician", "en": "Galician"}, {"code": "ka", "native": "Georgian", "en": "Georgian"}, {"code": "de", "native": "German", "en": "German"}, {"code": "el", "native": "Greek", "en": "Greek"}, {"code": "gu", "native": "Gujarati", "en": "Gujarati"}, {"code": "ht", "native": "Haitian Creole", "en": "Haitian Creole"}, {"code": "ha", "native": "Hausa", "en": "Hausa"}, {"code": "he", "native": "Hebrew", "en": "Hebrew"}, {"code": "hu", "native": "Hungarian", "en": "Hungarian"}, {"code": "is", "native": "Icelandic", "en": "Icelandic"}, {"code": "ig", "native": "Igbo", "en": "Igbo"}, {"code": "id", "native": "Indonesian", "en": "Indonesian"}, {"code": "ga", "native": "Irish", "en": "Irish"}, {"code": "it", "native": "Italian", "en": "Italian"}, {"code": "ja", "native": "Japanese", "en": "Japanese"}, {"code": "jv", "native": "Javanese", "en": "Javanese"}, {"code": "kn", "native": "Kannada", "en": "Kannada"}, {"code": "kk", "native": "Kazakh", "en": "Kazakh"}, {"code": "km", "native": "Khmer", "en": "Khmer"}, {"code": "ko", "native": "Korean", "en": "Korean"}, {"code": "ku", "native": "Kurdish", "en": "Kurdish"}, {"code": "ky", "native": "Kyrgyz", "en": "Kyrgyz"}, {"code": "lo", "native": "Lao", "en": "Lao"}, {"code": "lv", "native": "Latvian", "en": "Latvian"}, {"code": "lt", "native": "Lithuanian", "en": "Lithuanian"}, {"code": "mk", "native": "Macedonian", "en": "Macedonian"}, {"code": "ms", "native": "Malay", "en": "Malay"}, {"code": "ml", "native": "Malayalam", "en": "Malayalam"}, {"code": "mt", "native": "Maltese", "en": "Maltese"}, {"code": "mr", "native": "Marathi", "en": "Marathi"}, {"code": "mn", "native": "Mongolian", "en": "Mongolian"}, {"code": "ne", "native": "Nepali", "en": "Nepali"}, {"code": "no", "native": "Norwegian", "en": "Norwegian"}, {"code": "or", "native": "Odia", "en": "Odia"}, {"code": "ps", "native": "Pashto", "en": "Pashto"}, {"code": "fa", "native": "Persian", "en": "Persian"}, {"code": "pl", "native": "Polish", "en": "Polish"}, {"code": "pt", "native": "Portuguese", "en": "Portuguese"}, {"code": "pa", "native": "Punjabi", "en": "Punjabi"}, {"code": "ro", "native": "Romanian", "en": "Romanian"}, {"code": "ru", "native": "Russian", "en": "Russian"}, {"code": "sr", "native": "Serbian", "en": "Serbian"}, {"code": "si", "native": "Sinhala", "en": "Sinhala"}, {"code": "sk", "native": "Slovak", "en": "Slovak"}, {"code": "sl", "native": "Slovenian", "en": "Slovenian"}, {"code": "sw", "native": "Swahili", "en": "Swahili"}, {"code": "sv", "native": "Swedish", "en": "Swedish"}, {"code": "ta", "native": "Tamil", "en": "Tamil"}, {"code": "te", "native": "Telugu", "en": "Telugu"}, {"code": "th", "native": "Thai", "en": "Thai"}, {"code": "tr", "native": "Turkish", "en": "Turkish"}, {"code": "uk", "native": "Ukrainian", "en": "Ukrainian"}, {"code": "ur", "native": "Urdu", "en": "Urdu"}, {"code": "uz", "native": "Uzbek", "en": "Uzbek"}, {"code": "vi", "native": "Vietnamese", "en": "Vietnamese"}, {"code": "cy", "native": "Welsh", "en": "Welsh"}, {"code": "xh", "native": "Xhosa", "en": "Xhosa"}, {"code": "yo", "native": "Yoruba", "en": "Yoruba"}, {"code": "zu", "native": "Zulu", "en": "Zulu"}];
+const ALL_LANGUAGES=[...LANGUAGES,...EXTRA_LANGUAGES];
+const CACHE=new Map();let pending=new Set(),busy=false,remoteTimer=null,translateBusy=false;
+try{Object.entries(JSON.parse(localStorage.getItem('mhm_translation_cache')||'{}')).forEach(([k,v])=>CACHE.set(k,v))}catch(e){}
 function translateInterface(){
- if(uiTranslating)return;uiTranslating=true;
+ if(translateBusy)return;translateBusy=true;
  try{
   const lang=getLang(),dict=UI_TRANSLATIONS[lang]||{};
-  document.documentElement.lang=lang;
-  document.documentElement.dir='ltr'; // keep existing shopping layout and numeric prices consistent
-  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  document.documentElement.lang=lang;document.documentElement.dir='ltr';
+  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);const nodes=[];
+  while(walker.nextNode())nodes.push(walker.currentNode);
   for(const node of nodes){
-   const parent=node.parentElement;if(!parent||parent.closest('script,style,svg,option,[data-no-translate],.p-card-name,.product-detail-panel h2,.product-review'))continue;
-   let original=UI_ORIGINAL_TEXT.get(node);
-   if(original===undefined){original=node.nodeValue;UI_ORIGINAL_TEXT.set(node,original)}
-   const trimmed=original.trim();if(!trimmed)continue;
-   const translated=dict[trimmed];
-   node.nodeValue=translated?original.replace(trimmed,translated):original;
+   const parent=node.parentElement;
+   if(!parent||parent.closest('script,style,svg,option,[data-no-translate],.lang-modal,.makka-profile-settings,.makka-order'))continue;
+   let orig=UI_ORIGINAL_TEXT.get(node);if(orig===undefined){orig=node.nodeValue;UI_ORIGINAL_TEXT.set(node,orig)}
+   const t=orig.trim();if(!t)continue;
+   const v=dict[t]||CACHE.get(lang+'|'+t);
+   if(lang!=='en'&&!v&&t.length>1&&t.length<220&&/[A-Za-z]/.test(t)&&!t.includes('@')&&!t.includes('http'))pending.add(t);
+   const rendered=v?orig.replace(t,v):orig;if(node.nodeValue!==rendered)node.nodeValue=rendered;
   }
   document.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(el=>{
    if(!UI_ORIGINAL_PLACEHOLDER.has(el))UI_ORIGINAL_PLACEHOLDER.set(el,el.getAttribute('placeholder'));
-   const orig=UI_ORIGINAL_PLACEHOLDER.get(el);el.setAttribute('placeholder',dict[orig]||orig);
+   const orig=UI_ORIGINAL_PLACEHOLDER.get(el),v=dict[orig]||CACHE.get(lang+'|'+orig);
+   if(lang!=='en'&&!v&&orig&&orig.length<220)pending.add(orig);
+   if(el.getAttribute('placeholder')!==(v||orig))el.setAttribute('placeholder',v||orig);
   });
-  const btn=document.getElementById('translateBtnTop');if(btn)btn.textContent='🌐 '+lang.toUpperCase();
- }finally{uiTranslating=false}
+  const btn=document.getElementById('translateBtnTop');if(btn)btn.textContent=lang.toUpperCase();
+  if(lang!=='en'&&pending.size&&!remoteTimer&&!busy)remoteTimer=setTimeout(fetchTranslations,450);
+ }finally{translateBusy=false}
 }
-function applyLang(code){if(!LANGUAGES.some(l=>l.code===code))code='en';setLang(code);translateInterface()}
-function renderLangGrid(){
- const cur=getLang();document.getElementById('langGrid').innerHTML=LANGUAGES.map(l=>`
+async function fetchTranslations(){
+ remoteTimer=null;if(busy||getLang()==='en')return;
+ const lang=getLang(),items=[...pending].slice(0,40);items.forEach(t=>pending.delete(t));if(!items.length)return;
+ busy=true;
+ try{
+  const r=await fetch('/.netlify/functions/translate-content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:lang,texts:items})});
+  if(!r.ok)throw Error('Translation service unavailable');
+  const data=await r.json();if(!Array.isArray(data.translations)||data.translations.length!==items.length)throw Error('Invalid response');
+  items.forEach((t,i)=>{if(typeof data.translations[i]==='string')CACHE.set(lang+'|'+t,data.translations[i])});
+  try{localStorage.setItem('mhm_translation_cache',JSON.stringify(Object.fromEntries([...CACHE].slice(-1200))))}catch(e){}
+  if(getLang()===lang)translateInterface();
+ }catch(e){console.warn('Translation unavailable; showing original text',e);pending.clear()}
+ finally{busy=false;if(pending.size&&getLang()!=='en'&&!remoteTimer)remoteTimer=setTimeout(fetchTranslations,500)}
+}
+function applyLang(code){if(!ALL_LANGUAGES.some(l=>l.code===code))code='en';pending.clear();setLang(code);translateInterface()}
+function renderLangGrid(search=''){
+ const cur=getLang(),q=search.trim().toLowerCase();
+ document.getElementById('langGrid').innerHTML=ALL_LANGUAGES.filter(l=>(l.native+' '+l.en+' '+l.code).toLowerCase().includes(q)).map(l=>`
  <button class="lang-opt${l.code===cur?' active':''}" onclick="pickLang('${l.code}')">
- <span class="lang-flag">${l.flag}</span><span><span class="lang-native">${l.native}</span><span class="lang-en">${l.en}</span></span></button>`).join('');
+ <span><span class="lang-native">${l.native}</span><span class="lang-en">${l.en}</span></span></button>`).join('');
 }
-function openLangModal(){renderLangGrid();document.getElementById('langModal').classList.add('open')}
+function openLangModal(){renderLangGrid();document.getElementById('langModal').classList.add('open');const el=document.getElementById('langSearch');if(el)el.value=''}
 function closeLangModal(){document.getElementById('langModal').classList.remove('open')}
 function pickLang(code){closeLangModal();applyLang(code)}
-// Reapply to newly rendered cart, category and product detail UI.
 let translationQueued=false;
-const translationObserver=new MutationObserver(()=>{
- if(uiTranslating||translationQueued)return;
- translationQueued=true;requestAnimationFrame(()=>{translationQueued=false;translateInterface()});
-});
-document.addEventListener('DOMContentLoaded',()=>{
- translateInterface();translationObserver.observe(document.body,{childList:true,subtree:true,characterData:false});
-});
+const translationObserver=new MutationObserver(()=>{if(translateBusy||translationQueued)return;translationQueued=true;requestAnimationFrame(()=>{translationQueued=false;translateInterface()})});
+document.addEventListener('DOMContentLoaded',()=>{translateInterface();translationObserver.observe(document.body,{childList:true,subtree:true,characterData:false})});
 /* ─── UTILS ─── */
 let toastTimer;
 function showToast(msg){
@@ -2052,6 +2136,21 @@ const HERO_SLIDES = [
 ];
 let heroSlideIndex = 0;
 let heroTimer = null;
+
+
+let featureSlideIndex=0,featureTimer=null;
+function showFeature(i){
+ const slides=document.querySelectorAll('#featureShowcase .feature-slide');
+ const dots=document.querySelectorAll('#featureDots button');
+ if(!slides.length)return;
+ featureSlideIndex=(i+slides.length)%slides.length;
+ slides.forEach((el,j)=>el.classList.toggle('active',j===featureSlideIndex));
+ dots.forEach((el,j)=>el.classList.toggle('active',j===featureSlideIndex));
+}
+function startFeatureRotation(){
+ if(featureTimer)clearInterval(featureTimer);
+ featureTimer=setInterval(()=>{if(!document.hidden)showFeature(featureSlideIndex+1)},5000);
+}
 
 function renderHeroSlider(){
   const slider = document.getElementById("heroSlider");
