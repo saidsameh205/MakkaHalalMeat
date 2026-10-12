@@ -15,7 +15,7 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const productId = body.productId !== undefined ? Number(body.productId) : null;
+    const productId = body.productId !== undefined ? String(body.productId).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 60) : null;
     const dealId = body.dealId !== undefined ? Number(body.dealId) : null;
     const settingKey = body.settingKey ? String(body.settingKey).replace(/[^a-z0-9_]/g, '') : null;
     if (!productId && !dealId && !settingKey) throw new Error('productId, dealId, or settingKey is required');
@@ -25,10 +25,9 @@ exports.handler = async (event) => {
     const dataBase64 = String(body.dataBase64 || '');
     if (!dataBase64) throw new Error('No image data received');
 
+    if (!/^image\/(jpeg|png|webp|gif)$/i.test(contentType)) throw new Error("Unsupported image format");
     const buffer = Buffer.from(dataBase64, 'base64');
-    const isVideo = contentType.startsWith('video/');
-    const maxSize = isVideo ? 50 * 1024 * 1024 : 4 * 1024 * 1024; // 50MB for video, 4MB for images
-    if (buffer.length > maxSize) throw new Error(isVideo ? 'Video is too large (max 50 MB)' : 'Image is too large (max 4 MB) — try a smaller photo');
+    if (buffer.length > 4 * 1024 * 1024) throw new Error('Image is too large (max 4 MB) — try a smaller photo');
 
     const folder = settingKey ? 'settings' : dealId ? 'deals' : 'products';
     const id = settingKey || dealId || productId;
