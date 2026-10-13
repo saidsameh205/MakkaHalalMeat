@@ -609,6 +609,8 @@ a{color:var(--brand);text-decoration:none;}
         <div class="settings-group"><h3>Homepage Sections</h3>
           <div id="homeSectionControls"></div>
         </div>
+        <div class="settings-group"><h3>Homepage Section Order</h3><p style="font-size:.8rem;color:var(--muted);margin-bottom:8px">Use arrows to rearrange the homepage. Hidden sections keep their positions.</p><div id="homeSectionOrderControls"></div></div>
+        <div class="settings-group"><h3>Promotional Banners</h3><p style="font-size:.8rem;color:var(--muted);margin-bottom:10px">Manage images, titles, department links, and dates. Current coupon and category discounts continue to display automatically.</p><div id="homeBannerControls"></div><button class="btn-outline" type="button" onclick="addHomeBanner()" style="margin-top:10px">+ Add promotional banner</button></div>
         <div class="settings-group"><h3>Department Tiles & Product Rows</h3>
           <div id="homeDepartmentControls">Loading departments…</div>
         </div>
@@ -616,6 +618,7 @@ a{color:var(--brand);text-decoration:none;}
           <p style="font-size:.82rem;color:var(--muted);margin-bottom:8px">Choose up to 12 active products to highlight on the homepage.</p>
           <input id="homeFeaturedFilter" placeholder="Filter products by name…" oninput="renderHomeFeaturedChoices()" style="width:100%;margin-bottom:8px">
           <div id="homeFeaturedChoices" style="max-height:270px;overflow:auto;border:1px solid var(--border);border-radius:10px;padding:10px"></div>
+          <div id="homeFeaturedOrder" style="margin-top:12px"></div>
           <p id="homeFeaturedCount" style="font-size:.8rem;color:var(--muted);margin-top:8px"></p>
         </div>
         <button class="btn-save" onclick="saveHomepageSettings()">Save Homepage</button>
@@ -1526,51 +1529,112 @@ async function loadHomepageSettings(){
  renderHomepageManager();
  }catch(e){target.textContent='Could not load: '+e.message;}
 }
+const HOME_SECTION_LABELS=[['benefits','Why Shop With Us'],['categories','Shop by Category'],['promotions','Promotions'],['deals','This Week’s Deals'],['featured','Featured Products'],['store_info','Store Information']];
+function homeEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function homeSectionOrder(){const saved=Array.isArray(HOME_CONFIG.home_section_order)?HOME_CONFIG.home_section_order:[];return [...new Set([...saved,...HOME_SECTION_LABELS.map(x=>x[0])])].filter(x=>HOME_SECTION_LABELS.some(k=>k[0]===x));}
 function renderHomepageManager(){
  const flags=HOME_CONFIG.home_sections||{};
  const sections=document.getElementById('homeSectionControls');sections.replaceChildren();
- [['categories','Shop by Category'],['promotions','Promotions'],['deals','This Week’s Deals'],['department_rows','Department Product Rows'],['featured','Featured Products']].forEach(([k,n])=>{
- const row=document.createElement('label');row.className='toggle-row';row.textContent=n+' ';
- const c=document.createElement('input');c.type='checkbox';c.dataset.homeSection=k;c.checked=flags[k]!==false;row.append(c);sections.append(row);
+ HOME_SECTION_LABELS.forEach(([k,n])=>{
+  const row=document.createElement('label');row.className='toggle-row';
+  const label=document.createElement('span');label.textContent=n;
+  const c=document.createElement('input');c.type='checkbox';c.dataset.homeSection=k;c.checked=flags[k]!==false;
+  row.append(label,c);sections.append(row);
  });
+ // Preserve checkbox changes while sorting: only rebuild the order list.
+ renderHomeSectionOrder();
  const hidden=new Set((HOME_CONFIG.hidden_departments||[]).map(homeKey));
  const target=document.getElementById('homeDepartmentControls');target.replaceChildren();
  HOME_DEPARTMENTS.forEach((d,i)=>{
- const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:12px;padding:9px;border-bottom:1px solid #ddd';
- const c=document.createElement('input');c.type='checkbox';c.dataset.homeDept=d.key;c.checked=!hidden.has(d.key);
- const n=document.createElement('span');n.textContent=d.name;n.style.flex='1';
- const up=document.createElement('button');up.className='btn-outline';up.textContent='↑';up.disabled=i===0;up.onclick=()=>moveHomeDept(i,-1);
- const down=document.createElement('button');down.className='btn-outline';down.textContent='↓';down.disabled=i===HOME_DEPARTMENTS.length-1;down.onclick=()=>moveHomeDept(i,1);
- row.append(c,n,up,down);target.append(row);
+  const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:12px;padding:9px;border-bottom:1px solid #ddd';
+  const c=document.createElement('input');c.type='checkbox';c.dataset.homeDept=d.key;c.checked=!hidden.has(d.key);
+  const n=document.createElement('span');n.textContent=d.name;n.style.flex='1';
+  const up=document.createElement('button');up.className='btn-outline';up.textContent='↑';up.disabled=i===0;up.onclick=()=>moveHomeDept(i,-1);
+  const down=document.createElement('button');down.className='btn-outline';down.textContent='↓';down.disabled=i===HOME_DEPARTMENTS.length-1;down.onclick=()=>moveHomeDept(i,1);
+  row.append(c,n,up,down);target.append(row);
  });
- renderHomeFeatured();
+ renderHomeFeatured();renderHomeBanners();
+}
+function renderHomeSectionOrder(){
+ const target=document.getElementById('homeSectionOrderControls');target.replaceChildren();
+ const keys=homeSectionOrder();
+ keys.forEach((k,i)=>{
+  const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:9px;padding:8px;border-bottom:1px solid #eee';
+  const name=document.createElement('span');name.style.flex='1';name.textContent=HOME_SECTION_LABELS.find(x=>x[0]===k)?.[1]||k;
+  row.append(name);
+  for(const [symbol,offset] of [['↑',-1],['↓',1]]){
+   const btn=document.createElement('button');btn.className='btn-outline';btn.textContent=symbol;btn.disabled=i+offset<0||i+offset>=keys.length;
+   btn.onclick=()=>{const updated=homeSectionOrder();[updated[i],updated[i+offset]]=[updated[i+offset],updated[i]];HOME_CONFIG.home_section_order=updated;renderHomeSectionOrder();};row.append(btn);
+  }target.append(row);
+ });
 }
 function moveHomeDept(i,by){
  HOME_CONFIG.hidden_departments=[...document.querySelectorAll('[data-home-dept]')].filter(c=>!c.checked).map(c=>c.dataset.homeDept);
+ HOME_CONFIG.home_sections=Object.fromEntries([...document.querySelectorAll('[data-home-section]')].map(c=>[c.dataset.homeSection,c.checked]));
  [HOME_DEPARTMENTS[i],HOME_DEPARTMENTS[i+by]]=[HOME_DEPARTMENTS[i+by],HOME_DEPARTMENTS[i]];
  renderHomepageManager();
 }
+function renderHomeFeaturedChoices(){renderHomeFeatured();}
 function renderHomeFeatured(){
  const el=document.getElementById('homeFeaturedChoices');el.replaceChildren();
- const selected=new Set((HOME_CONFIG.featured_product_ids||[]).map(String));
+ const ids=(HOME_CONFIG.featured_product_ids||[]).map(String);
+ const selected=new Set(ids);
  const filter=document.getElementById('homeFeaturedFilter').value.trim().toLowerCase();
  const matches=ALL_PRODUCTS.filter(p=>p.active!==false&&String(p.name||'').toLowerCase().includes(filter));
- matches.slice(0,150).forEach(p=>{
- const row=document.createElement('label');row.style.cssText='display:flex;gap:8px;padding:5px';
- const c=document.createElement('input');c.type='checkbox';c.checked=selected.has(String(p.id));
- c.onchange=()=>{
- const ids=new Set((HOME_CONFIG.featured_product_ids||[]).map(String));
- if(c.checked){if(ids.size>=12){c.checked=false;showToast('Maximum 12 featured products','error');return;}ids.add(String(p.id));}else ids.delete(String(p.id));
- HOME_CONFIG.featured_product_ids=[...ids];
- document.getElementById('homeFeaturedCount').textContent=ids.size+' / 12 selected';
- };
- const name=document.createElement('span');name.textContent=p.name||'Unnamed';row.append(c,name);el.append(row);
+ matches.slice(0,200).forEach(p=>{
+  const row=document.createElement('label');row.style.cssText='display:flex;gap:8px;padding:5px';
+  const c=document.createElement('input');c.type='checkbox';c.checked=selected.has(String(p.id));
+  c.onchange=()=>{
+   const values=(HOME_CONFIG.featured_product_ids||[]).map(String);
+   if(c.checked){if(values.length>=12){c.checked=false;showToast('Maximum 12 featured products','error');return;}if(!values.includes(String(p.id)))values.push(String(p.id));}
+   else{const i=values.indexOf(String(p.id));if(i>=0)values.splice(i,1);}
+   HOME_CONFIG.featured_product_ids=values;renderHomeFeatured();
+  };
+  const name=document.createElement('span');name.textContent=p.name||'Unnamed';row.append(c,name);el.append(row);
  });
- document.getElementById('homeFeaturedCount').textContent=selected.size+' / 12 selected';
+ document.getElementById('homeFeaturedCount').textContent=ids.length+' / 12 selected';
+ const box=document.getElementById('homeFeaturedOrder');box.replaceChildren();
+ if(ids.length){const title=document.createElement('strong');title.textContent='Featured product order';box.append(title);}
+ ids.forEach((id,i)=>{
+  const p=ALL_PRODUCTS.find(x=>String(x.id)===id);
+  const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:8px;padding:5px 0';
+  const txt=document.createElement('span');txt.style.flex='1';txt.textContent=p?.name||'Product '+id;
+  row.append(txt);
+  for(const [symbol,offset] of [['↑',-1],['↓',1]]){
+   const btn=document.createElement('button');btn.className='btn-outline';btn.textContent=symbol;btn.disabled=i+offset<0||i+offset>=ids.length;
+   btn.onclick=()=>{const a=[...ids];[a[i],a[i+offset]]=[a[i+offset],a[i]];HOME_CONFIG.featured_product_ids=a;renderHomeFeatured();};row.append(btn);
+  }box.append(row);
+ });
+}
+function addHomeBanner(){
+ HOME_CONFIG.store_promotions=[...(HOME_CONFIG.store_promotions||[]),{title:'New Promotion',description:'',image_url:'',department:'',starts_at:'',ends_at:'',active:false}];renderHomeBanners();
+}
+function removeHomeBanner(i){if(!confirm('Remove this banner? Changes take effect after Save Homepage.'))return;HOME_CONFIG.store_promotions.splice(i,1);renderHomeBanners();}
+function renderHomeBanners(){
+ const container=document.getElementById('homeBannerControls');container.replaceChildren();
+ (HOME_CONFIG.store_promotions||[]).forEach((p,i)=>{
+  const card=document.createElement('div');card.style.cssText='padding:14px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px';
+  const title=document.createElement('strong');title.textContent='Banner '+(i+1);card.append(title);
+  const grid=document.createElement('div');grid.className='form-grid';grid.style.marginTop='10px';
+  const field=(label,key,type='text')=>{
+   const wrap=document.createElement('div');wrap.className='fld'+(key==='description'||key==='image_url'?' span2':'');
+   const lab=document.createElement('label');lab.textContent=label;
+   const input=document.createElement('input');input.type=type;input.value=p[key]||'';
+   input.oninput=()=>p[key]=input.value;wrap.append(lab,input);grid.append(wrap);
+  };
+  field('Title','title');field('Department link (blank = categories)','department');field('Description','description');field('Image URL (HTTPS)','image_url');field('Starts (optional)','starts_at','date');field('Ends (optional)','ends_at','date');
+  card.append(grid);
+  const controls=document.createElement('div');controls.style.cssText='display:flex;align-items:center;gap:12px;margin-top:10px';
+  const check=document.createElement('input');check.type='checkbox';check.checked=p.active===true;check.onchange=()=>p.active=check.checked;
+  const active=document.createElement('span');active.textContent='Active';controls.append(check,active);
+  const del=document.createElement('button');del.className='btn-delete';del.style.marginLeft='auto';del.textContent='Remove';del.onclick=()=>removeHomeBanner(i);controls.append(del);card.append(controls);container.append(card);
+ });
 }
 async function saveHomepageSettings(){
  const sections={};document.querySelectorAll('[data-home-section]').forEach(c=>sections[c.dataset.homeSection]=c.checked);
- const config={department_order:HOME_DEPARTMENTS.map(d=>d.key),hidden_departments:[...document.querySelectorAll('[data-home-dept]')].filter(c=>!c.checked).map(c=>c.dataset.homeDept),home_sections:sections,featured_product_ids:HOME_CONFIG.featured_product_ids||[]};
+ const banners=HOME_CONFIG.store_promotions||[];
+ for(const p of banners){if(p.image_url && !/^https:\/\//i.test(p.image_url)){showToast('Banner image must use an HTTPS URL','error');return;}}
+ const config={department_order:HOME_DEPARTMENTS.map(d=>d.key),hidden_departments:[...document.querySelectorAll('[data-home-dept]')].filter(c=>!c.checked).map(c=>c.dataset.homeDept),home_sections:sections,home_section_order:homeSectionOrder(),featured_product_ids:HOME_CONFIG.featured_product_ids||[],store_promotions:banners};
  try{await api('admin-homepage',{method:'PATCH',body:JSON.stringify(config)});HOME_CONFIG={...HOME_CONFIG,...config};showToast('Homepage saved ✓','success');}
  catch(e){showToast('Save failed: '+e.message,'error');}
 }
