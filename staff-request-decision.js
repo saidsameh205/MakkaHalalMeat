@@ -28,7 +28,7 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
   const auth = await requireStaff(event);
   if (!auth.ok) return auth.response;
-  if (auth.isButcher) return json(403, { error: 'Butcher access is limited to meat preparation.' });
+  if (auth.role === 'butcher') return json(403, { error: 'Butcher accounts can only mark meat ready.' });
   if (!auth.isAdmin) {
     return json(403, { error: 'Only the store admin can approve or deny cancellations and refunds.' });
   }

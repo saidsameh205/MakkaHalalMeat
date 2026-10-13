@@ -1,6 +1,6 @@
 const { json, requireAdmin, supabaseFetch, hashPin, generatePin, isWeakPin } = require('./_util');
 
-const PUBLIC_COLUMNS = 'id,name,active,can_approve,last_login_at,locked_until,created_at';
+const PUBLIC_COLUMNS = 'id,name,active,can_approve,role,last_login_at,locked_until,created_at';
 
 function cleanName(raw) {
   const name = String(raw || '').trim().replace(/\s+/g, ' ');
@@ -46,7 +46,7 @@ exports.handler = async (event) => {
       const rows = await supabaseFetch('staff', {
         method: 'POST',
         headers: { Prefer: 'return=representation' },
-        body: JSON.stringify({ name, name_key: nameKey, pin_hash: hashPin(pin), active: true, can_approve: !!b.can_approve }),
+        body: JSON.stringify({ name, name_key: nameKey, pin_hash: hashPin(pin), active: true, role: b.role === 'butcher' ? 'butcher' : 'employee', can_approve: b.role === 'butcher' ? false : !!b.can_approve }),
       });
       const { pin_hash, name_key, failed_attempts, ...person } = rows[0];
       return json(201, { staff: person, pin });
@@ -68,7 +68,19 @@ exports.handler = async (event) => {
         patch.active = !!b.active;
         if (!b.active) patch.sessions_valid_after = new Date().toISOString();   // switching off also ends any open session for good
       }
-      if (b.can_approve !== undefined) patch.can_approve = !!b.can_approve;
+      if (b.role !== undefined) {
+        if (!['employee','butcher'].includes(b.role)) throw httpError(400, 'Invalid staff role');
+        patch.role = b.role;
+        if (b.role === 'butcher') patch.can_approve = false;
+        patch.sessions_valid_after = new Date().toISOString();
+      }
+      if (b.can_approve !== undefined) {
+        if (b.can_approve) {
+          const existing = await supabaseFetch(`staff?id=eq.${id}&select=role`);
+          if (patch.role === 'butcher' || (!patch.role && existing[0]?.role === 'butcher')) throw httpError(403, 'Butchers cannot approve refunds or cancellations');
+        }
+        patch.can_approve = !!b.can_approve;
+      }
       if (b.unlock) { patch.failed_attempts = 0; patch.locked_until = null; }
       if (b.reset_pin) {
         const p = pinFrom(b.reset_pin === true ? undefined : b.reset_pin);

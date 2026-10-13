@@ -67,7 +67,6 @@ async function shapeOrders(rows) {
       order_code: o.order_code,
       placed_at: o.placed_at || o.created_at,
       events: Array.isArray(o.events) ? o.events.slice(-30) : [],
-      meat_ready_at: o.meat_ready_at || null,
       cancel_request: cancelReq,
       refund_request: refundReq,
       refunded_amount: refunded,

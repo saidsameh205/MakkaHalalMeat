@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     if (!nameKey || !pin) return json(400, { error: 'Enter your name and PIN.' });
 
     const rows = await supabaseFetch(
-      `staff?name_key=eq.${encodeURIComponent(nameKey)}&select=id,name,pin_hash,active,can_approve,failed_attempts,locked_until`
+      `staff?name_key=eq.${encodeURIComponent(nameKey)}&select=id,name,pin_hash,active,can_approve,role,failed_attempts,locked_until`
     );
     const person = rows && rows[0];
 
@@ -62,7 +62,7 @@ exports.handler = async (event) => {
 
     const expires = now + SESSION_HOURS * 3600 * 1000;
     const token = signSession({ sid: person.id, iat: now, exp: expires });
-    return json(200, { token, name: person.name, is_admin: !!person.can_approve, expires_at: new Date(expires).toISOString() });
+    return json(200, { token, name: person.name, is_admin: !!person.can_approve && person.role !== 'butcher', role: person.role || 'employee', expires_at: new Date(expires).toISOString() });
   } catch (e) {
     console.error('staff-login', e);
     return json(500, { error: 'Unable to sign in right now.' });

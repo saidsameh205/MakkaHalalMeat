@@ -1,7 +1,7 @@
+const { meatOnlyOrders } = require('./_butcher');
 const { json, requireStaff, supabaseFetch } = require('./_util');
 const { reconcilePendingOrders } = require('./_reconcile');
 const { shapeOrders, ORDER_COLUMNS } = require('./_staff');
-const { meatIndexes, redactButcherOrder } = require('./_butcher');
 
 const ACTIVE = ['New', 'Preparing', 'Ready for Pickup', 'Paid - Preparing'];
 const DONE = ['Completed'];
@@ -32,21 +32,13 @@ exports.handler = async (event) => {
     }
 
     let orders = await shapeOrders(filtered);
-    if (auth.isButcher) {
-      const safe = [];
-      for (const order of orders) {
-        const indexes = await meatIndexes(order.items);
-        const redacted = redactButcherOrder(order, indexes);
-        if (redacted) safe.push(redacted);
-      }
-      orders = safe;
-    }
+    if (auth.role === 'butcher') orders = await meatOnlyOrders(orders);
 
     // Cancellation / refund requests waiting for the admin (any age), plus
     // recently decided ones for reference. Refund requests belong to orders
     // that are already completed, so they can't come from the list above.
     let requests = [];
-    if (view === 'active' && !auth.isButcher) {
+    if (view === 'active' && auth.role !== 'butcher') {
       const back = new Date(Date.now() - 45 * 24 * 3600 * 1000).toISOString();
       const reqRows = await supabaseFetch(
         `orders?select=${ORDER_COLUMNS}&created_at=gte.${encodeURIComponent(back)}` +
@@ -61,7 +53,7 @@ exports.handler = async (event) => {
       requests = await shapeOrders(keep);
     }
 
-    return json(200, { server_time: new Date().toISOString(), view, is_admin: !!auth.isAdmin, is_butcher: !!auth.isButcher, staff_name: auth.staffName || '', orders, requests });
+    return json(200, { server_time: new Date().toISOString(), view, is_admin: !!auth.isAdmin, role: auth.role || 'employee', staff_name: auth.staffName || '', orders, requests });
   } catch (e) {
     console.error('staff-orders', e);
     return json(500, { error: 'Unable to load orders' });

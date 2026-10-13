@@ -55,6 +55,11 @@
   #productsTable input, #productsTable textarea, #productsTable select { box-sizing:border-box; }
   #productsTable textarea.auto-fit-description { overflow:hidden; }
 </style>
+<style id="makka-universal-upload-css">
+.makka-universal-drop{border:2px dashed #c8a6a6;border-radius:13px;padding:15px;margin:8px 0;background:rgba(192,39,45,.035);text-align:center;cursor:pointer;color:inherit;font-size:13px;line-height:1.5;outline-offset:3px}
+.makka-universal-drop strong{display:block;font-size:14px}.makka-universal-drop.drag-over,.makka-universal-drop:focus{border-color:#c0272d;background:rgba(192,39,45,.1)}
+.makka-universal-drop small{display:block;color:#6b7280}.makka-universal-drop .makka-drop-status{display:block;color:#166534;font-weight:600;overflow-wrap:anywhere}
+</style>
 </head>
 <body>
 
@@ -820,6 +825,57 @@ async function moveCategory(dept,index,dir){ const {state,rows}=editableRows(dep
 async function deleteCategory(dept,index){ const {state,rows}=editableRows(dept); const name=rows[index].name; const used=PRODUCTS.filter(p=>p.department===dept&&p.category===name).length; if(used){ alert(`${name} still has ${used} product(s). Rename/move those products first, or rename this category and choose to move them.`); return; } if(!confirm(`Delete category “${name}”?`))return; rows.splice(index,1); rows.forEach((x,i)=>x.order=i); state[dept]=rows; await persistCategories(state); }
 
 function escHtml(s) { return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+</script>
+<script id="makka-universal-upload-js">
+/* All admin file inputs share drag/drop, paste and file browsing. Existing change handlers remain authoritative. */
+(function(){
+ const MAX=20*1024*1024;
+ let active=null;
+ const SKIP=new Set(['cameraInput']);
+ function fileInput(el){return el&&el.matches&&el.matches('input[type="file"]')&&!SKIP.has(el.id)}
+ function useFile(input,files){
+   if(!input||!files||!files.length)return;
+   const allowed=[...files].filter(f=>f.type.startsWith('image/') || (input.accept||'').includes('video')&&f.type.startsWith('video/'));
+   if(!allowed.length){alert('Please choose an image'+((input.accept||'').includes('video')?' or supported video':'')+'.');return}
+   if(allowed.some(f=>f.size>MAX)){alert('File is larger than the 20 MB uploader limit. Some sections have a smaller limit.');return}
+   const dt=new DataTransfer();
+   (input.multiple?allowed:[allowed[0]]).forEach(f=>dt.items.add(f));
+   input.files=dt.files;
+   active=input;
+   input.dispatchEvent(new Event('change',{bubbles:true}));
+   const z=document.querySelector('.makka-universal-drop[data-for="'+CSS.escape(input.id)+'"]');
+   if(z){const status=z.querySelector('.makka-drop-status');if(status)status.textContent=[...dt.files].map(f=>f.name).join(', ')+' selected';}
+ }
+ function create(input){
+   if(!fileInput(input)||input.dataset.makkaUploader==='yes')return;
+   if(!input.id)input.id='makka-upload-'+Math.random().toString(36).slice(2);
+   input.dataset.makkaUploader='yes';
+   const z=document.createElement('div');z.className='makka-universal-drop';z.dataset.for=input.id;z.tabIndex=0;z.setAttribute('role','button');z.setAttribute('aria-label','Choose, drop or paste image');
+   z.innerHTML='<strong>📷 Drag & drop or paste an image</strong><small>Click to browse · Ctrl+V to paste a copied image</small><span class="makka-drop-status" aria-live="polite"></span>';
+   input.insertAdjacentElement('afterend',z);
+   z.addEventListener('click',()=>{active=input;input.click()});
+   z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=input;input.click()}});
+   z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag-over')});
+   z.addEventListener('dragleave',()=>z.classList.remove('drag-over'));
+   z.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();z.classList.remove('drag-over');useFile(input,e.dataTransfer.files)});
+   input.addEventListener('click',()=>{active=input});
+   input.addEventListener('change',()=>{active=input});
+   z.addEventListener('pointerenter',()=>{active=input});
+ }
+ function scan(){document.querySelectorAll('input[type="file"]').forEach(create)}
+ document.addEventListener('paste',e=>{
+   const files=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));
+   if(!files.length)return;
+   const target=e.target;
+   if(target&&target.closest&&target.closest('input:not([type="file"]),textarea,[contenteditable="true"]'))return;
+   const modal=target?.closest?.('.modal,.modal-backdrop');
+   const chosen=modal?.querySelector('input[type="file"]')||active||document.querySelector('input[type="file"]:not([id="cameraInput"])');
+   if(!chosen)return;
+   e.preventDefault();useFile(chosen,files);
+ });
+ document.addEventListener('focusin',e=>{const zone=e.target?.closest?.('.makka-universal-drop');if(zone){active=document.getElementById(zone.dataset.for)}});
+ scan();new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
+})();
 </script>
 </body>
 </html>

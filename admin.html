@@ -214,6 +214,11 @@ a{color:var(--brand);text-decoration:none;}
 .empty-state h3{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:4px;}
 .empty-state p{font-size:.82rem;}
 </style>
+<style id="makka-universal-upload-css">
+.makka-universal-drop{border:2px dashed #c8a6a6;border-radius:13px;padding:15px;margin:8px 0;background:rgba(192,39,45,.035);text-align:center;cursor:pointer;color:inherit;font-size:13px;line-height:1.5;outline-offset:3px}
+.makka-universal-drop strong{display:block;font-size:14px}.makka-universal-drop.drag-over,.makka-universal-drop:focus{border-color:#c0272d;background:rgba(192,39,45,.1)}
+.makka-universal-drop small{display:block;color:#6b7280}.makka-universal-drop .makka-drop-status{display:block;color:#166534;font-weight:600;overflow-wrap:anywhere}
+</style>
 </head>
 <body>
 
@@ -1695,6 +1700,7 @@ function renderStaff(){
     <thead><tr style="color:var(--muted);font-size:.75rem;">
       <th style="text-align:left;padding:6px 8px;font-weight:600;">Name</th>
       <th style="text-align:left;padding:6px 8px;font-weight:600;">Status</th>
+      <th style="text-align:left;padding:6px 8px;font-weight:600;">Role</th>
       <th style="text-align:left;padding:6px 8px;font-weight:600;">Can Approve</th>
       <th style="text-align:left;padding:6px 8px;font-weight:600;">Last Login</th>
       <th style="padding:6px 8px;"></th>
@@ -1709,7 +1715,8 @@ function renderTeamRows(){
     return `<tr style="border-top:1px solid var(--line);">
       <td style="padding:10px 8px;font-weight:600;">${escH(p.name)}</td>
       <td style="padding:10px 8px;">${p.active?'<span style="color:var(--fresh);font-size:.75rem;font-weight:700;">On</span>':'<span style="color:var(--muted);font-size:.75rem;">Off</span>'}${locked?' <span style="background:#FEF9C3;color:#92400E;font-size:.7rem;font-weight:700;padding:1px 6px;border-radius:10px;">Locked</span>':""}</td>
-      <td style="padding:10px 8px;"><input type="checkbox" style="width:auto;" ${p.can_approve?"checked":""} onchange="setApprove(${p.id},this.checked)"></td>
+      <td style="padding:10px 8px;"><select aria-label="Role for ${escH(p.name)}" onchange="setStaffRole(${p.id},this.value)" style="padding:7px;border:1px solid var(--line);border-radius:8px;"><option value="employee" ${(p.role||'employee')==='employee'?'selected':''}>Employee</option><option value="butcher" ${p.role==='butcher'?'selected':''}>Butcher — meat only</option></select></td>
+      <td style="padding:10px 8px;"><input type="checkbox" style="width:auto;" ${p.role==='butcher'?'disabled title="Butchers cannot approve refunds"':''} ${p.can_approve?"checked":""} onchange="setApprove(${p.id},this.checked)"></td>
       <td style="padding:10px 8px;color:var(--muted);">${escH(last)}</td>
       <td style="padding:10px 8px;display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn-outline" style="font-size:.75rem;padding:4px 10px;" onclick="resetPin(${p.id})">Reset PIN</button>
@@ -1746,6 +1753,13 @@ async function resetPin(id){
 async function setActive(id, active){
   try { await api("admin-staff",{method:"PATCH",body:JSON.stringify({id, active})}); loadStaff(); }
   catch(e){ showToast(e.message,"error"); }
+}
+async function setStaffRole(id,role){
+  const member=TEAM.find(p=>p.id===id);
+  if(!member) return;
+  if(!confirm(`Change ${member.name} to ${role === 'butcher' ? 'Butcher (meat-only)' : 'Regular Employee'}? Their current shift will be signed out.`)){renderStaff();return;}
+  try{await api('admin-staff',{method:'PATCH',body:JSON.stringify({id,role})});await loadStaff();showToast('Role updated. Employee must sign in again.');}
+  catch(e){showToast(e.message,'error');loadStaff();}
 }
 async function setApprove(id, can_approve){
   if(can_approve && !confirm("Let this person approve/deny cancellations & refunds (moves real money)?")){ loadStaff(); return; }
@@ -1859,6 +1873,57 @@ function showToast(msg, type=""){
 function escH(s){ return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function escA(s){ return escH(s); }
 function escJ(s){ return String(s||"").replace(/'/g,"\\'"); }
+</script>
+<script id="makka-universal-upload-js">
+/* All admin file inputs share drag/drop, paste and file browsing. Existing change handlers remain authoritative. */
+(function(){
+ const MAX=20*1024*1024;
+ let active=null;
+ const SKIP=new Set(['cameraInput']);
+ function fileInput(el){return el&&el.matches&&el.matches('input[type="file"]')&&!SKIP.has(el.id)}
+ function useFile(input,files){
+   if(!input||!files||!files.length)return;
+   const allowed=[...files].filter(f=>f.type.startsWith('image/') || (input.accept||'').includes('video')&&f.type.startsWith('video/'));
+   if(!allowed.length){alert('Please choose an image'+((input.accept||'').includes('video')?' or supported video':'')+'.');return}
+   if(allowed.some(f=>f.size>MAX)){alert('File is larger than the 20 MB uploader limit. Some sections have a smaller limit.');return}
+   const dt=new DataTransfer();
+   (input.multiple?allowed:[allowed[0]]).forEach(f=>dt.items.add(f));
+   input.files=dt.files;
+   active=input;
+   input.dispatchEvent(new Event('change',{bubbles:true}));
+   const z=document.querySelector('.makka-universal-drop[data-for="'+CSS.escape(input.id)+'"]');
+   if(z){const status=z.querySelector('.makka-drop-status');if(status)status.textContent=[...dt.files].map(f=>f.name).join(', ')+' selected';}
+ }
+ function create(input){
+   if(!fileInput(input)||input.dataset.makkaUploader==='yes')return;
+   if(!input.id)input.id='makka-upload-'+Math.random().toString(36).slice(2);
+   input.dataset.makkaUploader='yes';
+   const z=document.createElement('div');z.className='makka-universal-drop';z.dataset.for=input.id;z.tabIndex=0;z.setAttribute('role','button');z.setAttribute('aria-label','Choose, drop or paste image');
+   z.innerHTML='<strong>📷 Drag & drop or paste an image</strong><small>Click to browse · Ctrl+V to paste a copied image</small><span class="makka-drop-status" aria-live="polite"></span>';
+   input.insertAdjacentElement('afterend',z);
+   z.addEventListener('click',()=>{active=input;input.click()});
+   z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=input;input.click()}});
+   z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag-over')});
+   z.addEventListener('dragleave',()=>z.classList.remove('drag-over'));
+   z.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();z.classList.remove('drag-over');useFile(input,e.dataTransfer.files)});
+   input.addEventListener('click',()=>{active=input});
+   input.addEventListener('change',()=>{active=input});
+   z.addEventListener('pointerenter',()=>{active=input});
+ }
+ function scan(){document.querySelectorAll('input[type="file"]').forEach(create)}
+ document.addEventListener('paste',e=>{
+   const files=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));
+   if(!files.length)return;
+   const target=e.target;
+   if(target&&target.closest&&target.closest('input:not([type="file"]),textarea,[contenteditable="true"]'))return;
+   const modal=target?.closest?.('.modal,.modal-backdrop');
+   const chosen=modal?.querySelector('input[type="file"]')||active||document.querySelector('input[type="file"]:not([id="cameraInput"])');
+   if(!chosen)return;
+   e.preventDefault();useFile(chosen,files);
+ });
+ document.addEventListener('focusin',e=>{const zone=e.target?.closest?.('.makka-universal-drop');if(zone){active=document.getElementById(zone.dataset.for)}});
+ scan();new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
+})();
 </script>
 </body>
 </html>

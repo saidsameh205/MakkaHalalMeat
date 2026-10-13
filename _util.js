@@ -162,7 +162,7 @@ async function requireStaff(event) {
     if (row.sessions_valid_after && (session.iat || 0) < new Date(row.sessions_valid_after).getTime()) {
       return unauthorized('Your session ended — please sign in again.');
     }
-    return { ok: true, isAdmin: !!row.can_approve, isButcher: row.role === 'butcher', staffId: row.id, staffName: row.name };
+    return { ok: true, isAdmin: !!row.can_approve && row.role !== 'butcher', role: row.role || 'employee', staffId: row.id, staffName: row.name };
   }
 
   const staffToken = process.env.STAFF_TOKEN;
@@ -170,8 +170,8 @@ async function requireStaff(event) {
   if (!staffToken && !adminToken) {
     return { ok: false, response: json(500, { error: 'Server is missing the STAFF_TOKEN environment variable.' }) };
   }
-  if (adminToken && safeEqual(provided, adminToken)) return { ok: true, isAdmin: true, staffName: 'Admin' };
-  if (staffToken && safeEqual(provided, staffToken)) return { ok: true, isAdmin: false, staffName: 'Shared staff code' };
+  if (adminToken && safeEqual(provided, adminToken)) return { ok: true, isAdmin: true, role: 'employee', staffName: 'Admin' };
+  if (staffToken && safeEqual(provided, staffToken)) return { ok: true, isAdmin: false, role: 'employee', staffName: 'Shared staff code' };
   return unauthorized();
 }
 

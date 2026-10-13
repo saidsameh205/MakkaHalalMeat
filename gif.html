@@ -156,9 +156,13 @@
   .toast{position:fixed; left:50%; bottom:calc(120px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(14px); opacity:0; background:#fff; color:#111; padding:12px 18px; border-radius:999px; font-weight:800; font-size:.92rem; z-index:80; pointer-events:none; transition:.2s; max-width:92vw; text-align:center;}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
   @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important;} }
+  #butcherPanel{position:fixed;inset:0;z-index:200;background:#15100d;color:#f4ede4;overflow-y:auto;padding:22px 18px 60px}
+  #butcherPanel .butcher-card{background:#2b211b;border:1px solid rgba(255,255,255,.12);padding:16px;border-radius:15px;margin:12px 0}
+  #butcherPanel .butcher-btn{background:#3bb273;color:#092315;border:0;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
+<section id="butcherPanel" hidden aria-label="Butcher queue"><div style="max-width:600px;margin:auto"><h1>🥩 GIF — Butcher Queue</h1><p>Only meat items are shown. Marking meat ready keeps the order open.</p><p id="butcherStatus">Loading…</p><div id="butcherCards"></div><button class="btn secondary" style="margin-top:20px" onclick="signOut()">Sign out</button></div></section>
 
 <!-- ============ SIGN IN ============ -->
 <div id="login" class="login">
@@ -235,8 +239,6 @@ let openId = null;
 let weighing = null;      // { id, idx } while entering a picked weight
 let subCtx = null;        // { id, idx, product }
 let knownIds = null;      // ids we've already seen (null until first load)
-let IS_BUTCHER = false;
-let KNOWN_MEAT_READY = new Set();
 let IS_ADMIN = false;     // true only when signed in with the admin code (or as a manager with approve rights)
 let ME = "";             // who is signed in
 let REQUESTS = [];        // orders that have a cancellation / refund request
@@ -304,6 +306,7 @@ async function signIn() {
 }
 function signOut(msg) {
   localStorage.removeItem("gif_token"); TOKEN = "";
+  $("butcherPanel").hidden = true;
   clearInterval(window._poll); clearInterval(window._tick);
   releaseWake(); closeSheet(true);
   $("app").hidden = true; $("login").hidden = false;
@@ -338,17 +341,16 @@ async function refresh() {
     const isNewIds = fresh.filter((o) => o.status === "New" && knownIds && !knownIds.has(o.id));
     knownIds = new Set(fresh.map((o) => o.id));
     ORDERS = fresh;
-    IS_ADMIN = !!data.is_admin; IS_BUTCHER = !!data.is_butcher; ME = data.staff_name || ME;
-    if (!IS_BUTCHER) {
-      const newlyReady = fresh.filter(o => o.meat_ready_at && !KNOWN_MEAT_READY.has(o.id));
-      if (KNOWN_MEAT_READY.size && newlyReady.length) toast('Meat ready: ' + newlyReady.map(o => o.order_code).join(', '));
-      KNOWN_MEAT_READY = new Set(fresh.filter(o => o.meat_ready_at).map(o => o.id));
-    }
+    if(data.role === 'butcher') { renderButcherQueue(fresh); return; }
+    $('butcherPanel').hidden = true;
+    IS_ADMIN = !!data.is_admin; ME = data.staff_name || ME;
     REQUESTS = data.requests || [];
     const pend = pendingRequests();
     const newReqs = pend.filter((r) => knownReqKeys && !knownReqKeys.has(r.key));
     knownReqKeys = new Set(pend.map((r) => r.key));
 
+    const meatReadyCount = fresh.filter(o=>o.meat_ready_at).length;
+    if(meatReadyCount) $('statusText').textContent = `Live · ${meatReadyCount} order(s) have meat ready`;
     if (tab === "done") await loadDone();
     if (isNewIds.length) onNewOrders(isNewIds);
     if (newReqs.length) onNewRequests(newReqs);
@@ -358,6 +360,17 @@ async function refresh() {
   } catch (e) {
     if (e.message !== "Unauthorized") setOnline(false);
   }
+}
+function butcherEscape(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderButcherQueue(orders){
+  $('butcherPanel').hidden=false;
+  $('butcherStatus').textContent=`${orders.filter(o=>!o.meat_ready_at).length} orders waiting for meat`;
+  $('butcherCards').innerHTML=orders.length?orders.map(o=>`<article class="butcher-card"><h3>${butcherEscape(o.order_code||o.id)}</h3><p>${butcherEscape(o.customer_name||'Order')}</p><ul>${o.items.map(it=>`<li>${butcherEscape(it.name)} — ${butcherEscape(it.qty)} ${butcherEscape(it.unit||'')}</li>`).join('')}</ul><p>${o.meat_ready_at?'✓ Meat ready':'Meat preparation pending'}</p>${o.meat_ready_at?'':`<button class="butcher-btn" onclick="markButcherReady(${Number(o.id)})">Mark Meat Ready</button>`}</article>`).join(''):'<p>No meat orders waiting.</p>';
+}
+async function markButcherReady(id){
+  if(!confirm('Mark the meat portion ready? The order will stay open.')) return;
+  try{await api('staff-meat-ready',{method:'POST',body:JSON.stringify({id})});await refresh();}
+  catch(e){alert(e.message||'Unable to mark meat ready');}
 }
 async function loadDone() {
   try { const d = await api("staff-orders?view=done"); DONE = d.orders; } catch (e) { /* keep old */ }
@@ -682,7 +695,6 @@ function textLink(o, body) {
   return phone ? `sms:${phone}?&body=${encodeURIComponent(body)}` : "#";
 }
 function renderSheet() {
-  if (IS_BUTCHER) { renderButcherSheet(); return; }
   const o = findOrder(openId);
   if (!o) { closeSheet(); return; }
   const d = dueInfo(o);
@@ -698,7 +710,7 @@ function renderSheet() {
     skip: ["Customer said: skip it if it's out", "If something's out, just mark it unavailable."],
   }[o.substitution_pref] || [];
 
-  const itemsHtml = (o.meat_ready_at ? `<div class="callout">✓ Meat ready — confirmed by butcher</div>` : "") + o.items.map((it) => itemHtml(o, it, editable)).join("");
+  const itemsHtml = o.items.map((it) => itemHtml(o, it, editable)).join("");
   const showTotal = o.adjusted_total != null && (o.items.some((i) => i.pick_status !== "pending") || o.adjusted_total !== o.total);
 
   let action = "";
@@ -726,29 +738,6 @@ function renderSheet() {
     ${held ? `<button class="btn secondary" disabled>⏸ Picking paused — cancellation request pending</button>` : (editable ? action : `<button class="btn secondary" onclick="closeSheet()">Close</button>`)}
   </div></div>`;
 }
-
-async function markMeatReady(id) {
-  try {
-    const data = await api('staff-update-order', { method:'POST', body:JSON.stringify({id,op:'meat_ready'}) });
-    applyUpdated(data.order); toast('Meat ready — employees notified'); renderSheet(); render();
-  } catch(e) { toast(e.message); }
-}
-function renderButcherSheet() {
-  const o = findOrder(openId);
-  if (!o) { closeSheet(); return; }
-  const pending = o.items.filter(i => i.pick_status === 'pending').length;
-  const editable = !o.meat_ready_at && o.status !== 'Completed';
-  const itemsHtml = o.items.map(it => itemHtml(o,it,editable)).join('');
-  $('sheet').innerHTML = `<div class="inner"><header>
-    <button class="back" onclick="closeSheet()">←</button>
-    <div class="sh-title"><b>${esc(o.order_code)} · Meat only</b><span>Butcher preparation</span></div>
-    </header><div class="timeline">Only meat items are shown.</div>${itemsHtml}</div>
-    <div class="footer"><div class="in">${o.meat_ready_at ?
-      '<button class="btn secondary" disabled>✓ Meat confirmed ready</button>' :
-      `<button class="btn green" ${pending || !editable ? 'disabled' : ''} onclick="markMeatReady(${o.id})">${pending ? pending+' meat item(s) remaining' : '✓ Mark Meat Ready & Notify Team'}</button>`
-    }</div></div>`;
-}
-
 function fmtQ(it, q) { return it.weighted ? `${Number(q)} lb` : `${Number(q)}`; }
 function itemHtml(o, it, editable) {
   const pic = it.image ? `background-image:url('${esc(it.image)}')` : "";
