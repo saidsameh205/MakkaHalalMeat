@@ -959,6 +959,110 @@ body.dark .feature-showcase .feature-slide p {
 .cat-tile.cat-picture:focus-visible{outline:3px solid #8c1a1e;outline-offset:3px}
 @media(min-width:900px){.cat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
+
+<style id="makka-homepage-visual-update">
+
+/* REMOVE EXCESSIVE SPACE */
+#homeView .feature-bottom {
+  margin-bottom: 10px !important;
+}
+
+#homeView #homeCategoriesSection .sec-head {
+  padding-top: 12px;
+}
+
+/* CATEGORY IMAGES — 16:9 */
+#homeView .cat-tile.cat-picture {
+  aspect-ratio: 16 / 9 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  border-radius: 14px;
+}
+
+#homeView .cat-tile.cat-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+/* PREMIUM PROMOTION BANNER */
+#homeView .promo-carousel {
+  width: 100%;
+  margin: 12px 0 20px;
+  border: 2px solid #D8A64D;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 14px 32px rgba(60,7,14,.24);
+}
+
+#homeView .promo-carousel .store-promo {
+  position: relative;
+  min-height: 365px;
+  padding: 54px 30px 30px;
+  background-color: #390c13;
+  background-size: cover, contain !important;
+  background-position: center, right center !important;
+  background-repeat: no-repeat !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+#homeView .promo-carousel .store-promo::before {
+  content: "LIMITED-TIME OFFER";
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  background: #F7DB9E;
+  color: #681624;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  z-index: 1;
+}
+
+#homeView .promo-card.store-promo h3 {
+  font-size: 1.7rem;
+  line-height: 1.15;
+}
+
+#homeView .promo-card.store-promo .promo-cta {
+  background: #F4C66E;
+  color: #4D1218;
+  border: none;
+  padding: 11px 21px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+/* MOBILE OPTIMIZATION */
+@media (max-width: 520px) {
+  #homeView .feature-bottom {
+    margin-bottom: 8px !important;
+  }
+
+  #homeView .cat-grid {
+    gap: 9px;
+  }
+
+  #homeView .promo-carousel .store-promo {
+    min-height: 310px;
+    padding: 54px 18px 22px;
+  }
+
+  #homeView .promo-card.store-promo h3 {
+    font-size: 1.34rem;
+  }
+
+  #homeView .promo-carousel .store-promo::before {
+    left: 18px;
+    top: 15px;
+  }
+}
+
+</style>
 </head>
 <body data-view="home" data-dept="meat">
 
