@@ -1,29 +1,20 @@
-MAKKA V36 PASSWORD-ONLY ADMIN LOGIN
+MAKKA — CATEGORY PICTURES + BUTCHER ROLE FIX (CHANGED FILES ONLY)
 
-Upload only:
-  admin.html -> repository root
-  netlify/functions/_util.js -> existing functions folder (replace)
-  netlify/functions/admin-login.js -> existing functions folder (new)
+Replace only these matching files in your existing GitHub project:
+  index.html
+  admin.html
+  netlify/functions/admin-staff.js
 
-Other files (admin-products.js and admin-settings.js) are included for reference only.
-Do not replace them unless you need to restore them.
+If your Netlify configuration instead points at the repository-root admin-staff.js, replace that copy too (included in this ZIP). Both backend copies are identical.
 
-Netlify -> Environment variables:
-  ADMIN_PASSWORD = choose a NEW strong unique password (at least 16 characters)
-  ADMIN_TOKEN = KEEP your existing value. Do not remove/change it: it also signs staff/customer sessions.
-After adding ADMIN_PASSWORD, deploy the site once to make the new environment variable available.
-Then password-only sign-in works without entering a token. Netlify redeploy is NOT needed for normal sign-ins.
+Includes:
+- Prior duplicate Candy & Sweets card fix and Shop by Category picture/name editor
+- Square admin category-image previews, centered crop
+- Category pictures use object-fit:cover rather than stretching
+- Existing employee-role dropdown retained; current backend supports role updates
+- Updated backend function for Supabase-backed butcher role PATCH requests
+- Helpful warning if Netlify still runs an old backend function
 
-Security:
-  Password is checked by the backend, not stored in HTML.
-  8-hour signed admin session, stored in sessionStorage.
-  Existing ADMIN_TOKEN callers remain supported for compatibility.
-  Changing ADMIN_TOKEN invalidates signed sessions (including staff/customer).
-  Rate limit is best-effort per warm function instance; not a globally distributed rate limiter.
+IMPORTANT: A 'Nothing to change' response on role change usually means the live deployed admin-staff function is outdated. This package includes the role-aware function. Deploy preview and verify role updates, Supabase staff.role, and butcher-only restrictions. SQL EMPLOYEE_BUTCHER_ROLES.sql must already have been run. Do not delete any other website files.
 
-Important:
-  This is a code-level repair, not tested against your deployed Supabase or Netlify environment.
-  Do not publish the original V36 admin.html: it contains a hardcoded password.
-  Other Admin functions that use requireAdmin should accept the signed session.
-  The old admin UI's product fields may not all be supported by the existing admin-products sanitizer.
-  Back up files first and test Products/Orders/Team before production use.
+No full website is included. Other existing website files remain untouched.

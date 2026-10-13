@@ -582,7 +582,7 @@ a{color:var(--brand);text-decoration:none;}
           <label class="toggle"><input type="checkbox" id="setOrderAhead" checked><span class="toggle-slider"></span></label>
         </div>
       </div>
-      <button class="btn-save" onclick="saveSettings()">Save Settings</button>
+      <div class="card"><div class="card-title">Shop by Category — Pictures & Names</div><p>Change a card name or upload a photo, then Save Settings.</p><div id="categoryCardsRows"></div></div><button class="btn-save" onclick="saveSettings()">Save Settings</button>
     </div>
 
     <!-- DEPARTMENT & CATEGORY MANAGER -->
@@ -1759,7 +1759,7 @@ async function setStaffRole(id,role){
   if(!member) return;
   if(!confirm(`Change ${member.name} to ${role === 'butcher' ? 'Butcher (meat-only)' : 'Regular Employee'}? Their current shift will be signed out.`)){renderStaff();return;}
   try{await api('admin-staff',{method:'PATCH',body:JSON.stringify({id,role})});await loadStaff();showToast('Role updated. Employee must sign in again.');}
-  catch(e){showToast(e.message,'error');loadStaff();}
+  catch(e){showToast(/nothing to change/i.test(String(e.message))?'Role not saved: deploy the updated netlify/functions/admin-staff.js, then retry.':e.message,'error');loadStaff();}
 }
 async function setApprove(id, can_approve){
   if(can_approve && !confirm("Let this person approve/deny cancellations & refunds (moves real money)?")){ loadStaff(); return; }
@@ -1813,9 +1813,36 @@ async function loadSettings(){
     document.getElementById("setDealTitle").value = c.deal_title||"";
     document.getElementById("setDealPrice").value = c.deal_price_label||"";
     dealImageUrl = c.deal_image||""; dealImageFile=null; previewDealImage(dealImageUrl);
+    categoryCardImages={...(c.category_card_images||{})};categoryCardLabels={...(c.category_card_labels||{})};renderCategoryCardsEditor();
     document.getElementById("setAskMakka").checked = !!c.ask_makka_enabled;
     document.getElementById("setOrderAhead").checked = c.order_ahead_enabled!==false;
   }catch(e){ showToast("Couldn't load settings","error"); }
+}
+const CATEGORY_CARD_NAMES=[['meat','Fresh Halal Meat'],['grocery','Grocery'],['household','Household'],['beauty','Beauty'],['baby','Baby'],['clothing','Clothing'],['candy','Candy & Sweets']];
+let categoryCardImages={},categoryCardLabels={};
+function renderCategoryCardsEditor(){
+ const wrap=document.getElementById('categoryCardsRows');if(!wrap)return;
+ wrap.replaceChildren();
+ for(const [id,name] of CATEGORY_CARD_NAMES){
+  const card=document.createElement('div');card.style.cssText='padding:12px;border:1px solid #ddd;border-radius:12px;margin:10px 0';
+  const heading=document.createElement('b');heading.textContent=name;card.appendChild(heading);
+  const label=document.createElement('input');label.id='category_label_'+id;label.placeholder='Card display name';label.value=categoryCardLabels[id]||name;label.style.cssText='display:block;width:100%;margin:8px 0';card.appendChild(label);
+  const url=document.createElement('input');url.id='category_image_'+id;url.placeholder='Picture URL or upload below';url.value=categoryCardImages[id]||'';url.style.cssText='display:block;width:100%;margin:8px 0';card.appendChild(url);
+  const preview=document.createElement('img');preview.id='category_preview_'+id;preview.alt=name;preview.style.cssText='display:block;width:150px;height:150px;max-width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center;border-radius:10px;margin:8px 0';if(url.value)preview.src=url.value;else preview.style.display='none';card.appendChild(preview);
+  url.addEventListener('input',()=>{preview.src=url.value;preview.style.display=url.value?'block':'none'});
+  const file=document.createElement('input');file.type='file';file.accept='image/*';file.style.cssText='display:block;max-width:100%';file.addEventListener('change',()=>uploadCategoryCardImage(id,file));card.appendChild(file);
+  const status=document.createElement('div');status.id='category_status_'+id;status.style.cssText='font-size:.8rem;margin-top:6px';card.appendChild(status);wrap.appendChild(card);
+ }
+}
+async function uploadCategoryCardImage(id,input){
+ const file=input.files&&input.files[0];if(!file)return;
+ const msg=document.getElementById('category_status_'+id);msg.textContent='Uploading…';
+ try{
+  const url=await uploadImageToSupabase(file,'category-'+id,{settingKey:'category_'+id});
+  document.getElementById('category_image_'+id).value=url;
+  const preview=document.getElementById('category_preview_'+id);preview.src=url;preview.style.display='block';
+  msg.textContent='Uploaded — click Save Settings to publish.';
+ }catch(e){msg.textContent=e.message||'Upload failed';}
 }
 async function saveSettings(){
   const payload = {
@@ -1830,6 +1857,13 @@ async function saveSettings(){
     ask_makka_enabled: document.getElementById("setAskMakka").checked,
     order_ahead_enabled: document.getElementById("setOrderAhead").checked,
   };
+  payload.category_card_images={...categoryCardImages};payload.category_card_labels={...categoryCardLabels};
+  for(const [id,name] of CATEGORY_CARD_NAMES){
+   const url=document.getElementById('category_image_'+id).value.trim();
+   if(url&&!/^https:\/\//i.test(url)&&!/^\/[^\/]/.test(url)){showToast('Please upload a picture or use an HTTPS URL for '+name,'error');return;}
+   if(url)payload.category_card_images[id]=url;else delete payload.category_card_images[id];
+   payload.category_card_labels[id]=document.getElementById('category_label_'+id).value.trim().slice(0,60)||name;
+  }
   // Remove undefined
   Object.keys(payload).forEach(k=>payload[k]===undefined && delete payload[k]);
 
