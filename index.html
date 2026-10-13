@@ -1122,6 +1122,102 @@ body.dark[data-view="home"] #homeView .sec-head h2{color:#111827;}
 }
 
 </style>
+<style id="makka-homepage-restoration">
+/* 2026-10-13: Restore page sequence and adjust mobile artwork/header */
+#homeView #homeMain{display:flex!important;flex-direction:column!important;}
+#homeView #homePromotionsSection{order:0!important;width:100%!important;}
+#homeView #homeCategoriesSection{order:1!important;}
+#homeView #homeMain > .search-wrap{order:2!important;}
+#homeView #homeFeaturedSection{order:3!important;}
+#homeView #homeBenefitsSection{
+  order:5!important;display:block!important;
+  margin:20px 16px 24px!important;
+}
+#homeView #saleSection{order:7!important;}
+#homeView #homeStoreInfoSection{order:8!important;}
+#homeView #homePreviews{order:9!important;}
+#homeView #homeMain > footer{order:100!important;display:block!important;}
+#homeView #homeBenefitsSection .feature-showcase{display:block!important;}
+/* Landscape promotions, no narrow 82%-width card left over from legacy CSS */
+#homeView #promoScroller.promo-carousel{
+  display:block!important;width:calc(100% - 24px)!important;
+  margin:10px 12px 5px!important;padding:0!important;
+  overflow:hidden!important;border-radius:18px!important;
+}
+#homeView #promoScroller .store-promo{
+  flex:none!important;width:100%!important;min-width:100%!important;
+  max-width:100%!important;aspect-ratio:1.9/1!important;
+  min-height:0!important;height:auto!important;
+  background-size:cover!important;background-position:center center!important;
+  background-repeat:no-repeat!important;
+  border-radius:18px!important;box-shadow:none!important;
+}
+#homeView #promoScroller .store-promo:not(.active){display:none!important;}
+#homeView #promoScroller .store-promo.active{display:flex!important;}
+/* Nudge the logo toward menu, without shifting menu or cart controls */
+#homeView #homeHeader .topbar-brand{
+  left:calc(50% - 17px)!important;transform:translateX(-50%)!important;
+}
+@media(max-width:520px){
+  #homeView #promoScroller .store-promo{aspect-ratio:1.75/1!important;}
+  #homeView #homeHeader .topbar-brand{left:calc(50% - 12px)!important;}
+}
+</style>
+
+<style id="makka-homepage-exact-order-20261013">
+/* Approved homepage sequence: benefits, promotions, categories, featured, info, pricing. */
+#homeView #homeMain{display:flex!important;flex-direction:column!important;background:#fff!important;}
+#homeView #homeBenefitsSection{order:0!important;display:block!important;margin:12px 14px 16px!important;}
+#homeView #homeBenefitsSection>.sec-head{display:flex!important;padding:12px 4px 10px!important;}
+#homeView #homeBenefitsSection .feature-showcase{display:block!important;}
+#homeView #homePromotionsSection{order:1!important;display:block!important;width:100%!important;margin:0!important;}
+#homeView #homePromotionsSection>.sec-head{display:flex!important;padding:12px 16px 9px!important;}
+#homeView #homeCategoriesSection{order:2!important;}
+#homeView #homeFeaturedSection{order:3!important;}
+#homeView #homeStoreInfoSection{order:4!important;margin-top:22px!important;}
+#homeView #homeMain>footer{order:5!important;display:block!important;margin:2px 12px 22px!important;padding:14px 8px 26px!important;color:#9ca3af!important;text-align:center!important;font-size:.76rem!important;}
+/* Search is accessible from fixed Search navigation, not between homepage sections. */
+#homeView #homeMain>.search-wrap{display:none!important;}
+/* Deals stay in the Deals tab, not in the requested home page sequence. */
+#homeView #saleSection{display:none!important;}
+#homeView #homePreviews{display:none!important;}
+/* Show all four rotating Why Shop benefit cards; existing rotation is preserved. */
+#homeView #homeBenefitsSection .feature-slide.active{display:flex!important;}
+/* Promotions: use full card width and preserve the entire uploaded artwork. */
+#homeView #promoScroller.promo-carousel{width:calc(100% - 24px)!important;margin:0 12px 6px!important;overflow:hidden!important;}
+#homeView #promoScroller .store-promo{flex:0 0 100%!important;width:100%!important;min-width:100%!important;max-width:100%!important;aspect-ratio:1.48/1!important;min-height:0!important;height:auto!important;border-radius:17px!important;background-size:contain!important;background-repeat:no-repeat!important;background-position:center!important;background-color:#650914!important;}
+#homeView #promoScroller .store-promo.has-promo-art{background-size:contain!important;background-position:center!important;background-color:#650914!important;}
+#homeView #promoScroller .store-promo.active{display:flex!important;}
+#homeView #promoScroller .store-promo:not(.active){display:none!important;}
+#homeView #homeHeader .topbar-brand{left:calc(50% - 14px)!important;}
+@media(max-width:520px){#homeView #promoScroller .store-promo{aspect-ratio:1.48/1!important;}#homeView #homeHeader .topbar-brand{left:calc(50% - 12px)!important;}}
+</style>
+
+<style id="makka-logo-and-full-promo-image-20261013">
+/* Nudge logo to the left; keep all header buttons in place. */
+#homeView #homeHeader .topbar-brand {left:calc(50% - 26px)!important;}
+@media(max-width:520px){#homeView #homeHeader .topbar-brand {left:calc(50% - 24px)!important;}}
+/* Never crop a promotional artwork image. The JS below makes each slide
+   follow the natural proportions of its uploaded artwork. */
+#homeView #promoScroller .store-promo.has-promo-art {
+  background-size:contain!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+}
+</style>
+
+<style id="makka-footer-last-confirmed-20261013">
+/* Keep the requested homepage order explicit, including the final disclosure. */
+#homeView #homeMain{display:flex!important;flex-direction:column!important;}
+#homeView #homeBenefitsSection{order:10!important;}
+#homeView #homePromotionsSection{order:20!important;}
+#homeView #homeCategoriesSection{order:30!important;}
+#homeView #homeFeaturedSection{order:40!important;}
+#homeView #homeStoreInfoSection{order:50!important;}
+#homeView #homeMain > footer{order:999!important;display:block!important;position:static!important;clear:both!important;}
+/* These are kept out of the home view and remain accessible in their dedicated tabs. */
+#homeView #homeMain > .search-wrap,#homeView #saleSection,#homeView #homePreviews{display:none!important;}
+</style>
 </head>
 <body data-view="home" data-dept="meat">
 
@@ -1855,6 +1951,23 @@ function renderPromos() {
         <button class="promo-cta" onclick="${action}">Shop now</button>
       </div>`;
   }).join('');
+
+  // Fit each promotion to the actual dimensions of its uploaded image.
+  // A wide artwork remains wide; taller artwork gets the height it needs.
+  // This avoids cutting off discount text placed at the top or bottom.
+  [...scroller.querySelectorAll('.store-promo.has-promo-art')].forEach(slide => {
+    const artUrl = slide.style.backgroundImage.match(/^url\(["']?(.*?)["']?\)$/)?.[1];
+    if (!artUrl) return;
+    const artwork = new Image();
+    artwork.onload = () => {
+      if (!artwork.naturalWidth || !artwork.naturalHeight) return;
+      const ratio = `${artwork.naturalWidth} / ${artwork.naturalHeight}`;
+      slide.style.setProperty('aspect-ratio', ratio, 'important');
+      slide.style.setProperty('height', 'auto', 'important');
+      slide.style.setProperty('background-size', 'contain', 'important');
+    };
+    artwork.src = artUrl;
+  });
 
   const existing = document.getElementById('promotionDots');
   if (existing) existing.remove();
