@@ -7,7 +7,8 @@
 <meta name="description" content="Fresh halal meat, groceries and more from Makka Halal Meat. Order ahead for pickup.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
-<meta name="theme-color" content="#8B1A1A">
+<meta name="theme-color" content="#650914">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -43,55 +44,64 @@ img{max-width:100%;display:block;}
 /* ── TOPBAR ── */
 .topbar{
   position:sticky;top:0;z-index:40;
-  background:var(--card-bg);
-  border-bottom:1px solid var(--line);
+  background:var(--brand-dark);
+  border-bottom:none;
   padding-top:env(safe-area-inset-top,0px);
+}
+#homeHeader{
+  background:var(--brand-dark);
 }
 .topbar-inner{
   display:flex;align-items:center;
-  padding:13px 16px;gap:12px;
+  padding:10px 16px;gap:8px;
 }
 .topbar-menu{
   width:38px;height:38px;border-radius:10px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
   background:none;flex:0 0 auto;
 }
-.topbar-menu span{display:block;width:20px;height:2px;background:var(--fg);border-radius:2px;}
+.topbar-menu span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;}
 .topbar-brand{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  flex:1;display:flex;align-items:center;justify-content:center;gap:0;
 }
+/* Show the full mosque logo image centered in the header */
 .topbar-logo{
-  width:36px;height:36px;border-radius:50%;
-  background:var(--brand-dark);
+  width:auto;height:52px;border-radius:0;
+  background:none;
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;flex:0 0 auto;
+  overflow:visible;flex:0 0 auto;
 }
-.topbar-logo img{width:100%;height:100%;object-fit:cover;}
-.topbar-logo-fallback{font-size:1.1rem;}
-.topbar-name{font-size:.95rem;font-weight:800;letter-spacing:-.02em;color:var(--fg);line-height:1.1;}
-.topbar-name span{display:block;font-size:.7rem;font-weight:500;color:var(--muted);letter-spacing:0;}
+.topbar-logo img{
+  height:52px;width:auto;max-width:180px;
+  object-fit:contain;border-radius:0;
+  filter:none;/* keep gold/colored logo as-is */
+}
+.topbar-logo-fallback{font-size:1.1rem;color:#fff;}
+.topbar-name{display:none;}/* hide text name — logo image replaces it */
 .topbar-right{display:flex;align-items:center;gap:4px;flex:0 0 auto;}
 .topbar-cart-btn{
   width:38px;height:38px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
   position:relative;background:none;
 }
-.topbar-cart-btn svg{stroke:var(--fg);}
+.topbar-cart-btn svg{stroke:#fff;}
 .cart-dot{
   position:absolute;top:4px;right:4px;
   background:var(--brand);color:#fff;
   font-size:.58rem;font-weight:800;
   border-radius:999px;min-width:15px;height:15px;
   display:none;align-items:center;justify-content:center;padding:0 3px;
-  border:1.5px solid var(--card-bg);
+  border:1.5px solid #fff;
 }
 .cart-dot.show{display:flex;}
 #translateBtnTop{
   width:38px;height:38px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  font-size:.68rem;font-weight:700;color:var(--muted);
+  font-size:.68rem;font-weight:700;color:rgba(255,255,255,.7);
   background:none;
 }
+#translateBtnTop svg{stroke:rgba(255,255,255,.7)!important;}
+#themeToggleBtn svg{stroke:rgba(255,255,255,.7)!important;}
 
 /* ── MAIN SCROLL ── */
 main{max-width:640px;margin:0 auto;}
@@ -961,50 +971,156 @@ body.dark .feature-showcase .feature-slide p {
 </style>
 
 <style id="makka-homepage-visual-update">
-/* Preserve category artwork and tighten benefit spacing */
-#homeView .feature-bottom{margin-bottom:10px!important}
-#homeView .cat-tile.cat-picture{aspect-ratio:16/9!important;height:auto!important;min-height:0!important;border-radius:13px}
-#homeView .cat-tile.cat-picture img{width:100%;height:100%;object-fit:contain!important;object-position:center!important}
-#homeView #homeCategoriesSection .sec-head{padding-top:14px}
-/* Approved burgundy and gold header */
-#homeView .makka-static-logo{display:none!important}
-#homeView #homeHeader{background:linear-gradient(110deg,#740e15,#450508 58%,#730d15)!important;border:0!important}
-#homeView #homeHeader .topbar-inner{min-height:102px;padding:8px 12px;gap:8px;display:flex;align-items:center;justify-content:space-between}
-#homeView .makka-header-menu{width:38px;height:42px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#fff}
-#homeView .makka-header-menu span{background:white;width:22px;height:2.5px;border-radius:3px}
-#homeView .makka-gold-header{flex:1;min-width:0;display:flex;align-items:center;justify-content:center}
-#homeView .makka-gold-header-logo{width:min(205px,100%);height:88px;object-fit:contain;display:block}
-#homeView #homeHeader .topbar-right{gap:3px}
-#homeView #homeHeader .topbar-cart-btn{width:43px;height:43px}
-#homeView #homeHeader .topbar-cart-btn svg{stroke:#fff!important;width:27px;height:27px}
-#homeView #homeHeader #translateBtnTop svg,#homeView #homeHeader #themeToggleBtn svg{stroke:#f4d7d9!important}
-#homeView #homeHeader .cart-dot{background:#ed2736;border-color:#740e15}
-/* Approved image-first promotions: no gold border, badge or black sidebars */
-#homeView #homePromotionsSection{margin:2px 0 7px}
-#homeView #homePromotionsSection .sec-head{padding-top:12px!important}
-#homeView .promo-carousel{width:calc(100% - 32px);margin:8px 16px 4px;border:0!important;border-radius:17px;overflow:hidden;box-shadow:0 5px 19px rgba(0,0,0,.13)!important;background:transparent!important}
-#homeView .promo-carousel .store-promo{position:relative;box-sizing:border-box;width:100%!important;min-height:0!important;aspect-ratio:1.65/1;padding:20px!important;border:0!important;border-radius:17px!important;box-shadow:none!important;background-color:#6b0a10;background-repeat:no-repeat!important;background-size:cover!important;background-position:center center!important;overflow:hidden;display:none;justify-content:space-between}
-#homeView .promo-carousel .store-promo.active{display:flex!important}
-#homeView .promo-carousel .store-promo:not(.active){display:none!important}
-#homeView .promo-carousel .store-promo:before,#homeView .promo-carousel .store-promo:after{display:none!important;content:none!important}
-#homeView .promo-carousel .store-promo.has-promo-art>div{display:none!important}
-#homeView .promo-carousel .store-promo:not(.has-promo-art){background:linear-gradient(115deg,#790b14,#390309)!important}
-#homeView .promo-carousel .store-promo:not(.has-promo-art)>div{max-width:86%;position:relative;z-index:1}
-#homeView .promo-carousel .store-promo:not(.has-promo-art) h3{font-size:clamp(1.28rem,4vw,1.85rem);line-height:1.12}
-#homeView .promo-carousel .store-promo:not(.has-promo-art) p{font-size:.84rem}
-#homeView .promo-carousel .promo-cta{align-self:flex-start;position:relative;z-index:2;margin-top:auto;background:#fff!important;color:#810d18!important;border:0!important;border-radius:999px;padding:10px 19px!important;font-size:.83rem;font-weight:800;box-shadow:0 4px 11px rgba(0,0,0,.15)}
-#homeView .promo-carousel .store-promo.has-promo-art .promo-cta{position:absolute;bottom:15px;left:15px}
-#homeView .promo-carousel-dots{padding:10px 6px}
-@media(max-width:520px){
- #homeView #homeHeader .topbar-inner{min-height:92px;padding:7px 9px}
- #homeView .makka-gold-header-logo{width:min(170px,100%);height:75px}
- #homeView #homeHeader #translateBtnTop,#homeView #homeHeader #themeToggleBtn{width:28px!important;height:36px!important}
- #homeView #homeHeader .topbar-cart-btn{width:36px;height:42px}
- #homeView .promo-carousel{width:calc(100% - 24px);margin:8px 12px 4px}
- #homeView .promo-carousel .store-promo{aspect-ratio:1.52/1;padding:14px!important}
- #homeView .promo-carousel .store-promo.has-promo-art .promo-cta{left:12px;bottom:12px}
- #homeView .promo-carousel .promo-cta{padding:8px 14px!important;font-size:.78rem}
+
+/* REMOVE EXCESSIVE SPACE */
+#homeView .feature-bottom {
+  margin-bottom: 10px !important;
 }
+
+#homeView #homeCategoriesSection .sec-head {
+  padding-top: 12px;
+}
+
+/* CATEGORY IMAGES — 16:9 */
+#homeView .cat-tile.cat-picture {
+  aspect-ratio: 16 / 9 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  border-radius: 14px;
+}
+
+#homeView .cat-tile.cat-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+/* APPROVED HEADER — burgundy edge-to-edge including iPhone safe-area */
+#homeView #homeHeader {
+  width: 100%;
+  margin: 0;
+  position: sticky;
+  top: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: linear-gradient(120deg, #4c0810, #810e1b 48%, #4c0810) !important;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+#homeView #homeHeader .topbar-inner {
+  min-height: 98px;
+  padding: 8px 14px;
+  display: grid;
+  position:relative;
+  grid-template-columns: 44px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+#homeView #homeHeader .topbar-brand {min-width:0;display:flex;justify-content:center;align-items:center;}
+#homeView #homeHeader .makka-top-logo {
+  width: min(202px, 100%);height:82px;
+  background:transparent;border-radius:0;overflow:visible;
+}
+#homeView #homeHeader .makka-top-logo img {
+  width:100%;height:100%;max-width:100%;object-fit:contain;
+  filter:none !important;
+}
+#homeView #homeHeader .topbar-menu {grid-column:1;grid-row:1;position:relative;z-index:2;}
+#homeView #homeHeader .topbar-brand {grid-column:2;grid-row:1;position:absolute;left:50%;transform:translateX(-50%);width:min(210px,45vw);z-index:1;pointer-events:none;}
+#homeView #homeHeader .topbar-right {grid-column:3;grid-row:1;gap:1px;position:relative;z-index:2;}
+#homeView #homeHeader .topbar-menu span {background:#fff !important;}
+#homeView #homeHeader .topbar-cart-btn svg,
+#homeView #homeHeader #translateBtnTop svg,
+#homeView #homeHeader #themeToggleBtn svg {stroke:#fff !important;}
+
+/* APPROVED PROMO — wide landscape artwork card, no yellow border or overlay box */
+#homeView #homePromotionsSection {width:100%;}
+#homeView #promoScroller.promo-carousel {
+  display:block;width:calc(100% - 24px);
+  margin:8px 12px 5px;padding:0;
+  border:0 !important;border-radius:18px;
+  background:transparent;box-shadow:none !important;
+  overflow:hidden;
+}
+#homeView #promoScroller .store-promo {
+  display:none;
+  flex:0 0 100% !important;
+  box-sizing:border-box;
+  position:relative;width:100%;min-height:0 !important;
+  aspect-ratio: 16 / 9;
+  border:0 !important;border-radius:18px;
+  box-shadow:none !important;
+  background-color:#650c19;
+  background-position:center !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
+  padding:22px !important;
+  overflow:hidden;
+}
+#homeView #promoScroller .store-promo.active {display:flex;}
+#homeView #promoScroller .store-promo::before,
+#homeView #promoScroller .store-promo::after {content:none !important;display:none !important;}
+/* Uploaded artwork is shown as a proper rectangular image, without extra text on top. */
+#homeView #promoScroller .store-promo.has-promo-art {
+  background-size:cover !important;
+  background-position:center center !important;
+  background-color:#5b101a !important;
+}
+#homeView #promoScroller .store-promo.has-promo-art > div {display:none;}
+#homeView #promoScroller .store-promo:not(.has-promo-art) > div {max-width:78%;}
+#homeView #promoScroller .promo-cta {
+  position:absolute;z-index:3;left:16px;bottom:16px;
+  padding:10px 18px !important;border:0 !important;
+  border-radius:999px;background:#fff !important;
+  color:#72131d !important;font-weight:800;font-size:.85rem;
+  box-shadow:0 4px 12px rgba(0,0,0,.17);
+}
+#homeView #promoScroller .store-promo h3 {font-size:clamp(1.2rem,4vw,1.75rem);}
+#homeView .promo-carousel-dots {padding:8px 0 4px;}
+@media(max-width:520px) {
+  #homeView #homeHeader .topbar-inner {min-height:86px;padding:5px 8px;grid-template-columns:38px minmax(0,1fr) auto;gap:3px;}
+  #homeView #homeHeader .makka-top-logo {width:min(148px,100%);height:72px;}
+  #homeView #homeHeader .topbar-right button {width:32px !important;height:34px !important;}
+  #homeView #promoScroller.promo-carousel {width:calc(100% - 24px);margin:8px 12px 5px;}
+  #homeView #promoScroller .store-promo {aspect-ratio:1.65/1;padding:16px !important;}
+  #homeView #promoScroller .promo-cta {left:12px;bottom:12px;padding:8px 14px !important;font-size:.76rem;}
+  #homeView #promoScroller .store-promo:not(.has-promo-art) > div {max-width:85%;}
+}
+
+/* Reference storefront layout: banner FIRST, categories immediately afterward. */
+#homeView #homeMain{display:flex;flex-direction:column;max-width:640px;background:#fff;min-height:100vh;}
+#homeView{background:#fff;color:#111827;}
+body[data-view="home"]{--bg:#fff;--fg:#111827;--card:#fff;--card-bg:#fff;--line:#e5e7eb;background:#fff;}
+body.dark[data-view="home"]{--bg:#fff;--fg:#111827;--card:#fff;--card-bg:#fff;--line:#e5e7eb;background:#fff;color:#111827;}
+body.dark[data-view="home"] #homeView .sec-head h2{color:#111827;}
+#homeView #homePromotionsSection{order:0 !important;margin:0;padding:0;}
+#homeView #homePromotionsSection>.sec-head{display:none;}
+#homeView #homeCategoriesSection{order:1 !important;}
+#homeView #homeCategoriesSection>.sec-head{padding-top:17px;padding-bottom:12px;}
+#homeView #homeMain>.search-wrap{order:2 !important;}
+#homeView #homeBenefitsSection{order:9 !important;display:none !important;}
+#homeView #saleSection{order:3 !important;}
+#homeView #homeFeaturedSection{order:4 !important;}
+#homeView #homeStoreInfoSection{order:8 !important;}
+#homeView #homePreviews{order:10 !important;}
+#homeView #promoScroller.promo-carousel{display:block !important;max-width:none !important;}
+#homeView #promoScroller .store-promo{flex:0 0 100% !important;width:100% !important;max-width:none !important;min-width:100% !important;aspect-ratio:16/9 !important;}
+#homeView #promoScroller .store-promo:not(.active){display:none !important;}
+#homeView #promoScroller .store-promo.active{display:flex !important;}
+#homeView #promoScroller .store-promo.has-promo-art{background-size:cover !important;background-position:center !important;}
+#homeView .promo-carousel-dots{padding-top:9px;padding-bottom:2px;}
+#homeView #homeHeader{background:#650914 !important;}
+#homeView #homeHeader .topbar-inner{min-height:103px;}
+#homeView #homeHeader .makka-top-logo img{filter:none !important;}
+#homeView #homeHeader .cart-dot{background:#f32436 !important;color:#fff !important;border-color:#650914 !important;}
+@media(max-width:520px){
+ #homeView #homeHeader .topbar-inner{min-height:94px;}
+ #homeView #promoScroller .store-promo{aspect-ratio:16/10 !important;}
+ #homeView #homeCategoriesSection .cat-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:8px;padding:0 12px 10px;}
+ #homeView #homeCategoriesSection .cat-tile.cat-picture{aspect-ratio:1/1 !important;}
+ #homeView #homeCategoriesSection .cat-tile.cat-picture img{object-fit:cover !important;}
+}
+
 </style>
 </head>
 <body data-view="home" data-dept="meat">
@@ -1015,11 +1131,12 @@ body.dark .feature-showcase .feature-slide p {
   <!-- topbar -->
   <header class="topbar" id="homeHeader">
     <div class="topbar-inner">
-
-      <button class="makka-header-menu" type="button" onclick="switchView('categories')" aria-label="Browse categories" title="Browse categories"><span></span><span></span><span></span></button>
-      <div class="topbar-brand makka-gold-header">
-        <img class="makka-gold-header-logo" src="makka-header-logo.svg" alt="Makka Halal Meat" onerror="this.style.display='none';document.getElementById('storeName').hidden=false">
-        <div class="topbar-name" id="storeName" hidden>Makka Halal Meat<span id="storeHoursTopbar"></span></div>
+      <button class="topbar-menu" type="button" onclick="switchView('categories')" aria-label="Browse categories" title="Browse categories"><span></span><span></span><span></span></button>
+      <div class="topbar-brand">
+        <div class="topbar-logo makka-top-logo">
+          <img src="makka-header-logo.svg" alt="Makka Halal Meat" width="340" height="170">
+        </div>
+        <div class="topbar-name" id="storeName">Makka Halal Meat<span id="storeHoursTopbar">Open · Tue–Sun 11 AM–6:30 PM</span></div>
       </div>
       <div class="topbar-right">
         <button id="translateBtnTop" onclick="openLangModal()" title="Translate" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:none;">
@@ -1039,7 +1156,7 @@ body.dark .feature-showcase .feature-slide p {
 
   <main id="homeMain">
     <!-- Static Makka logo, no hero slideshow -->
-    <div class="makka-static-logo"><img src="banner-sign.jpg" alt="Makka Halal Meat — Goat, Lamb, Beef, Chicken — 404-297-0008" loading="eager"></div>
+
 
     <section id="homeBenefitsSection" class="feature-bottom" aria-label="Why shop with Makka Halal Meat">
       <div class="sec-head"><h2>Why Shop With Us</h2></div>
@@ -1496,7 +1613,7 @@ function applyHomeSectionVisibility(){
   const main=document.getElementById('homeMain');
   const sectionNodes={benefits:'homeBenefitsSection',categories:'homeCategoriesSection',promotions:'homePromotionsSection',deals:'saleSection',featured:'homeFeaturedSection',store_info:'homeStoreInfoSection'};
   const saved=Array.isArray(SETTINGS.home_section_order)?SETTINGS.home_section_order:[];
-  const keys=[...new Set([...(saved.length?saved:['benefits','promotions','categories','deals','featured','store_info']),...Object.keys(sectionNodes)])].filter(k=>sectionNodes[k]);
+  const keys=[...new Set([...saved,...Object.keys(sectionNodes)])].filter(k=>sectionNodes[k]);
   const ordered=keys.map(k=>document.getElementById(sectionNodes[k])).filter(el=>el&&el.parentElement===main);
   // Insert the ordered group after the logo, while preserving non-managed nodes.
   const anchor=document.getElementById('homeBenefitsSection');
@@ -1640,7 +1757,7 @@ function renderPromos() {
     );
 
     const imageStyle = img
-      ? `style="background-image:url('${img}');background-size:cover;background-position:center"`
+      ? `style="background-image:url('${img}');background-size:cover;background-position:center center"`
       : '';
 
     if (type === 'category') {
