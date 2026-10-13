@@ -961,107 +961,50 @@ body.dark .feature-showcase .feature-slide p {
 </style>
 
 <style id="makka-homepage-visual-update">
-
-/* REMOVE EXCESSIVE SPACE */
-#homeView .feature-bottom {
-  margin-bottom: 10px !important;
+/* Preserve category artwork and tighten benefit spacing */
+#homeView .feature-bottom{margin-bottom:10px!important}
+#homeView .cat-tile.cat-picture{aspect-ratio:16/9!important;height:auto!important;min-height:0!important;border-radius:13px}
+#homeView .cat-tile.cat-picture img{width:100%;height:100%;object-fit:contain!important;object-position:center!important}
+#homeView #homeCategoriesSection .sec-head{padding-top:14px}
+/* Approved burgundy and gold header */
+#homeView .makka-static-logo{display:none!important}
+#homeView #homeHeader{background:linear-gradient(110deg,#740e15,#450508 58%,#730d15)!important;border:0!important}
+#homeView #homeHeader .topbar-inner{min-height:102px;padding:8px 12px;gap:8px;display:flex;align-items:center;justify-content:space-between}
+#homeView .makka-header-menu{width:38px;height:42px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#fff}
+#homeView .makka-header-menu span{background:white;width:22px;height:2.5px;border-radius:3px}
+#homeView .makka-gold-header{flex:1;min-width:0;display:flex;align-items:center;justify-content:center}
+#homeView .makka-gold-header-logo{width:min(205px,100%);height:88px;object-fit:contain;display:block}
+#homeView #homeHeader .topbar-right{gap:3px}
+#homeView #homeHeader .topbar-cart-btn{width:43px;height:43px}
+#homeView #homeHeader .topbar-cart-btn svg{stroke:#fff!important;width:27px;height:27px}
+#homeView #homeHeader #translateBtnTop svg,#homeView #homeHeader #themeToggleBtn svg{stroke:#f4d7d9!important}
+#homeView #homeHeader .cart-dot{background:#ed2736;border-color:#740e15}
+/* Approved image-first promotions: no gold border, badge or black sidebars */
+#homeView #homePromotionsSection{margin:2px 0 7px}
+#homeView #homePromotionsSection .sec-head{padding-top:12px!important}
+#homeView .promo-carousel{width:calc(100% - 32px);margin:8px 16px 4px;border:0!important;border-radius:17px;overflow:hidden;box-shadow:0 5px 19px rgba(0,0,0,.13)!important;background:transparent!important}
+#homeView .promo-carousel .store-promo{position:relative;box-sizing:border-box;width:100%!important;min-height:0!important;aspect-ratio:1.65/1;padding:20px!important;border:0!important;border-radius:17px!important;box-shadow:none!important;background-color:#6b0a10;background-repeat:no-repeat!important;background-size:cover!important;background-position:center center!important;overflow:hidden;display:none;justify-content:space-between}
+#homeView .promo-carousel .store-promo.active{display:flex!important}
+#homeView .promo-carousel .store-promo:not(.active){display:none!important}
+#homeView .promo-carousel .store-promo:before,#homeView .promo-carousel .store-promo:after{display:none!important;content:none!important}
+#homeView .promo-carousel .store-promo.has-promo-art>div{display:none!important}
+#homeView .promo-carousel .store-promo:not(.has-promo-art){background:linear-gradient(115deg,#790b14,#390309)!important}
+#homeView .promo-carousel .store-promo:not(.has-promo-art)>div{max-width:86%;position:relative;z-index:1}
+#homeView .promo-carousel .store-promo:not(.has-promo-art) h3{font-size:clamp(1.28rem,4vw,1.85rem);line-height:1.12}
+#homeView .promo-carousel .store-promo:not(.has-promo-art) p{font-size:.84rem}
+#homeView .promo-carousel .promo-cta{align-self:flex-start;position:relative;z-index:2;margin-top:auto;background:#fff!important;color:#810d18!important;border:0!important;border-radius:999px;padding:10px 19px!important;font-size:.83rem;font-weight:800;box-shadow:0 4px 11px rgba(0,0,0,.15)}
+#homeView .promo-carousel .store-promo.has-promo-art .promo-cta{position:absolute;bottom:15px;left:15px}
+#homeView .promo-carousel-dots{padding:10px 6px}
+@media(max-width:520px){
+ #homeView #homeHeader .topbar-inner{min-height:92px;padding:7px 9px}
+ #homeView .makka-gold-header-logo{width:min(170px,100%);height:75px}
+ #homeView #homeHeader #translateBtnTop,#homeView #homeHeader #themeToggleBtn{width:28px!important;height:36px!important}
+ #homeView #homeHeader .topbar-cart-btn{width:36px;height:42px}
+ #homeView .promo-carousel{width:calc(100% - 24px);margin:8px 12px 4px}
+ #homeView .promo-carousel .store-promo{aspect-ratio:1.52/1;padding:14px!important}
+ #homeView .promo-carousel .store-promo.has-promo-art .promo-cta{left:12px;bottom:12px}
+ #homeView .promo-carousel .promo-cta{padding:8px 14px!important;font-size:.78rem}
 }
-
-#homeView #homeCategoriesSection .sec-head {
-  padding-top: 12px;
-}
-
-/* CATEGORY IMAGES — 16:9 */
-#homeView .cat-tile.cat-picture {
-  aspect-ratio: 16 / 9 !important;
-  height: auto !important;
-  min-height: 0 !important;
-  border-radius: 14px;
-}
-
-#homeView .cat-tile.cat-picture img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain !important;
-  object-position: center !important;
-}
-
-/* PREMIUM PROMOTION BANNER */
-#homeView .promo-carousel {
-  width: 100%;
-  margin: 12px 0 20px;
-  border: 2px solid #D8A64D;
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow: 0 14px 32px rgba(60,7,14,.24);
-}
-
-#homeView .promo-carousel .store-promo {
-  position: relative;
-  min-height: 365px;
-  padding: 54px 30px 30px;
-  background-color: #390c13;
-  background-size: cover, contain !important;
-  background-position: center, right center !important;
-  background-repeat: no-repeat !important;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-#homeView .promo-carousel .store-promo::before {
-  content: "LIMITED-TIME OFFER";
-  position: absolute;
-  top: 18px;
-  left: 30px;
-  background: #F7DB9E;
-  color: #681624;
-  padding: 7px 13px;
-  border-radius: 999px;
-  font-size: .66rem;
-  font-weight: 900;
-  letter-spacing: .12em;
-  z-index: 1;
-}
-
-#homeView .promo-card.store-promo h3 {
-  font-size: 1.7rem;
-  line-height: 1.15;
-}
-
-#homeView .promo-card.store-promo .promo-cta {
-  background: #F4C66E;
-  color: #4D1218;
-  border: none;
-  padding: 11px 21px;
-  border-radius: 999px;
-  font-weight: 800;
-}
-
-/* MOBILE OPTIMIZATION */
-@media (max-width: 520px) {
-  #homeView .feature-bottom {
-    margin-bottom: 8px !important;
-  }
-
-  #homeView .cat-grid {
-    gap: 9px;
-  }
-
-  #homeView .promo-carousel .store-promo {
-    min-height: 310px;
-    padding: 54px 18px 22px;
-  }
-
-  #homeView .promo-card.store-promo h3 {
-    font-size: 1.34rem;
-  }
-
-  #homeView .promo-carousel .store-promo::before {
-    left: 18px;
-    top: 15px;
-  }
-}
-
 </style>
 </head>
 <body data-view="home" data-dept="meat">
@@ -1073,12 +1016,10 @@ body.dark .feature-showcase .feature-slide p {
   <header class="topbar" id="homeHeader">
     <div class="topbar-inner">
 
-      <div class="topbar-brand">
-        <div class="topbar-logo">
-          <img src="icon-180.png" alt="Makka" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <span class="topbar-logo-fallback" style="display:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span>
-        </div>
-        <div class="topbar-name" id="storeName">Makka Halal Meat<span id="storeHoursTopbar">Open · Tue–Sun 11 AM–6:30 PM</span></div>
+      <button class="makka-header-menu" type="button" onclick="switchView('categories')" aria-label="Browse categories" title="Browse categories"><span></span><span></span><span></span></button>
+      <div class="topbar-brand makka-gold-header">
+        <img class="makka-gold-header-logo" src="makka-header-logo.svg" alt="Makka Halal Meat" onerror="this.style.display='none';document.getElementById('storeName').hidden=false">
+        <div class="topbar-name" id="storeName" hidden>Makka Halal Meat<span id="storeHoursTopbar"></span></div>
       </div>
       <div class="topbar-right">
         <button id="translateBtnTop" onclick="openLangModal()" title="Translate" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:none;">
@@ -1555,7 +1496,7 @@ function applyHomeSectionVisibility(){
   const main=document.getElementById('homeMain');
   const sectionNodes={benefits:'homeBenefitsSection',categories:'homeCategoriesSection',promotions:'homePromotionsSection',deals:'saleSection',featured:'homeFeaturedSection',store_info:'homeStoreInfoSection'};
   const saved=Array.isArray(SETTINGS.home_section_order)?SETTINGS.home_section_order:[];
-  const keys=[...new Set([...saved,...Object.keys(sectionNodes)])].filter(k=>sectionNodes[k]);
+  const keys=[...new Set([...(saved.length?saved:['benefits','promotions','categories','deals','featured','store_info']),...Object.keys(sectionNodes)])].filter(k=>sectionNodes[k]);
   const ordered=keys.map(k=>document.getElementById(sectionNodes[k])).filter(el=>el&&el.parentElement===main);
   // Insert the ordered group after the logo, while preserving non-managed nodes.
   const anchor=document.getElementById('homeBenefitsSection');
@@ -1699,7 +1640,7 @@ function renderPromos() {
     );
 
     const imageStyle = img
-      ? `style="background-image:linear-gradient(90deg,rgba(35,5,5,.90),rgba(35,5,5,.35)),url('${img}');background-size:cover;background-position:center"`
+      ? `style="background-image:url('${img}');background-size:cover;background-position:center"`
       : '';
 
     if (type === 'category') {
@@ -1722,7 +1663,7 @@ function renderPromos() {
         : `switchView('categories')`;
 
       return `
-        <div class="promo-card store-promo deal ${i===0?'active':''}" ${imageStyle}>
+        <div class="promo-card store-promo deal ${i===0?'active':''} ${img ? 'has-promo-art' : ''}" ${imageStyle}>
           <div>
             <div class="promo-eyebrow">Category deal · ${percent}% off</div>
             <h3>${title}</h3>
@@ -1742,7 +1683,7 @@ function renderPromos() {
       const detail = `Now $${sale.toFixed(2)} (regularly $${normal.toFixed(2)})`;
 
       return `
-        <div class="promo-card store-promo deal ${i===0?'active':''}" ${imageStyle}>
+        <div class="promo-card store-promo deal ${i===0?'active':''} ${img ? 'has-promo-art' : ''}" ${imageStyle}>
           <div>
             <div class="promo-eyebrow">Product deal · ${percent}% off</div>
             <h3>${name}</h3>
@@ -1767,7 +1708,7 @@ function renderPromos() {
       ].filter(Boolean).join(' · ');
 
       return `
-        <div class="promo-card store-promo coupon-home ${i===0?'active':''}" ${imageStyle}>
+        <div class="promo-card store-promo coupon-home ${i===0?'active':''} ${img ? 'has-promo-art' : ''}" ${imageStyle}>
           <div>
             <div class="promo-eyebrow">Special coupon · ${escapeHtml(label)}</div>
             <h3>${title}</h3>
@@ -1788,7 +1729,7 @@ function renderPromos() {
       : `switchView('categories')`;
 
     return `
-      <div class="promo-card store-promo ${i===0?'active':''}" ${imageStyle}>
+      <div class="promo-card store-promo ${i===0?'active':''} ${img ? 'has-promo-art' : ''}" ${imageStyle}>
         <div>
           <div class="promo-eyebrow">Store promotion</div>
           <h3>${title}</h3>

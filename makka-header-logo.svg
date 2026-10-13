@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 170" role="img" aria-labelledby="title">
+<title id="title">Makka Halal Meat</title>
+<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe7a0"/><stop offset=".52" stop-color="#e9b83c"/><stop offset="1" stop-color="#c48b19"/></linearGradient></defs>
+<g fill="#48080e" stroke="url(#gold)" stroke-width="4" stroke-linejoin="round">
+<path d="M38 83H62Q72 83 82 65L89 48Q102 39 116 39H132Q144 18 170 6Q196 18 208 39H224Q238 39 251 48L258 65Q268 83 278 83H302V139H38Z"/>
+</g>
+<g fill="url(#gold)">
+<path d="M166 20c-12 7-17 16-17 29h42c0-13-6-22-17-29-2-1-4-3-4-5-1 2-2 4-4 5z"/>
+<rect x="152" y="49" width="37" height="20" rx="1"/>
+<path d="M118 45c-7 6-10 12-10 20h22c0-8-4-14-12-20zM222 45c-7 6-11 12-11 20h23c0-8-4-14-12-20z"/>
+<rect x="109" y="65" width="20" height="10"/><rect x="212" y="65" width="20" height="10"/>
+<rect x="94" y="47" width="5" height="31"/><path d="M89 47h15l-7-9z"/><rect x="243" y="47" width="5" height="31"/><path d="M238 47h15l-8-9z"/>
+<path d="M170 1a9 9 0 1 0 8 13 8 8 0 1 1-8-13z"/>
+</g>
+<text x="170" y="112" font-size="43" font-weight="900" font-family="Georgia,serif" fill="#fff9e9" text-anchor="middle" letter-spacing="2">MAKKA</text>
+<text x="170" y="133" font-size="19" font-weight="700" font-family="Georgia,serif" fill="url(#gold)" text-anchor="middle" letter-spacing="7">HALAL MEAT</text>
+</svg>
