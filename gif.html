@@ -1126,5 +1126,104 @@ if (TOKEN) { startApp(); }
   }
 })();
 </script>
+
+<!-- GIF additional Spanish translations -->
+<script>
+(() => {
+  const extra = [
+    [/^(\d+) orders waiting for meat$/i, "$1 pedidos esperando carne"],
+    [/^Meat preparation pending$/i, "Preparación de carne pendiente"],
+    [/^Mark Meat Ready$/i, "Marcar carne lista"],
+    [/^No meat orders waiting\.$/i, "No hay pedidos de carne pendientes."],
+    [/^✓ Meat ready$/i, "✓ Carne lista"],
+    [/^Ordered:\s*(.+)$/i, "Pedido: $1"],
+    [/^✓ Picked\s*(.*)$/i, "✓ Preparado $1"],
+    [/^✕ Unavailable$/i, "✕ Agotado"],
+    [/^⇄ Substituted with (.+)$/i, "⇄ Sustituido por $1"],
+    [/^(\d+) items? · picking$/i, "$1 productos · preparando"],
+    [/^(\d+) items? left to pick$/i, "Faltan $1 productos por preparar"],
+    [/^Due in (\d+) min · (.+)$/i, "Faltan $1 min · $2"],
+    [/^OVERDUE (\d+) min · was (.+)$/i, "RETRASADO $1 min · previsto $2"],
+    [/^Waiting for pickup · was due (.+)$/i, "Esperando recogida · previsto $1"],
+    [/^Ready · pickup (.+)$/i, "Listo · recogida $1"],
+    [/^Pickup (.+)$/i, "Recogida $1"],
+    [/^Substitute for (.+)$/i, "Sustituto para $1"],
+    [/^(.+) — not available\?$/i, "¿$1 no está disponible?"],
+    [/^Also mark (.+) sold out in the app$/i, "Marcar también $1 como agotado en la app"],
+    [/^(.+) \(out of stock\)$/i, "$1 (agotado)"],
+    [/^No matches\.$/i, "No hay resultados."],
+    [/^Search for a similar item to swap in\.$/i, "Busca un producto similar para sustituirlo."],
+    [/^Loading items…$/i, "Cargando productos…"],
+    [/^Use this substitute$/i, "Usar este sustituto"],
+    [/^← Back to search$/i, "← Volver a buscar"],
+    [/^(\d+) new orders?!$/i, "¡$1 pedidos nuevos!"],
+    [/^New order (.+)$/i, "Pedido nuevo $1"],
+    [/^(\d+) new orders? waiting$/i, "$1 pedidos nuevos esperando"],
+    [/^(\d+) cancellation requests? — decide now$/i, "$1 solicitudes de cancelación — decidir ahora"],
+    [/^(\d+) cancellation requests? — waiting for admin$/i, "$1 solicitudes de cancelación — esperando al administrador"]
+  ];
+
+  function isSpanish() {
+    return localStorage.getItem("gif_language") === "es";
+  }
+
+  function applyExtraTranslations() {
+    if (!isSpanish()) return;
+
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT
+    );
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    for (const node of nodes) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest(
+        "script,style,textarea,#gifLangSwitch,#gifLanguageButton,.iname,.code,.cust,.reason,.subrow .n"
+      )) continue;
+
+      const original = node.nodeValue;
+      const trimmed = original.trim();
+      if (!trimmed) continue;
+
+      for (const [pattern, replacement] of extra) {
+        if (pattern.test(trimmed)) {
+          node.nodeValue = original.replace(trimmed, trimmed.replace(pattern, replacement));
+          break;
+        }
+      }
+    }
+  }
+
+  let pending = false;
+  function scheduleExtra() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      applyExtraTranslations();
+    });
+  }
+
+  const observer = new MutationObserver(scheduleExtra);
+
+  function start() {
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+    applyExtraTranslations();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+})();
+</script>
 </body>
 </html>
