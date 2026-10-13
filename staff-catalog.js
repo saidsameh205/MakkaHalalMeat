@@ -6,6 +6,7 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return json(405, { error: 'Method Not Allowed' });
   const auth = await requireStaff(event);
   if (!auth.ok) return auth.response;
+  if (auth.isButcher) return json(403, { error: 'Butcher access is limited to meat preparation.' });
 
   try {
     const rows = await supabaseFetch(

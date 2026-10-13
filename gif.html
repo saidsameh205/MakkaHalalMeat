@@ -235,6 +235,8 @@ let openId = null;
 let weighing = null;      // { id, idx } while entering a picked weight
 let subCtx = null;        // { id, idx, product }
 let knownIds = null;      // ids we've already seen (null until first load)
+let IS_BUTCHER = false;
+let KNOWN_MEAT_READY = new Set();
 let IS_ADMIN = false;     // true only when signed in with the admin code (or as a manager with approve rights)
 let ME = "";             // who is signed in
 let REQUESTS = [];        // orders that have a cancellation / refund request
@@ -336,7 +338,12 @@ async function refresh() {
     const isNewIds = fresh.filter((o) => o.status === "New" && knownIds && !knownIds.has(o.id));
     knownIds = new Set(fresh.map((o) => o.id));
     ORDERS = fresh;
-    IS_ADMIN = !!data.is_admin; ME = data.staff_name || ME;
+    IS_ADMIN = !!data.is_admin; IS_BUTCHER = !!data.is_butcher; ME = data.staff_name || ME;
+    if (!IS_BUTCHER) {
+      const newlyReady = fresh.filter(o => o.meat_ready_at && !KNOWN_MEAT_READY.has(o.id));
+      if (KNOWN_MEAT_READY.size && newlyReady.length) toast('Meat ready: ' + newlyReady.map(o => o.order_code).join(', '));
+      KNOWN_MEAT_READY = new Set(fresh.filter(o => o.meat_ready_at).map(o => o.id));
+    }
     REQUESTS = data.requests || [];
     const pend = pendingRequests();
     const newReqs = pend.filter((r) => knownReqKeys && !knownReqKeys.has(r.key));
@@ -675,6 +682,7 @@ function textLink(o, body) {
   return phone ? `sms:${phone}?&body=${encodeURIComponent(body)}` : "#";
 }
 function renderSheet() {
+  if (IS_BUTCHER) { renderButcherSheet(); return; }
   const o = findOrder(openId);
   if (!o) { closeSheet(); return; }
   const d = dueInfo(o);
@@ -690,7 +698,7 @@ function renderSheet() {
     skip: ["Customer said: skip it if it's out", "If something's out, just mark it unavailable."],
   }[o.substitution_pref] || [];
 
-  const itemsHtml = o.items.map((it) => itemHtml(o, it, editable)).join("");
+  const itemsHtml = (o.meat_ready_at ? `<div class="callout">✓ Meat ready — confirmed by butcher</div>` : "") + o.items.map((it) => itemHtml(o, it, editable)).join("");
   const showTotal = o.adjusted_total != null && (o.items.some((i) => i.pick_status !== "pending") || o.adjusted_total !== o.total);
 
   let action = "";
@@ -718,6 +726,29 @@ function renderSheet() {
     ${held ? `<button class="btn secondary" disabled>⏸ Picking paused — cancellation request pending</button>` : (editable ? action : `<button class="btn secondary" onclick="closeSheet()">Close</button>`)}
   </div></div>`;
 }
+
+async function markMeatReady(id) {
+  try {
+    const data = await api('staff-update-order', { method:'POST', body:JSON.stringify({id,op:'meat_ready'}) });
+    applyUpdated(data.order); toast('Meat ready — employees notified'); renderSheet(); render();
+  } catch(e) { toast(e.message); }
+}
+function renderButcherSheet() {
+  const o = findOrder(openId);
+  if (!o) { closeSheet(); return; }
+  const pending = o.items.filter(i => i.pick_status === 'pending').length;
+  const editable = !o.meat_ready_at && o.status !== 'Completed';
+  const itemsHtml = o.items.map(it => itemHtml(o,it,editable)).join('');
+  $('sheet').innerHTML = `<div class="inner"><header>
+    <button class="back" onclick="closeSheet()">←</button>
+    <div class="sh-title"><b>${esc(o.order_code)} · Meat only</b><span>Butcher preparation</span></div>
+    </header><div class="timeline">Only meat items are shown.</div>${itemsHtml}</div>
+    <div class="footer"><div class="in">${o.meat_ready_at ?
+      '<button class="btn secondary" disabled>✓ Meat confirmed ready</button>' :
+      `<button class="btn green" ${pending || !editable ? 'disabled' : ''} onclick="markMeatReady(${o.id})">${pending ? pending+' meat item(s) remaining' : '✓ Mark Meat Ready & Notify Team'}</button>`
+    }</div></div>`;
+}
+
 function fmtQ(it, q) { return it.weighted ? `${Number(q)} lb` : `${Number(q)}`; }
 function itemHtml(o, it, editable) {
   const pic = it.image ? `background-image:url('${esc(it.image)}')` : "";

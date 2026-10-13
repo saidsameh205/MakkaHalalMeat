@@ -1,5 +1,6 @@
 const { json, requireStaff, supabaseFetch, computeAdjusted, appendEvent } = require('./_util');
 const { shapeOrders, ORDER_COLUMNS } = require('./_staff');
+const { meatIndexes, redactButcherOrder } = require('./_butcher');
 
 const EDITABLE = ['New', 'Preparing', 'Ready for Pickup', 'Paid - Preparing'];
 const STAFF_STATUSES = ['Preparing', 'Ready for Pickup', 'Completed'];
@@ -21,7 +22,7 @@ function assertNotOnHold(order) {
 }
 
 async function loadOrder(id) {
-  const rows = await supabaseFetch(`orders?id=eq.${id}&select=id,items,status,updated_at,cancel_request_status,events`);
+  const rows = await supabaseFetch(`orders?id=eq.${id}&select=id,items,status,meat_ready_at,updated_at,cancel_request_status,events`);
   return rows && rows[0];
 }
 
@@ -56,15 +57,40 @@ exports.handler = async (event) => {
     let soldOutProductId = null;
 
     let result;
+    if (auth.isButcher && op !== 'item' && op !== 'meat_ready') {
+      throw Object.assign(new Error('Butcher accounts can only prepare meat items.'), { status: 403 });
+    }
 
-    if (op === 'item') {
+    if (op === 'meat_ready') {
+      if (!auth.isButcher) throw Object.assign(new Error('Only a butcher can confirm meat preparation.'), { status: 403 });
+      const meatOrder = await loadOrder(id);
+      if (!meatOrder) throw Object.assign(new Error('Order not found'), { status: 404 });
+      const requiredMeat = await meatIndexes(meatOrder.items);
+      if (!requiredMeat.size || [...requiredMeat].some(i => !meatOrder.items[i].pick_status || meatOrder.items[i].pick_status === 'pending')) {
+        throw Object.assign(new Error('Finish marking every meat item before confirming ready.'), { status: 400 });
+      }
+      result = await patchWithRetry(id, (order) => {
+        assertNotOnHold(order);
+        if (!EDITABLE.includes(order.status)) throw Object.assign(new Error('Order is not active.'), { status: 400 });
+        // The order remains open; this timestamp is the employee-facing notification.
+        if (order.meat_ready_at) throw Object.assign(new Error('Meat already confirmed ready.'), { status: 409 });
+        return { meat_ready_at: new Date().toISOString(), events: appendEvent(order.events, auth.staffName, 'Meat ready — employee notification') };
+      });
+    } else if (op === 'item') {
       const action = String(b.action || '');
       const index = Number(b.index);
+      if (auth.isButcher) {
+        const current = await loadOrder(id);
+        if (!current) throw Object.assign(new Error('Order not found'), { status: 404 });
+        const allowed = await meatIndexes(current.items);
+        if (!allowed.has(index)) throw Object.assign(new Error('Butcher may only edit meat items.'), { status: 403 });
+      }
       result = await patchWithRetry(id, (order) => {
         assertNotOnHold(order);
         if (!EDITABLE.includes(order.status)) {
           throw Object.assign(new Error(`This order is ${order.status} and can't be edited.`), { status: 400 });
         }
+        if (auth.isButcher && order.meat_ready_at) throw Object.assign(new Error('Meat is already confirmed ready.'), { status: 409 });
         const items = Array.isArray(order.items) ? order.items.map((x) => ({ ...x })) : [];
         if (!Number.isInteger(index) || index < 0 || index >= items.length) {
           throw Object.assign(new Error('Item not found on this order'), { status: 400 });
@@ -136,6 +162,12 @@ exports.handler = async (event) => {
     } else if (op === 'status') {
       const status = String(b.status || '');
       if (!STAFF_STATUSES.includes(status)) throw Object.assign(new Error('Invalid status'), { status: 400 });
+      if (status === 'Ready for Pickup' || status === 'Completed') {
+        const current = await loadOrder(id);
+        if (current && (await meatIndexes(current.items)).size && !current.meat_ready_at) {
+          throw Object.assign(new Error('Wait for the butcher to confirm meat ready.'), { status: 409 });
+        }
+      }
       result = await patchWithRetry(id, (order) => {
         assertNotOnHold(order);
         if (!EDITABLE.includes(order.status) && order.status !== 'Completed') {
@@ -165,6 +197,10 @@ exports.handler = async (event) => {
 
     const rows = await supabaseFetch(`orders?id=eq.${id}&select=${ORDER_COLUMNS}`);
     const [order] = await shapeOrders(rows || []);
+    if (auth.isButcher) {
+      const allowed = await meatIndexes(order.items);
+      return json(200, { ok: true, order: redactButcherOrder(order, allowed) });
+    }
     return json(200, { ok: true, order });
   } catch (e) {
     console.error('staff-update-order', e);

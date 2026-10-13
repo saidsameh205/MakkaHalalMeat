@@ -1,13 +1,9 @@
-MAKKA DEALS + FULL-SCREEN PRODUCT DETAILS
+MAKKA HALAL MEAT — STAGED COMBINED UPDATE (NOT DEPLOYED)
 
-This package REPLACES the previous Deals + Reviews package. No reviews, stars, or review database are included.
+Includes homepage four Why Shop With Us cards under original banner; seven category images (traditional Arab/Somali clothing and realistic packaged candy); and GIF butcher workflow.
 
-1. Back up your current GitHub admin.html, index.html and netlify/functions.
-2. Run DEALS_MIGRATION.sql in Supabase SQL Editor only if not already applied. Do NOT run the old product-reviews migration.
-3. Replace root admin.html and index.html.
-4. Copy the included JavaScript files into netlify/functions at the same paths.
-5. Deploy to a Netlify preview and test products, images, descriptions, weights, Add to Cart, discounts, admin login and photo uploads.
+DEPLOYMENT: Keep your original site files. Replace only the matching files in their original paths (index.html, gif.html and the matching Netlify functions), add department-images/ at the site root. The Netlify functions here have been flattened into the ZIP root: copy each into its matching netlify/functions/ location in your repo, NOT into site root.
 
-NOTE: Category discounts are visual only and are NOT included in server-side checkout totals in this package. Do not advertise automatic category discounts until checkout logic is updated.
+IMPORTANT: First review and apply BUTCHER_SETUP.sql in Supabase, create and assign butcher role, then test on Netlify preview with meat+nonmeat mixed order, server filtering and in-app notification before production. Confirm products.department values match _butcher.js. The changes have NOT been end-to-end tested against the live database. In-app notifications only, not push notifications.
 
-No live deployment or end-to-end testing was performed.
+WARNING: This ZIP contains a staged update, not a complete repository. Do not upload this ZIP alone as the entire Netlify site.

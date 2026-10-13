@@ -5,7 +5,7 @@ const ORDER_COLUMNS =
   'status,payment_status,pickup_time,requested_pickup,substitution_pref,staff_notes,notes,created_at,updated_at,placed_at,' +
   'cancel_request_status,cancel_requested_at,cancel_request_reason,cancel_decided_at,cancel_decision_note,' +
   'refund_request_status,refund_requested_at,refund_request_reason,refund_decided_at,refund_decision_note,' +
-  'refund_approved_amount,refunded_amount,events';
+  'refund_approved_amount,refunded_amount,meat_ready_at,events';
 
 // Orders placed before GIF existed stored only { id, qty } per item. This
 // looks those products up so every item GIF shows has a name, price, unit
@@ -67,6 +67,7 @@ async function shapeOrders(rows) {
       order_code: o.order_code,
       placed_at: o.placed_at || o.created_at,
       events: Array.isArray(o.events) ? o.events.slice(-30) : [],
+      meat_ready_at: o.meat_ready_at || null,
       cancel_request: cancelReq,
       refund_request: refundReq,
       refunded_amount: refunded,

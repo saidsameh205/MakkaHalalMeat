@@ -151,7 +151,7 @@ async function requireStaff(event) {
     if (session.expired) return unauthorized('Your session ended — please sign in again.');
     let row = null;
     try {
-      const rows = await supabaseFetch(`staff?id=eq.${encodeURIComponent(session.sid)}&select=id,name,active,can_approve,sessions_valid_after`);
+      const rows = await supabaseFetch(`staff?id=eq.${encodeURIComponent(session.sid)}&select=id,name,active,can_approve,role,sessions_valid_after`);
       row = rows && rows[0];
     } catch (e) {
       console.error('requireStaff: team lookup failed', e);
@@ -162,7 +162,7 @@ async function requireStaff(event) {
     if (row.sessions_valid_after && (session.iat || 0) < new Date(row.sessions_valid_after).getTime()) {
       return unauthorized('Your session ended — please sign in again.');
     }
-    return { ok: true, isAdmin: !!row.can_approve, staffId: row.id, staffName: row.name };
+    return { ok: true, isAdmin: !!row.can_approve, isButcher: row.role === 'butcher', staffId: row.id, staffName: row.name };
   }
 
   const staffToken = process.env.STAFF_TOKEN;

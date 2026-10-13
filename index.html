@@ -879,6 +879,25 @@ body.dark .cat-modern-title,body.dark .cat-modern-desc{color:#202124} /* pastel 
 body.dark .store-info,body.dark .promo-card,body.dark .store-promo{color:#FFF} /* branded dark panels */
 body.dark .btn-solid,body.dark .checkout-btn,body.dark .makka-accent-btn,body.dark .add-btn,body.dark .product-detail-action{color:#FFF}
 </style>
+<style>
+/* Four permanent benefits directly beneath the original Makka banner. */
+#homeMain .feature-bottom{margin:12px 16px 24px!important}
+#homeMain .feature-showcase{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-height:0;background:transparent;border:0;box-shadow:none;overflow:visible}
+#homeMain .feature-showcase::before,#homeMain .feature-showcase::after,#homeMain .feature-dots{display:none!important}
+#homeMain .feature-showcase .feature-slide,#homeMain .feature-showcase .feature-slide.active{display:flex!important;position:static!important;opacity:1!important;visibility:visible!important;transform:none!important;animation:none!important;flex-direction:column;align-items:center;text-align:center;padding:12px 8px;gap:6px;min-width:0;min-height:0;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-md)}
+#homeMain .feature-showcase .feature-card-art{width:46px;height:46px;flex:0 0 46px}
+#homeMain .feature-showcase .feature-slide h3{font-size:.94rem;margin:0}
+#homeMain .feature-showcase .feature-slide p{font-size:.78rem;line-height:1.35}
+@media(max-width:680px){#homeMain .feature-showcase{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
+</style>
+<style>
+/* Individual department artwork supplied by store owner */
+.cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cat-tile.cat-picture{display:block;position:relative;padding:0;overflow:hidden;border:0;border-radius:18px;aspect-ratio:0.89;background:#f7f2ee;box-shadow:none;min-height:0;width:100%;cursor:pointer}
+.cat-tile.cat-picture img{display:block;width:100%;height:100%;object-fit:fill}
+.cat-tile.cat-picture:focus-visible{outline:3px solid #8c1a1e;outline-offset:3px}
+@media(min-width:900px){.cat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
 </head>
 <body data-view="home" data-dept="meat">
 
@@ -916,6 +935,16 @@ body.dark .btn-solid,body.dark .checkout-btn,body.dark .makka-accent-btn,body.da
     <!-- Static Makka logo, no hero slideshow -->
     <div class="makka-static-logo"><img src="banner-sign.jpg" alt="Makka Halal Meat — Goat, Lamb, Beef, Chicken — 404-297-0008" loading="eager"></div>
 
+    <section class="feature-bottom" aria-label="Why shop with Makka Halal Meat">
+      <div class="sec-head"><h2>Why Shop With Us</h2></div>
+      <div class="feature-showcase" id="featureShowcase" aria-label="Store benefits slideshow" aria-live="off">
+        <article class="feature-slide active"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 52s-21-12-21-27c0-7 5-12 12-12 4 0 7 2 9 6 2-4 5-6 9-6 7 0 12 5 12 12 0 15-21 27-21 27Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M23 31h18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Quality you can trust</span><h3>Fresh Halal Meat</h3><p>Quality halal cuts prepared for your order with care.</p></div></article>
+        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="10" y="13" width="19" height="19" rx="4" stroke="currentColor" stroke-width="3"/><rect x="35" y="13" width="19" height="19" rx="4" stroke="currentColor" stroke-width="3"/><rect x="10" y="38" width="19" height="16" rx="4" stroke="currentColor" stroke-width="3"/><rect x="35" y="38" width="19" height="16" rx="4" stroke="currentColor" stroke-width="3"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Everything in one place</span><h3>Wide Variety</h3><p>Shop groceries, everyday essentials, and more in one order.</p></div></article>
+        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 56s19-17 19-32a19 19 0 1 0-38 0c0 15 19 32 19 32Z" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="24" r="7" stroke="currentColor" stroke-width="3"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Convenient local shopping</span><h3>Local Pickup Only</h3><p>Order online and collect your groceries at our Clarkston store.</p></div></article>
+        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="23" stroke="currentColor" stroke-width="3"/><path d="M32 18v15l11 7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Plan your pickup</span><h3>Open Tuesday–Sunday</h3><p>11:00 AM–6:30 PM. Meat counter closes at 6:00 PM.</p></div></article>
+        <div class="feature-dots" id="featureDots"><button class="active" aria-label="Feature 1" onclick="showFeature(0)"></button><button aria-label="Feature 2" onclick="showFeature(1)"></button><button aria-label="Feature 3" onclick="showFeature(2)"></button><button aria-label="Feature 4" onclick="showFeature(3)"></button></div>
+      </div>
+    </section>
     <!-- search bar -->
     <div class="search-wrap" style="padding:12px 16px 4px;">
       <div class="search-box">
@@ -954,16 +983,7 @@ body.dark .btn-solid,body.dark .checkout-btn,body.dark .makka-accent-btn,body.da
     <!-- product previews per dept -->
     <!-- Department product rows intentionally omitted; browse through category cards. -->
     <div id="homePreviews" hidden></div>
-    <section class="feature-bottom" aria-label="Why shop with Makka Halal Meat">
-      <div class="sec-head"><h2>Why Shop With Us</h2></div>
-      <div class="feature-showcase" id="featureShowcase" aria-label="Store benefits slideshow" aria-live="off">
-        <article class="feature-slide active"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 52s-21-12-21-27c0-7 5-12 12-12 4 0 7 2 9 6 2-4 5-6 9-6 7 0 12 5 12 12 0 15-21 27-21 27Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M23 31h18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Quality you can trust</span><h3>Fresh Halal Meat</h3><p>Quality halal cuts prepared for your order with care.</p></div></article>
-        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="10" y="13" width="19" height="19" rx="4" stroke="currentColor" stroke-width="3"/><rect x="35" y="13" width="19" height="19" rx="4" stroke="currentColor" stroke-width="3"/><rect x="10" y="38" width="19" height="16" rx="4" stroke="currentColor" stroke-width="3"/><rect x="35" y="38" width="19" height="16" rx="4" stroke="currentColor" stroke-width="3"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Everything in one place</span><h3>Wide Variety</h3><p>Shop groceries, everyday essentials, and more in one order.</p></div></article>
-        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 56s19-17 19-32a19 19 0 1 0-38 0c0 15 19 32 19 32Z" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="24" r="7" stroke="currentColor" stroke-width="3"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Convenient local shopping</span><h3>Local Pickup Only</h3><p>Order online and collect your groceries at our Clarkston store.</p></div></article>
-        <article class="feature-slide"><div class="feature-card-art"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="23" stroke="currentColor" stroke-width="3"/><path d="M32 18v15l11 7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div><div class="feature-card-copy"><span class="feature-kicker">Plan your pickup</span><h3>Open Tuesday–Sunday</h3><p>11:00 AM–6:30 PM. Meat counter closes at 6:00 PM.</p></div></article>
-        <div class="feature-dots" id="featureDots"><button class="active" aria-label="Feature 1" onclick="showFeature(0)"></button><button aria-label="Feature 2" onclick="showFeature(1)"></button><button aria-label="Feature 3" onclick="showFeature(2)"></button><button aria-label="Feature 4" onclick="showFeature(3)"></button></div>
-      </div>
-    </section>
+
 
     <!-- store info -->
     <div class="store-info">
@@ -1379,16 +1399,10 @@ function departmentsInOrder(){
 
 /* ─── CATEGORY GRID ─── */
 function renderCatGrid(){
-  const palette=[['#FFF0EF','#831C24'],['#EFF6E9','#365C2F'],['#EAF5FA','#235875'],['#FFF0F2','#852F4D'],['#FFF8E9','#825322'],['#F0EFFF','#4B4486'],['#FFF0EE','#831C24']];
-  const descriptions={meat:'Beef, lamb, chicken & more',grocery:'Everyday essentials',household:'Cleaning & home care',beauty:'Personal care & cosmetics',baby:'Baby food & essentials',clothing:'For the whole family',candy:'Snacks, chocolates & more'};
-  const icons={}; // Clean department cards: no emojis or decorative symbols
-  const html=departmentsInOrder().map((id,i)=>{
-    const d=DEPT_MAP[id], colors=palette[i%palette.length];
-    return `<button class="cat-tile cat-modern" style="--tile-bg:${colors[0]};--tile-ink:${colors[1]}" onclick="openDeptPage('${id}')">
-      ${icons[id] ? `<span class="cat-modern-icon" aria-hidden="true">${icons[id]}</span>` : ''}
-      <span class="cat-modern-title">${escapeHtml(d.label)}</span>
-      <span class="cat-modern-desc">${escapeHtml(descriptions[id]||'Explore our selection')}</span>
-      <span class="cat-modern-arrow" aria-hidden="true">→</span>
+  const html=departmentsInOrder().map(id=>{
+    const d=DEPT_MAP[id];
+    return `<button class="cat-tile cat-picture" type="button" aria-label="${escapeHtml(d.label)}" onclick="openDeptPage('${id}')">
+      <img src="department-images/${id}.webp" alt="" loading="lazy" decoding="async">
     </button>`;
   }).join('');
   document.getElementById('catGrid').innerHTML=html;
