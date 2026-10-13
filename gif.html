@@ -887,5 +887,244 @@ if ("serviceWorker" in navigator) window.addEventListener("load", () => navigato
 try { const n = localStorage.getItem("gif_name"); if (n) $("nameInput").value = n; } catch (e) {}
 if (TOKEN) { startApp(); }
 </script>
+
+<!-- GIF English / Spanish translation add-on -->
+<style>
+  #gifLanguageButton {
+    position: fixed;
+    right: 12px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    z-index: 1000;
+    padding: 11px 15px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 999px;
+    background: #c0272d;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 18px rgba(0,0,0,.35);
+  }
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  const dictionary = {
+    "Staff sign-in": "Inicio de sesión",
+    "Makka Halal Meat · order picking": "Makka Halal Meat · preparación de pedidos",
+    "Your name": "Tu nombre",
+    "Your PIN": "Tu PIN",
+    "Start shift": "Iniciar turno",
+    "Owner or shared code? Use a code instead": "¿Dueño o código compartido? Usar código",
+    "Code": "Código",
+    "← Back to name & PIN": "← Volver a nombre y PIN",
+    "Enter your name and PIN.": "Ingresa tu nombre y PIN.",
+    "Enter your staff code.": "Ingresa tu código de empleado.",
+    "Orders": "Pedidos",
+    "Connecting…": "Conectando…",
+    "To do": "Pendientes",
+    "Ready": "Listos",
+    "Requests": "Solicitudes",
+    "Done": "Terminados",
+    "New order": "Pedido nuevo",
+    "Silence 10 min": "Silenciar 10 min",
+    "Tap to turn on sound alerts for new orders": "Toca para activar las alertas de sonido",
+    "Turn on": "Activar",
+    "Nothing to pick right now.": "No hay pedidos para preparar.",
+    "New orders will pop up here.": "Los pedidos nuevos aparecerán aquí.",
+    "No orders waiting for pickup.": "No hay pedidos esperando ser recogidos.",
+    "No completed orders in the last 2 days.": "No hay pedidos completados en los últimos 2 días.",
+    "NEW": "NUEVO",
+    "ASAP": "URGENTE",
+    "CANCEL REQUESTED": "CANCELACIÓN SOLICITADA",
+    "REFUND REQUESTED": "REEMBOLSO SOLICITADO",
+    "Customer": "Cliente",
+    "Picking paused — waiting for the admin": "Preparación pausada — esperando al administrador",
+    "OK to substitute": "Se permite sustituir",
+    "Skip if out": "Omitir si está agotado",
+    "Call/text me first": "Llamar o enviar mensaje primero",
+    "Start picking": "Comenzar preparación",
+    "✓ All set — mark Ready for Pickup": "✓ Todo listo — marcar listo para recoger",
+    "Back to picking": "Volver a preparar",
+    "Handed to customer ✓": "Entregado al cliente ✓",
+    "Call": "Llamar",
+    "Text": "Mensaje",
+    "Activity": "Actividad",
+    "Notes for the team": "Notas para el equipo",
+    "Updated total": "Total actualizado",
+    "Close": "Cerrar",
+    "Settings": "Configuración",
+    "Sound alerts": "Alertas de sonido",
+    "Keep screen on": "Mantener pantalla encendida",
+    "Pop-up notifications": "Notificaciones emergentes",
+    "Enable": "Activar",
+    "Test the alert sound": "Probar sonido de alerta",
+    "Play": "Reproducir",
+    "Sign out": "Cerrar sesión",
+    "Butcher Queue": "Cola de carnicería",
+    "GIF — Butcher Queue": "GIF — Pedidos de carnicería",
+    "Only meat items are shown. Marking meat ready keeps the order open.": "Solo se muestran productos de carne. Marcar la carne como lista no cierra el pedido.",
+    "Loading…": "Cargando…",
+    "Order": "Pedido",
+    "✓ Meat ready": "✓ Carne lista",
+    "Meat preparation pending": "Preparación de carne pendiente",
+    "Mark Meat Ready": "Marcar carne lista",
+    "No meat orders waiting.": "No hay pedidos de carne pendientes.",
+    "Mark the meat portion ready? The order will stay open.": "¿Marcar la carne como lista? El pedido permanecerá abierto.",
+    "Unable to mark meat ready": "No se pudo marcar la carne como lista",
+    "Picked": "Preparado",
+    "Out of stock": "Agotado",
+    "Substitute": "Sustituir",
+    "Undo": "Deshacer",
+    "Cancel": "Cancelar",
+    "Back": "Volver",
+    "Approve cancel": "Aprobar cancelación",
+    "Approve refund": "Aprobar reembolso",
+    "Deny": "Rechazar",
+    "View order": "Ver pedido",
+    "Recently decided": "Decisiones recientes",
+    "Nothing waiting for a decision. 🎉": "No hay solicitudes pendientes. 🎉",
+    "Waiting for the store admin to decide": "Esperando decisión del administrador",
+    "Only the store admin can decide": "Solo el administrador puede decidir",
+    "Request denied": "Solicitud rechazada",
+    "Order cancelled ✓": "Pedido cancelado ✓",
+    "Refund sent ✓": "Reembolso enviado ✓",
+    "Sound is on": "Sonido activado",
+    "Sound alerts off": "Alertas de sonido desactivadas",
+    "Silenced for 10 minutes": "Silenciado durante 10 minutos",
+    "Live · updates every few seconds": "En vivo · actualiza cada pocos segundos",
+    "Offline — trying to reconnect…": "Sin conexión — intentando reconectar…",
+    "Preparing": "Preparando",
+    "Ready for Pickup": "Listo para recoger",
+    "Completed": "Completado",
+    "Cancelled": "Cancelado",
+    "Pending": "Pendiente",
+    "Approved": "Aprobado",
+    "Denied": "Rechazado",
+    "e.g. customer called, will arrive late": "Ej. el cliente llamó, llegará tarde"
+  };
+
+  let language = localStorage.getItem("gif_language") === "es"
+    ? "es" : "en";
+
+  const reverse = {};
+  Object.entries(dictionary).forEach(([en, es]) => {
+    reverse[es] = en;
+  });
+
+  function translateString(value) {
+    if (!value || !value.trim()) return value;
+
+    const leading = value.match(/^\s*/)[0];
+    const trailing = value.match(/\s*$/)[0];
+    const content = value.trim();
+
+    const english = reverse[content] || content;
+    const result = language === "es"
+      ? (dictionary[english] || english)
+      : english;
+
+    return leading + result + trailing;
+  }
+
+  function translateElement(root) {
+    if (!root || root.nodeType !== 1) return;
+    if (root.closest && root.closest("#gifLanguageButton")) return;
+
+    const elements = [root, ...root.querySelectorAll("*")];
+
+    elements.forEach(el => {
+      if (el.id === "gifLanguageButton") return;
+      if (["SCRIPT", "STYLE", "TEXTAREA", "OPTION"].includes(el.tagName)) return;
+
+      ["placeholder", "title", "aria-label"].forEach(attr => {
+        if (el.hasAttribute(attr)) {
+          const oldValue = el.getAttribute(attr);
+          const newValue = translateString(oldValue);
+          if (oldValue !== newValue) el.setAttribute(attr, newValue);
+        }
+      });
+    });
+
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          if (parent.closest("#gifLanguageButton")) return NodeFilter.FILTER_REJECT;
+          if (["SCRIPT", "STYLE", "TEXTAREA", "OPTION"].includes(parent.tagName)) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    nodes.forEach(node => {
+      const translated = translateString(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    });
+  }
+
+  function translatePage() {
+    document.documentElement.lang = language;
+    translateElement(document.body);
+    const btn = document.getElementById("gifLanguageButton");
+    if (btn) {
+      btn.textContent = language === "es"
+        ? "🌐 English"
+        : "🌐 Español";
+      btn.setAttribute(
+        "aria-label",
+        language === "es" ? "Switch to English" : "Cambiar a español"
+      );
+    }
+  }
+
+  window.gifSwitchLanguage = function () {
+    language = language === "en" ? "es" : "en";
+    localStorage.setItem("gif_language", language);
+    translatePage();
+  };
+
+  function initializeLanguage() {
+    const btn = document.createElement("button");
+    btn.id = "gifLanguageButton";
+    btn.type = "button";
+    btn.onclick = window.gifSwitchLanguage;
+    document.body.appendChild(btn);
+
+    translatePage();
+
+    let scheduled = false;
+    const observer = new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        translatePage();
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeLanguage);
+  } else {
+    initializeLanguage();
+  }
+})();
+</script>
 </body>
 </html>
