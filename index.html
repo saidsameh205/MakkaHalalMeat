@@ -878,6 +878,78 @@ body.dark .p-card-price.reduced{color:#86EFAC}
 body.dark .cat-modern-title,body.dark .cat-modern-desc{color:#202124} /* pastel category tiles remain light */
 body.dark .store-info,body.dark .promo-card,body.dark .store-promo{color:#FFF} /* branded dark panels */
 body.dark .btn-solid,body.dark .checkout-btn,body.dark .makka-accent-btn,body.dark .add-btn,body.dark .product-detail-action{color:#FFF}
+
+/* FIX: Why Shop With Us — 4 full-card gradients */
+
+/* Remove the shared white background */
+.feature-showcase,
+body.dark .feature-showcase {
+  background: #210708 !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
+  overflow: hidden !important;
+}
+
+/* Make every slide fill the entire card */
+.feature-showcase .feature-slide {
+  width: 100% !important;
+  min-height: 222px !important;
+  box-sizing: border-box !important;
+}
+
+/* Slide 1 — Deep Burgundy */
+.feature-showcase .feature-slide:nth-child(1) {
+  background: linear-gradient(120deg, #641212, #210708) !important;
+}
+
+/* Slide 2 — Emerald Green */
+.feature-showcase .feature-slide:nth-child(2) {
+  background: linear-gradient(120deg, #175747, #0b2926) !important;
+}
+
+/* Slide 3 — Warm Bronze */
+.feature-showcase .feature-slide:nth-child(3) {
+  background: linear-gradient(120deg, #80511c, #2d1b0b) !important;
+}
+
+/* Slide 4 — Midnight Blue */
+.feature-showcase .feature-slide:nth-child(4) {
+  background: linear-gradient(120deg, #243f75, #101b38) !important;
+}
+
+/* Keep text readable */
+.feature-showcase .feature-slide h3,
+body.dark .feature-showcase .feature-slide h3 {
+  color: #ffffff !important;
+}
+
+.feature-showcase .feature-slide p,
+body.dark .feature-showcase .feature-slide p {
+  color: rgba(255,255,255,.88) !important;
+}
+
+.feature-showcase .feature-kicker {
+  color: #ffd1b3 !important;
+}
+
+/* Keep navigation dots visible */
+.feature-showcase .feature-dots {
+  z-index: 3;
+}
+
+.feature-showcase .feature-dots button {
+  background: rgba(255,255,255,.55);
+}
+
+.feature-showcase .feature-dots button.active {
+  background: #f5a45b;
+}
+
+/* Mobile sizing */
+@media (max-width: 520px) {
+  .feature-showcase .feature-slide {
+    min-height: 204px !important;
+  }
+}
 </style>
 <style>
 /* Individual department artwork supplied by store owner; images embedded to avoid broken deployment paths. */
