@@ -1754,12 +1754,25 @@ async function setActive(id, active){
   try { await api("admin-staff",{method:"PATCH",body:JSON.stringify({id, active})}); loadStaff(); }
   catch(e){ showToast(e.message,"error"); }
 }
-async function setStaffRole(id,role){
+
+async function setStaffRole(id, role){
   const member=TEAM.find(p=>p.id===id);
   if(!member) return;
   if(!confirm(`Change ${member.name} to ${role === 'butcher' ? 'Butcher (meat-only)' : 'Regular Employee'}? Their current shift will be signed out.`)){renderStaff();return;}
-  try{await api('admin-staff',{method:'PATCH',body:JSON.stringify({id,role})});await loadStaff();showToast('Role updated. Employee must sign in again.');}
-  catch(e){showToast(/nothing to change/i.test(String(e.message))?'Role not saved: deploy the updated netlify/functions/admin-staff.js, then retry.':e.message,'error');loadStaff();}
+  try {
+    // Explicitly send the role; do not report success until the API confirms it.
+    const payload = {id: Number(id), role: String(role)};
+    const result = await api('admin-staff', {method:'PATCH', body:JSON.stringify(payload)});
+    if (result.staff?.role !== payload.role) throw new Error('The server did not confirm the new role. Please check the deployed Netlify function.');
+    await loadStaff();
+    showToast('Role updated. Employee must sign in again.', 'success');
+  } catch(e) {
+    const message = /nothing to change/i.test(String(e.message))
+      ? 'The server received no editable fields. This page sends a role, so check the deployed function/version and the Network request payload.'
+      : e.message;
+    showToast(message, 'error');
+    await loadStaff();
+  }
 }
 async function setApprove(id, can_approve){
   if(can_approve && !confirm("Let this person approve/deny cancellations & refunds (moves real money)?")){ loadStaff(); return; }
