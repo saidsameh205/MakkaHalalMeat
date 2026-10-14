@@ -772,7 +772,7 @@ body.dark .badge-pill{background:#1F2937;}
 /* Makka approved Option 3: calm, minimal category cards */
 .cat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .cat-tile.cat-modern{aspect-ratio:auto;min-height:146px;background:var(--tile-bg);border:1px solid rgba(90,40,40,.07);box-shadow:none;border-radius:17px;text-align:left;padding:17px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;color:#202124}
-.cat-modern-icon{font-size:29px;line-height:1.3;color:var(--tile-ink)}
+.cat-modern-icon{display:none;font-size:29px;line-height:1.3;color:var(--tile-ink)}
 .cat-modern-title{font-size:.88rem;font-weight:800;line-height:1.3}
 .cat-modern-desc{font-size:.69rem;line-height:1.4;color:#62636a;max-width:85%}
 .cat-modern-arrow{position:absolute;right:13px;top:44%;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.75);display:grid;place-items:center;color:var(--tile-ink);font-weight:800}
@@ -846,6 +846,10 @@ body.dark .feature-showcase .feature-slide h3{color:#f9f4f3}
 body.dark .feature-showcase .feature-slide p{color:#d4c7c5}
 body.dark .feature-showcase .feature-kicker,body.dark .feature-showcase .feature-slide:nth-child(n) .feature-kicker{color:#f5c7a8}
 @media(max-width:520px){.feature-showcase,.feature-showcase .feature-slide{min-height:204px}.feature-showcase .feature-slide{padding:24px 19px 43px;gap:15px}.feature-card-art{width:68px;height:68px;flex-basis:68px;border-radius:18px}.feature-card-art svg{width:36px;height:36px}.feature-kicker{font-size:.57rem;letter-spacing:.07em}.feature-showcase .feature-slide h3{font-size:1.13rem;margin:4px 0 7px}.feature-showcase .feature-slide p{font-size:.78rem;line-height:1.48}.feature-showcase::after{width:170px;height:170px;right:-100px;top:-100px;border-width:27px}}
+/* Category and product fallbacks: text, not emoji. */
+#deptPageIcon,.cat-modern-icon,.cat-tile-emoji-icon{display:none!important}
+.p-card-media span{font-size:.72rem!important;font-weight:700;text-align:center;padding:8px;overflow-wrap:anywhere}
+.makka-cart-image-fallback{font-size:.7rem!important;font-weight:700;text-align:center;padding:6px;overflow-wrap:anywhere}
 </style>
 <style id="makka-account-style">.makka-account{max-width:640px;margin:0 auto;padding:22px 18px 110px}.makka-account h3{margin:0 0 12px;font-size:1.08rem}.makka-account p{font-size:.84rem;color:var(--muted);line-height:1.5;margin-bottom:14px}.makka-account label{display:block;font-size:.8rem;font-weight:700;margin:10px 0}.makka-account input{display:block;width:100%;margin-top:5px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}.makka-accent-btn{background:var(--brand-dark);color:white;padding:12px 18px;border-radius:10px;font-weight:700;margin-top:10px}.makka-auth-tabs{display:flex;gap:10px;margin:16px 0}.makka-auth-tabs button{flex:1;border:1px solid var(--brand);color:var(--brand);padding:10px;border-radius:9px;font-weight:700}.makka-text-btn{color:var(--brand);font-weight:700;margin-top:16px}.makka-order{border:1px solid var(--line);padding:14px;border-radius:12px;margin:10px 0;background:var(--card)}.makka-order small{display:block;color:var(--muted);margin-top:6px}.store-info a.makka-contact{color:#fff;text-decoration:underline;text-underline-offset:3px}.makka-account-hint{margin-top:12px}</style>
 <style id="makka-account-history-style">
@@ -1218,6 +1222,50 @@ body.dark[data-view="home"] #homeView .sec-head h2{color:#111827;}
 /* These are kept out of the home view and remain accessible in their dedicated tabs. */
 #homeView #homeMain > .search-wrap,#homeView #saleSection,#homeView #homePreviews{display:none!important;}
 </style>
+<style id="makka-cart-navigation-fix-20261014">
+/* Keep header anchored without adding an oversized offset spacer. */
+#homeView #homeHeader{position:sticky!important;top:0!important;z-index:42!important;margin:0!important;}
+#homeView{margin-top:0!important;padding-top:0!important;}
+#homeView #homeMain{margin-top:0!important;padding-top:0!important;}
+/* iOS bottom safe area is kept separate from compact navigation buttons. */
+.tabbar{bottom:0!important;align-items:flex-start!important;padding:6px 0 max(8px,env(safe-area-inset-bottom,0px))!important;min-height:0!important;height:auto!important;}
+.tabbar .tab-btn{padding:5px 1px 7px!important;gap:4px!important;justify-content:flex-start!important;min-height:58px!important;}
+/* Cart is its own full-viewport surface on phones and desktops. */
+#drawer{position:fixed!important;inset:0!important;width:100vw!important;max-width:none!important;height:100dvh!important;max-height:none!important;z-index:100!important;transform:translateX(105%)!important;border-radius:0!important;background:var(--card)!important;}
+#drawer.open{transform:translateX(0)!important;}
+#drawer .drawer-head{padding:14px 18px!important;flex:none;}
+#drawer .drawer-items{flex:1!important;min-height:0;overflow-y:auto;padding:12px 16px!important;}
+#drawer .drawer-foot{flex:none;padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px))!important;max-height:52dvh;overflow-y:auto;}
+#drawer .drawer-item{display:flex;align-items:center;gap:13px;padding:13px 0;}
+#drawer .makka-cart-image{width:84px;height:84px;flex:0 0 84px;object-fit:cover;background:#f1f1f1;border-radius:12px;}
+#drawer .makka-cart-image-fallback{width:84px;height:84px;flex:0 0 84px;display:grid;place-items:center;background:#f1f1f1;border-radius:12px;font-size:28px;}
+#drawer .drawer-item .meta{min-width:0;}
+#drawer .makka-cart-item-total{font-size:.82rem;font-weight:800;margin-top:4px;color:var(--fg);}
+#drawer .makka-cart-remove{font-size:.76rem;color:var(--brand);text-decoration:underline;text-underline-offset:2px;margin-top:8px;}
+#drawer .stepper{flex:0 0 auto;}
+#checkoutModal .makka-marketing-optin{display:flex;align-items:flex-start;gap:10px;margin:6px 0 15px;padding:10px 0;font-size:.8rem;line-height:1.5;color:var(--fg);}
+#checkoutModal .makka-marketing-optin input{width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;accent-color:var(--brand);}
+@media(max-width:420px){#drawer .makka-cart-image,#drawer .makka-cart-image-fallback{width:70px;height:70px;flex-basis:70px;}#drawer .drawer-item{gap:8px;}#drawer .stepper button{width:23px;height:23px;}}
+</style>
+<style id="makka-oct14-final-ui-fixes">
+/* On iOS, keep the page surface from flashing white between app chrome. */
+html, body { background-color:var(--bg); }
+body.dark #checkoutModal .modal, body.dark #checkoutModal .modal-pad { background:#1f2937!important;color:#f9fafb!important; }
+body.dark #checkoutModal input:not([type="checkbox"]) { background:#111827!important;color:#f9fafb!important;border-color:#475569!important; }
+body.dark #checkoutModal input::placeholder { color:#bac6d5!important;opacity:1; }
+body.dark #checkoutModal .btn-ghost {color:#f9fafb;border-color:#64748b;}
+#checkoutModal .modal {max-width:420px;box-sizing:border-box;}
+#checkoutModal .modal-pad {background:var(--card);}
+#checkoutModal .makka-marketing-optin {color:var(--fg);}
+/* Compact tab content, with the iPhone safe-area underneath rather than a tall empty block. */
+.tabbar {padding-top:4px!important; padding-bottom:max(5px,env(safe-area-inset-bottom,0px))!important;}
+.tabbar .tab-btn {padding:4px 1px 5px!important;min-height:54px!important;justify-content:center!important;}
+#homeView #homeHeader {position:sticky!important;top:0!important;z-index:43!important;}
+#homeView {padding-top:0!important;}
+.makka-guest-history {margin:24px 0 0;padding-top:18px;border-top:1px solid var(--line);}
+.makka-guest-history h3 {font-size:1rem;}
+.makka-guest-history p {font-size:.76rem;}
+</style>
 </head>
 <body data-view="home" data-dept="meat">
 
@@ -1425,7 +1473,11 @@ body.dark[data-view="home"] #homeView .sec-head h2{color:#111827;}
         <label>Email<input id="makkaAuthEmail" type="email" autocomplete="email" required></label>
         <label>Password<input id="makkaAuthPassword" type="password" minlength="8" autocomplete="current-password" required></label>
         <button type="submit" class="makka-accent-btn" id="makkaAuthSubmit">Sign In</button>
-      </form><p class="makka-account-hint">No automatic emails are sent. For password assistance, contact the store.</p>
+      </form><p class="makka-account-hint">Order updates appear in the app. For password assistance, contact the store.</p>
+      <section class="makka-guest-history" aria-label="Orders placed on this device">
+        <h3>Recent guest orders</h3><p>Confirmed orders from this device appear below. Sign in for account order history across devices.</p>
+        <div id="makkaGuestOrders" class="makka-orders-scroll">No guest orders recorded on this device yet.</div>
+      </section>
     </div>
     <div id="makkaSignedAccount" hidden>
       <div class="makka-account-heading">
@@ -1478,7 +1530,7 @@ body.dark[data-view="home"] #homeView .sec-head h2{color:#111827;}
 <div class="overlay" id="overlay" onclick="closeCart()"></div>
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
-    <strong>Your order</strong>
+    <strong>Your cart</strong>
     <button class="drawer-close" onclick="closeCart()">✕</button>
   </div>
   <div class="drawer-items" id="drawerItems"></div>
@@ -1504,7 +1556,8 @@ body.dark[data-view="home"] #homeView .sec-head h2{color:#111827;}
       <h3>Pickup details</h3>
       <input id="custName" placeholder="Full name">
       <input id="custPhone" placeholder="Phone number">
-      <input id="custEmail" placeholder="Email (for receipt)">
+      <input id="custEmail" type="email" autocomplete="email" placeholder="Email address (optional)">
+      <label class="makka-marketing-optin" for="makkaMarketingOptIn"><input type="checkbox" id="makkaMarketingOptIn" autocomplete="off"><span>Email me special offers, new products, and promotions from Makka Halal Meat. I can unsubscribe at any time. (Optional)</span></label>
       <div class="modal-row">
         <button class="btn-ghost" onclick="closeCheckoutModal()">Back</button>
         <button class="btn-solid" id="payBtn" onclick="submitCheckout()">Continue to payment</button>
@@ -1591,19 +1644,19 @@ const SUPABASE_URL = "https://zbsesllddfjwfsowxlgp.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_fgQoJ3lUEfNIxqbOSxit3Q_FK89Oxn_";
 
 const DEPTS = [
-  { id:"meat",      label:"Fresh Halal Meat", icon:"🥩", tile:"#8C1A1E",
+  { id:"meat",      label:"Fresh Halal Meat", tile:"#8C1A1E",
     photo:"https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80" },
-  { id:"grocery",   label:"Grocery",          icon:"🛒", tile:"#B9812A",
+  { id:"grocery",   label:"Grocery",          tile:"#B9812A",
     photo:"https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80" },
-  { id:"household", label:"Household",        icon:"🧼", tile:"#2E6E7D",
+  { id:"household", label:"Household",        tile:"#2E6E7D",
     photo:"https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&q=80" },
-  { id:"beauty",    label:"Beauty",           icon:"💄", tile:"#A8506A",
+  { id:"beauty",    label:"Beauty",           tile:"#A8506A",
     photo:"https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&q=80" },
-  { id:"baby",      label:"Baby",             icon:"👶", tile:"#4A6F9C",
+  { id:"baby",      label:"Baby",             tile:"#4A6F9C",
     photo:"https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=80" },
-  { id:"clothing",  label:"Clothing",         icon:"👗", tile:"#7D6633",
+  { id:"clothing",  label:"Clothing",         tile:"#7D6633",
     photo:"https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400&q=80" },
-  { id:"candy",     label:"Candy & Sweets",   icon:"🍬", tile:"#C0527D",
+  { id:"candy",     label:"Candy & Sweets",   tile:"#C0527D",
     photo:"https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=400&q=80" },
 ];
 const DEPT_MAP = Object.fromEntries(DEPTS.map(d=>[d.id,d]));
@@ -2058,7 +2111,7 @@ function renderHomePreviews(){
     const sec = document.createElement("div");
     sec.innerHTML = `
       <div class="sec-head" style="padding-top:18px;">
-        <h2>${['grocery','baby','household'].includes(id)?'':d.icon+' '}${d.label}</h2>
+        <h2>${['grocery','baby','household'].includes(id)?'':''}${d.label}</h2>
         <button class="see-all" onclick="openDeptPage('${id}')">See all (${items.length}) ›</button>
       </div>
       <div class="row-scroll" id="rowhome-${id}"></div>
@@ -2127,7 +2180,7 @@ function openDeptPage(id, catFilter){
   switchView("dept");
   const d = DEPT_MAP[id];
   const items = PRODUCTS.filter(p=>p.department===id);
-  document.getElementById("deptPageIcon").textContent = d.icon+" ";
+  document.getElementById("deptPageIcon").textContent = "";
   document.getElementById("deptPageLabel").textContent = d.label;
   document.getElementById("deptPageCount").textContent = `${items.length} items`;
   const cats = [...new Set(items.map(p=>p.category).filter(Boolean))];
@@ -2176,7 +2229,7 @@ function fmtQty(p,qty){ return isWeighted(p)?`${qty} lb`:`${qty}`; }
 function cardHtml(p){
   const img = p.image
     ? `<div class="p-card-media" style="background-image:url('${escapeAttr(p.image)}');">`
-    : `<div class="p-card-media"><span style="font-size:2rem;">${p.emoji||"🛒"}</span>`;
+    : `<div class="p-card-media"><span style="font-size:2rem;">${escapeHtml(p.name)}</span>`;
   const stock = p.stock==null ? "" : Number(p.stock)>0
     ? `<span class="p-card-stock in">In Stock</span>`
     : `<span class="p-card-stock out">Out of Stock</span>`;
@@ -2235,7 +2288,7 @@ function openProductDetail(id){
 function renderProductDetail(){
   const p=PRODUCTS.find(x=>Number(x.id)===detailProductId);if(!p)return;
   const photos=[p.image,...(Array.isArray(p.images)?p.images:[])].filter(Boolean);
-  const img=photos.length?`<img id="detailMainPhoto" class="product-detail-image" src="${escapeHtml(photos[0])}" alt="${escapeHtml(p.name)}">${photos.length>1?`<div class="detail-photo-strip">${photos.map((url,i)=>`<button type="button" onclick="document.getElementById('detailMainPhoto').src=this.querySelector('img').src" aria-label="View product photo ${i+1}"><img src="${escapeHtml(url)}" alt="Product photo ${i+1}"></button>`).join('')}</div>`:''}`:`<div class="product-detail-image" style="display:grid;place-items:center;font-size:72px">${escapeHtml(p.emoji||'🛒')}</div>`;
+  const img=photos.length?`<img id="detailMainPhoto" class="product-detail-image" src="${escapeHtml(photos[0])}" alt="${escapeHtml(p.name)}">${photos.length>1?`<div class="detail-photo-strip">${photos.map((url,i)=>`<button type="button" onclick="document.getElementById('detailMainPhoto').src=this.querySelector('img').src" aria-label="View product photo ${i+1}"><img src="${escapeHtml(url)}" alt="Product photo ${i+1}"></button>`).join('')}</div>`:''}`:`<div class="product-detail-image" style="display:grid;place-items:center;font-size:72px">${escapeHtml(p.name)}</div>`;
   const discounted=p.price!=null&&effectivePrice(p)<Number(p.price);
   const price=p.price==null?'Ask in store':`$${effectivePrice(p).toFixed(2)} ${escapeHtml(p.unit||'')}`;
   const stock=p.stock==null?'Available':Number(p.stock)>0?'In stock':'Out of stock';
@@ -2302,7 +2355,7 @@ function storeMeatInstructions(){try{localStorage.setItem(MEAT_INSTRUCTIONS_KEY,
 function openWeightModal(id){
  const p=PRODUCTS.find(x=>Number(x.id)===Number(id));if(!p)return;
  weightModalProductId=p.id;
- const mm=document.getElementById('wmMedia');mm.style.backgroundImage=p.image?`url('${escapeAttr(p.image)}')`:'';mm.textContent=p.image?'':(p.emoji||'🥩');
+ const mm=document.getElementById('wmMedia');mm.style.backgroundImage=p.image?`url('${escapeAttr(p.image)}')`:'';mm.textContent=p.image?'':p.name;
  document.getElementById('wmName').textContent=p.name;
  document.getElementById('wmPrice').textContent=`$${Number(p.price).toFixed(2)} ${p.unit||''}`;
  const ci=document.getElementById('wmCustom');ci.min=meatMin(p);ci.value=CART[p.id]||meatMin(p);
@@ -2342,7 +2395,7 @@ function renderSearchDiscovery(){
   const depts=departmentsInOrder().filter(id=>PRODUCTS.some(p=>p.department===id));
   const suggested=[...PRODUCTS].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''))).slice(0,16);
   wrap.innerHTML=`<div style="padding:18px 16px 4px;font-size:1.08rem;font-weight:800">Explore departments</div>
-    <div style="display:flex;gap:9px;overflow-x:auto;padding:10px 16px 18px">${depts.map(id=>`<button class="see-all" style="flex:none;border:1px solid #ddd;border-radius:22px;padding:10px 14px" onclick="openDeptPage('${id}')">${DEPT_MAP[id].icon} ${escapeHtml(DEPT_MAP[id].label)}</button>`).join('')}</div>
+    <div style="display:flex;gap:9px;overflow-x:auto;padding:10px 16px 18px">${depts.map(id=>`<button class="see-all" style="flex:none;border:1px solid #ddd;border-radius:22px;padding:10px 14px" onclick="openDeptPage('${id}')">${escapeHtml(DEPT_MAP[id].label)}</button>`).join('')}</div>
     <div style="padding:4px 16px 10px;font-size:1.08rem;font-weight:800">Discover products</div>
     <div class="grid">${suggested.map(cardHtml).join('')}</div>`;
 }
@@ -2405,12 +2458,18 @@ function renderDrawer(){
   const lines=cartLines();
   wrap.innerHTML=lines.length?lines.map(({p,qty})=>{
     const step=stepFor(p);
-    const ea=isWeighted(p)?` onclick="event.stopPropagation();openWeightModal(${p.id})" style="cursor:pointer;"`:""
+    const ea=isWeighted(p)?` onclick="event.stopPropagation();openWeightModal(${p.id})" style="cursor:pointer;"`:"";
+    const photo=p.image?`<img class="makka-cart-image" src="${escapeAttr(p.image)}" alt="${escapeAttr(p.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">`:'';
+    const fallback=`<div class="makka-cart-image-fallback" style="${p.image?'display:none;':''}">${escapeHtml(p.name)}</div>`;
     return `<div class="drawer-item">
-      <div class="meta"><div class="item-name">${escapeHtml(p.name)}</div><div class="item-unit">$${Number(p.price).toFixed(2)} ${escapeHtml(p.unit||"")}</div>${isWeighted(p)?`<div class="item-unit">${escapeHtml(MEAT_INSTRUCTIONS[p.id]||'No special instructions')}</div><button style="font-size:.73rem;color:var(--brand);font-weight:700" onclick="openWeightModal(${p.id})">Edit weight / instructions</button>`:''}</div>
+      ${photo}${fallback}
+      <div class="meta"><div class="item-name">${escapeHtml(p.name)}</div><div class="item-unit">$${Number(effectivePrice(p)).toFixed(2)} ${escapeHtml(p.unit||"")}</div>
+      <div class="makka-cart-item-total">$${(Number(effectivePrice(p))*qty).toFixed(2)}</div>
+      ${isWeighted(p)?`<div class="item-unit">${escapeHtml(MEAT_INSTRUCTIONS[p.id]||'No special instructions')}</div><button style="font-size:.73rem;color:var(--brand);font-weight:700" onclick="openWeightModal(${p.id})">Edit weight / instructions</button>`:''}
+      <button class="makka-cart-remove" onclick="changeQty(${p.id},-${qty})" aria-label="Remove ${escapeAttr(p.name)}">Remove</button></div>
       <div class="stepper"><button onclick="changeQty(${p.id},${-step})">−</button><span class="qty"${ea}>${fmtQty(p,qty)}</span><button onclick="changeQty(${p.id},${step})">+</button></div>
     </div>`;
-  }).join(""):`<div class="empty-state"><div class="big"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>Your cart is empty.<br>Find something delicious above.</div>`;
+  }).join(""):`<div class="empty-state"><div class="big">🛒</div>Your cart is empty.<br>Find something delicious above.</div>`;
   const subtotal=lines.reduce((s,{p,qty})=>s+effectivePrice(p)*qty,0);
   const discount=0; // authoritative discount preview below
   const discounted=Math.max(0,subtotal-discount);
@@ -2454,8 +2513,10 @@ async function submitCheckout(){
   payBtn.disabled=true;payBtn.textContent="Redirecting…";
   const items=cartLines().map(({p,qty})=>({id:p.id,qty,effective_price:effectivePrice(p),instructions:isWeighted(p)?(MEAT_INSTRUCTIONS[p.id]||''):''}));
   const promoCode = appliedPromo ? appliedPromo.code : null;
+  const marketingOptIn=Boolean(document.getElementById("makkaMarketingOptIn")?.checked);
+  if(marketingOptIn && !/^\S+@\S+\.\S+$/.test(email)){showToast("Enter a valid email to subscribe to offers.");payBtn.disabled=false;payBtn.textContent="Continue to payment";return;}
   try{
-    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",...(localStorage.getItem("makka_customer_token")?{"x-customer-token":localStorage.getItem("makka_customer_token")}:{})},body:JSON.stringify({items,name,phone,email,promoCode,customerToken:localStorage.getItem("makka_customer_token")||undefined})});
+    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",...(localStorage.getItem("makka_customer_token")?{"x-customer-token":localStorage.getItem("makka_customer_token")}:{})},body:JSON.stringify({items,name,phone,email,promoCode,marketingOptIn,customerToken:localStorage.getItem("makka_customer_token")||undefined})});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||"Unable to start checkout");
     window.location.href=data.url;
@@ -2469,7 +2530,7 @@ async function handlePaymentReturn(){
     try{
       const res=await fetch(`/.netlify/functions/verify-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
       const data=await res.json();
-      if(data.authorized){CART={};saveLocal();renderCartChrome();renderHomePreviews();showToast(`Order ${data.orderCode||""} confirmed! We'll text you when it's ready.`);}
+      if(data.authorized){CART={};saveLocal();renderCartChrome();renderHomePreviews();makkaRememberGuestOrder(data);showToast(`Order ${data.orderCode||""} confirmed! Check Account & Orders for details.`);}
     }catch(e){console.error(e);}
     window.history.replaceState({},"",window.location.pathname);
   } else if(params.get("payment")==="cancelled"){
@@ -2821,12 +2882,34 @@ let makkaMode='login';
 function makkaAuthMode(mode){makkaMode=mode;document.getElementById('makkaSignupFields').hidden=mode!=='signup';document.getElementById('makkaAuthSubmit').textContent=mode==='signup'?'Create Account':'Sign In';document.getElementById('makkaAuthPassword').autocomplete=mode==='signup'?'new-password':'current-password';}
 async function makkaAccountFetch(endpoint,method='GET',body){const token=localStorage.getItem('makka_customer_token');const res=await fetch('/.netlify/functions/'+endpoint,{method,headers:{'Content-Type':'application/json',...(token?{'x-customer-token':token}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await res.json();if(!res.ok)throw new Error(data.error||'Request failed');return data;}
 async function makkaSubmitAuth(ev){ev.preventDefault();try{const body={email:document.getElementById('makkaAuthEmail').value.trim(),password:document.getElementById('makkaAuthPassword').value};if(makkaMode==='signup'){body.name=document.getElementById('makkaAuthName').value.trim();body.phone=document.getElementById('makkaAuthPhone').value.trim();}const result=await makkaAccountFetch(makkaMode==='signup'?'customer-signup':'customer-login','POST',body);localStorage.setItem('makka_customer_token',result.token);document.getElementById('makkaAuthPassword').value='';showToast('Signed in successfully');makkaRefreshAccount();}catch(e){showToast(e.message);}}
-async function makkaRefreshAccount(){const token=localStorage.getItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=!!token;document.getElementById('makkaSignedAccount').hidden=!token;if(!token)return;try{const profile=await makkaAccountFetch('customer-me');document.getElementById('makkaWelcome').textContent='My Orders';document.getElementById('makkaProfileName').value=profile.name||'';document.getElementById('makkaProfileEmail').value=profile.email||'';document.getElementById('makkaProfilePhone').value=profile.phone||'';const orders=await makkaAccountFetch('customer-orders');document.getElementById('makkaAccountOrders').innerHTML=Array.isArray(orders)&&orders.length?orders.map(o=>`<div class="makka-order"><strong>${escapeHtml(o.order_code||'Order')}</strong> · ${escapeHtml(o.status||'')}<small>${escapeHtml((o.items||[]).map(i=>i.name).join(', '))}</small><small>Total: $${Number(o.total||0).toFixed(2)}</small></div>`).join(''):'No account orders yet. Guest orders may not appear here.';}catch(e){if(/session|token|unauthoriz|sign in/i.test(e.message)){makkaSignOut();}else showToast(e.message);}}
+async function makkaRefreshAccount(){const token=localStorage.getItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=!!token;document.getElementById('makkaSignedAccount').hidden=!token;if(!token){makkaRenderGuestOrders();return;}try{const profile=await makkaAccountFetch('customer-me');document.getElementById('makkaWelcome').textContent='My Orders';document.getElementById('makkaProfileName').value=profile.name||'';document.getElementById('makkaProfileEmail').value=profile.email||'';document.getElementById('makkaProfilePhone').value=profile.phone||'';const orders=await makkaAccountFetch('customer-orders');document.getElementById('makkaAccountOrders').innerHTML=Array.isArray(orders)&&orders.length?orders.map(o=>`<div class="makka-order"><strong>${escapeHtml(o.order_code||'Order')}</strong> · ${escapeHtml(o.status||'')}<small>${escapeHtml((o.items||[]).map(i=>i.name).join(', '))}</small><small>Total: $${Number(o.total||0).toFixed(2)}</small></div>`).join(''):'No account orders yet. Guest orders may not appear here.';}catch(e){if(/session expired|session ended|unauthorized|invalid token|sign in again|account is no longer active/i.test(e.message)){localStorage.removeItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=false;document.getElementById('makkaSignedAccount').hidden=true;makkaRenderGuestOrders();}else showToast(e.message);}}
 function makkaToggleProfileSettings(){const panel=document.getElementById('makkaProfileSettings'),btn=document.getElementById('makkaProfileSettingsBtn');if(!panel||!btn)return;panel.hidden=!panel.hidden;btn.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
 async function makkaSaveProfile(ev){ev.preventDefault();try{await makkaAccountFetch('customer-me','PATCH',{name:document.getElementById('makkaProfileName').value.trim(),phone:document.getElementById('makkaProfilePhone').value.trim()});showToast('Profile saved');makkaRefreshAccount();}catch(e){showToast(e.message);}}
 function makkaSignOut(){localStorage.removeItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=false;document.getElementById('makkaSignedAccount').hidden=true;showToast('Signed out');}
 function makkaLinkContact(){const addr=document.getElementById('infoAddress'),phone=document.getElementById('infoPhone');if(addr){const a=addr.textContent.trim();if(a){const link=document.createElement('a');link.className='makka-contact';link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a);link.target='_blank';link.rel='noopener noreferrer';link.textContent=a;addr.replaceChildren(link);}}if(phone){const n=phone.textContent.trim();if(n){const link=document.createElement('a');link.className='makka-contact';link.href='tel:'+n.replace(/[^+0-9]/g,'');link.textContent=n;phone.replaceChildren(link);}}}
 document.addEventListener('DOMContentLoaded',makkaLinkContact);
+
+
+/* Device-only guest order history: entries are written only after Stripe is verified. */
+function makkaRememberGuestOrder(verified){
+  const code=String(verified?.orderCode||'').trim();
+  if(!code || localStorage.getItem('makka_customer_token'))return;
+  try{
+    const key='mhm_verified_guest_orders';
+    const old=JSON.parse(localStorage.getItem(key)||'[]');
+    const items=Array.isArray(old)?old:[];
+    const record={code,at:new Date().toISOString(),total:(Number(verified.amountTotal)||0)/100};
+    localStorage.setItem(key,JSON.stringify([record,...items.filter(o=>o.code!==code)].slice(0,20)));
+    makkaRenderGuestOrders();
+  }catch(e){console.warn('Unable to save local guest history',e);}
+}
+function makkaRenderGuestOrders(){
+  const area=document.getElementById('makkaGuestOrders');if(!area)return;
+  let orders=[];
+  try{const saved=JSON.parse(localStorage.getItem('mhm_verified_guest_orders')||'[]');orders=Array.isArray(saved)?saved:[];}catch(e){}
+  area.innerHTML=orders.length?orders.map(o=>`<div class="makka-order"><strong>${escapeHtml(o.code)}</strong><small>${escapeHtml(new Date(o.at).toLocaleDateString())} · Checkout confirmed</small><small>Total: $${Number(o.total||0).toFixed(2)}</small></div>`).join(''):'No guest orders recorded on this device yet.';
+}
+document.addEventListener('DOMContentLoaded',makkaRenderGuestOrders);
 
 </script>
 </body>
