@@ -45,6 +45,7 @@ async function reconcilePendingOrders() {
             updated_at: now,
           }),
         });
+        if(session.client_reference_id){try{await supabaseFetch('rpc/makka_pickup_confirm',{method:'POST',body:JSON.stringify({p_code:session.client_reference_id})});}catch(e){console.error('pickup confirmation',e);}}
         continue;
       }
 
@@ -63,7 +64,7 @@ async function reconcilePendingOrders() {
           headers: { Prefer: 'return=representation' },
           body: JSON.stringify({ status: 'Abandoned', payment_status: 'unpaid', updated_at: now }),
         });
-        if (claimed && claimed.length) await restoreOrderStock(order.items);
+        if (claimed && claimed.length){await restoreOrderStock(order.items);if(session.client_reference_id){try{await supabaseFetch('rpc/makka_pickup_release',{method:'POST',body:JSON.stringify({p_code:session.client_reference_id})});}catch(e){console.error('pickup release',e);}}}
       }
     } catch (e) {
       console.error('reconcile: order', order.id, e);

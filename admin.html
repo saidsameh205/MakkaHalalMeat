@@ -521,6 +521,31 @@ a{color:var(--brand);text-decoration:none;}
       <button class="filter-chip" onclick="switchSettingsTab('staff',this)">Team</button>
       <button class="filter-chip" onclick="switchSettingsTab('taxonomy',this)">Departments & Categories</button>
       <button class="filter-chip" onclick="switchSettingsTab('homepage',this)">Homepage</button>
+      <button class="filter-chip" onclick="switchSettingsTab('pickup',this)">Pickup Scheduling</button>
+    </div>
+
+    <!-- PICKUP SCHEDULING / SERVER-CONTROLLED CAPACITY -->
+    <div id="setTabPickup" style="display:none;">
+      <div class="card">
+        <div class="card-title">Pickup Scheduling</div>
+        <p style="font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:18px;">Control how many customer orders your store accepts each hour. Full pickup windows are blocked automatically on the customer app, and the server enforces the limit to prevent overbooking.</p>
+        <div class="form-grid">
+          <div class="fld">
+            <label for="pickupCapacity">Maximum orders per hour</label>
+            <input type="number" id="pickupCapacity" min="1" max="100" step="1" value="5">
+          </div>
+          <div class="fld">
+            <label for="pickupWindow">Pickup window length</label>
+            <select id="pickupWindow"><option value="60">60-minute windows</option><option value="30">30-minute windows</option></select>
+          </div>
+        </div>
+        <p style="font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:12px;">Example: 5 orders per hour. The same hourly capacity applies across the full hour even if you display 30-minute pickup windows.</p>
+        <div class="action-row">
+          <button class="btn-outline" type="button" onclick="loadPickupSettings()">Refresh</button>
+          <button class="btn-save" type="button" id="pickupSaveBtn" onclick="savePickupSettings()">Save Pickup Settings</button>
+        </div>
+        <p id="pickupSettingsStatus" role="status" aria-live="polite" style="font-size:.8rem;color:var(--muted);margin-top:12px;line-height:1.4;"></p>
+      </div>
     </div>
 
     <!-- STORE INFO -->
@@ -1500,9 +1525,47 @@ async function deleteCatDiscount(id){
   }catch(e){ showToast("Failed: "+e.message,"error"); }
 }
 
+/* Pickup scheduling: uses the existing authenticated admin session. */
+async function loadPickupSettings(){
+  const status=document.getElementById('pickupSettingsStatus');
+  if(status) status.textContent='Loading current capacity…';
+  try{
+    const data=await api('pickup-admin');
+    if(Number.isFinite(Number(data.orders_per_hour)) && Number(data.orders_per_hour)>0){
+      document.getElementById('pickupCapacity').value=data.orders_per_hour;
+    }
+    if([30,60].includes(Number(data.slot_minutes))){
+      document.getElementById('pickupWindow').value=String(data.slot_minutes);
+    }
+    status.textContent='Current pickup settings loaded.';
+  }catch(e){
+    status.textContent='Unable to load pickup settings: '+e.message+'. Make sure the pickup-admin Netlify function and Supabase setup have been deployed.';
+  }
+}
+async function savePickupSettings(){
+  const btn=document.getElementById('pickupSaveBtn');
+  const status=document.getElementById('pickupSettingsStatus');
+  const orders_per_hour=Number(document.getElementById('pickupCapacity').value);
+  const slot_minutes=Number(document.getElementById('pickupWindow').value);
+  if(!Number.isInteger(orders_per_hour)||orders_per_hour<1||orders_per_hour>100||![30,60].includes(slot_minutes)){
+    status.textContent='Enter an hourly capacity from 1 to 100 and choose 30 or 60 minutes.';
+    return;
+  }
+  btn.disabled=true;
+  status.textContent='Saving…';
+  try{
+    await api('pickup-admin',{method:'POST',body:JSON.stringify({orders_per_hour,slot_minutes})});
+    status.textContent='Saved. Updated capacity will be used by the customer pickup scheduler.';
+    showToast('Pickup capacity saved','success');
+  }catch(e){
+    status.textContent='Save failed: '+e.message;
+    showToast('Pickup settings could not be saved','error');
+  }finally{btn.disabled=false;}
+}
+
 /* ─── SETTINGS SUB-TABS ─── */
 function switchSettingsTab(t, el){
-  ["store","banner","staff","taxonomy","homepage"].forEach(s=>{
+  ["store","banner","staff","taxonomy","homepage","pickup"].forEach(s=>{
     document.getElementById("setTab"+s.charAt(0).toUpperCase()+s.slice(1)).style.display = s===t?"block":"none";
   });
   document.querySelectorAll("#tab-settings .filter-chip").forEach(c=>c.classList.toggle("active",c===el));
@@ -1510,6 +1573,7 @@ function switchSettingsTab(t, el){
   if(t==="homepage") loadHomepageSettings();
   if(t==="staff") loadStaff();
   if(t==="banner") loadBannerCurrent();
+  if(t==="pickup") loadPickupSettings();
 }
 
 

@@ -26,6 +26,7 @@ exports.handler = async (event) => {
       }
     }
 
+    if(authorized&&s.client_reference_id){try{await supabaseFetch('rpc/makka_pickup_confirm',{method:'POST',body:JSON.stringify({p_code:s.client_reference_id})});}catch(e){console.error('pickup confirmation',e);}}
     return json(200, {
       authorized,
       orderCode: s.client_reference_id || '',

@@ -37,6 +37,7 @@ function computeDiscount(deal, subtotal) {
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
 
+  let pickupReservedCode=null;
   const reserved = []; // { id, qty } successfully decremented so far, for rollback
 
   try {
@@ -130,6 +131,14 @@ exports.handler = async (event) => {
       if (session && !session.expired && session.sid) customerId = session.sid;
     }
 
+    // Atomically reserve pickup capacity, enforced server-side with a PostgreSQL advisory lock.
+    const pickupTime=typeof body.requested_pickup==='string'?new Date(body.requested_pickup):null;
+    if(!pickupTime||Number.isNaN(pickupTime.getTime()))throw new Error('Please select an available pickup time.');
+    const orderCode = 'MHM-' + Date.now().toString(36).toUpperCase() + '-' + require('crypto').randomBytes(3).toString('hex').toUpperCase();
+    const claim=await supabaseFetch('rpc/makka_reserve_pickup',{method:'POST',body:JSON.stringify({p_code:orderCode,p_start:pickupTime.toISOString()})});
+    if(claim!==true)throw new Error('That pickup slot is full or unavailable. Please select another time.');
+    pickupReservedCode=orderCode;
+
     // Reserve stock one item at a time with an optimistic-concurrency check:
     // the update only applies if stock still matches what we just read, so a
     // simultaneous purchase can't oversell the same item.
@@ -149,7 +158,6 @@ exports.handler = async (event) => {
     const total = round2(subtotal + tax);
     const cents = Math.round(total * 100);
 
-    const orderCode = 'MHM-' + Date.now().toString(36).toUpperCase();
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const origin = event.headers.origin || `https://${event.headers.host}`;
@@ -194,7 +202,7 @@ exports.handler = async (event) => {
         stripe_session_id: session.id,
         status: 'Awaiting Payment',
         payment_status: 'unpaid',
-        requested_pickup: requestedPickup,
+        requested_pickup: pickupTime.toISOString(),
         substitution_pref: substitutionPref,
         notes: lineDescriptions.join(', ').slice(0, 2000),
       }),
@@ -203,6 +211,7 @@ exports.handler = async (event) => {
     return json(200, { id: session.id, url: session.url });
   } catch (err) {
     console.error('create-checkout-session', err);
+    if(pickupReservedCode){try{await supabaseFetch('rpc/makka_pickup_release',{method:'POST',body:JSON.stringify({p_code:pickupReservedCode})});}catch(e){console.error('pickup rollback',e);}}
     // Give back any inventory we already reserved for this failed attempt.
     for (const r of reserved) {
       try {

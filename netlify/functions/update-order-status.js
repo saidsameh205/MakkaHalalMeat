@@ -47,6 +47,12 @@ exports.handler = async (event) => {
       headers: { Prefer: 'return=minimal' },
       body: JSON.stringify(patch),
     });
+    if (patch.status === 'Cancelled' || patch.status === 'Abandoned') {
+      try {
+        const codes = await supabaseFetch(`orders?id=eq.${id}&select=order_code`);
+        if(codes?.[0]?.order_code) await supabaseFetch('rpc/makka_pickup_release',{method:'POST',body:JSON.stringify({p_code:codes[0].order_code})});
+      } catch(e){console.error('Could not release pickup slot',e);}
+    }
     return json(200, { ok: true, ...patch });
   } catch (e) {
     console.error('update-order-status', e);

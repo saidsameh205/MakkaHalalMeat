@@ -1266,7 +1266,9 @@ body.dark #checkoutModal .btn-ghost {color:#f9fafb;border-color:#64748b;}
 .makka-guest-history h3 {font-size:1rem;}
 .makka-guest-history p {font-size:.76rem;}
 </style>
-</head>
+<style id="makka-scheduling-marketing-order-fix">
+#checkoutModal{z-index:160!important}#checkoutModal .modal{max-height:calc(100dvh - 32px);overflow:auto}#checkoutModal .makka-slot-label{display:block;font-size:.84rem;font-weight:700;margin:12px 0 6px}#checkoutModal select{width:100%;padding:13px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--fg)}#checkoutModal input[type="date"]{color:var(--fg)}.makka-slot-note{font-size:.77rem;line-height:1.5;color:var(--muted);margin:10px 0 17px}.makka-email-prefs{margin:20px 0;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}.makka-email-prefs p{font-size:.77rem}.makka-preference-check{display:flex!important;gap:10px;align-items:flex-start;line-height:1.5}.makka-preference-check input{width:19px!important;height:19px;flex:0 0 19px;margin:2px 0 0}.makka-order-success[hidden]{display:none!important}.makka-order-success{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.64);display:flex;align-items:center;justify-content:center;padding:20px}.makka-success-card{width:min(430px,100%);background:var(--card);color:var(--fg);border-radius:22px;padding:26px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.24)}.makka-success-card h2{margin:12px 0}.makka-success-card p{line-height:1.5;margin:8px 0}.makka-success-check{margin:auto;border-radius:50%;width:60px;height:60px;background:#e3f6ea;color:#17883f;font-size:36px;display:grid;place-items:center}.makka-success-code{font-weight:800}.makka-success-card .makka-accent-btn{width:100%}.makka-success-card .makka-text-btn{display:block;width:100%;margin-top:12px}
+</style></head>
 <body data-view="home" data-dept="meat">
 
 <!-- ══════════════ HOME VIEW ══════════════ -->
@@ -1487,7 +1489,7 @@ body.dark #checkoutModal .btn-ghost {color:#f9fafb;border-color:#64748b;}
       <section id="makkaProfileSettings" class="makka-profile-settings" hidden>
         <h3>Profile Settings</h3>
         <form onsubmit="makkaSaveProfile(event)"><label>Name<input id="makkaProfileName" autocomplete="name"></label><label>Email<input id="makkaProfileEmail" type="email" disabled></label><label>Phone<input id="makkaProfilePhone" type="tel" autocomplete="tel"></label><button type="submit" class="makka-accent-btn">Save Profile</button></form>
-        <button type="button" class="makka-text-btn" onclick="makkaSignOut()">Sign Out</button>
+        <section class="makka-email-prefs"><h3>Marketing email preferences</h3><p>Choose whether you'd like special offers, new arrivals and promotions. This does not control order confirmation messages.</p><label class="makka-preference-check"><input type="checkbox" id="makkaAccountMarketing"> Email me promotions from Makka Halal Meat. I can unsubscribe any time.</label><button type="button" class="makka-accent-btn" onclick="makkaSaveMarketing()">Save email preference</button><p id="makkaMarketingStatus" aria-live="polite"></p></section><button type="button" class="makka-text-btn" onclick="makkaSignOut()">Sign Out</button>
       </section>
       <section class="makka-history-section" aria-label="Order history">
         <div class="makka-history-header"><h3>Order History</h3><span>Recent orders first</span></div>
@@ -1557,7 +1559,7 @@ body.dark #checkoutModal .btn-ghost {color:#f9fafb;border-color:#64748b;}
       <input id="custName" placeholder="Full name">
       <input id="custPhone" placeholder="Phone number">
       <input id="custEmail" type="email" autocomplete="email" placeholder="Email address (optional)">
-      <label class="makka-marketing-optin" for="makkaMarketingOptIn"><input type="checkbox" id="makkaMarketingOptIn" autocomplete="off"><span>Email me special offers, new products, and promotions from Makka Halal Meat. I can unsubscribe at any time. (Optional)</span></label>
+      <label for="makkaPickupDate" class="makka-slot-label">Pickup date</label><input type="date" id="makkaPickupDate" onchange="makkaLoadSlots()" required><label for="makkaPickupSlot" class="makka-slot-label">Available pickup time</label><select id="makkaPickupSlot" required><option value="">Choose a date first</option></select><p class="makka-slot-note">Pickup only. Times are estimated windows; the store will let you know when your order is ready.</p><p class="makka-slot-note" id="makkaPickupAvailabilityNotice" role="status" aria-live="polite">Availability refreshes every 12 seconds.</p>
       <div class="modal-row">
         <button class="btn-ghost" onclick="closeCheckoutModal()">Back</button>
         <button class="btn-solid" id="payBtn" onclick="submitCheckout()">Continue to payment</button>
@@ -2501,8 +2503,8 @@ async function refreshPromotionPreview(lines){
 }
 function openCart(){document.getElementById("drawer").classList.add("open");document.getElementById("overlay").classList.add("open");renderDrawer();}
 function closeCart(){document.getElementById("drawer").classList.remove("open");document.getElementById("overlay").classList.remove("open");}
-function openCheckoutModal(){if(!cartLines().length){showToast("Your cart is empty.");return;}document.getElementById("checkoutModal").classList.add("open");}
-function closeCheckoutModal(){document.getElementById("checkoutModal").classList.remove("open");}
+function openCheckoutModal(){if(!cartLines().length){showToast("Your cart is empty.");return;}document.getElementById("checkoutModal").classList.add("open");makkaInitializePickup();}
+function closeCheckoutModal(){document.getElementById("checkoutModal").classList.remove("open");makkaStopSlotUpdates();}
 
 async function submitCheckout(){
   const name=document.getElementById("custName").value.trim();
@@ -2513,13 +2515,13 @@ async function submitCheckout(){
   payBtn.disabled=true;payBtn.textContent="Redirecting…";
   const items=cartLines().map(({p,qty})=>({id:p.id,qty,effective_price:effectivePrice(p),instructions:isWeighted(p)?(MEAT_INSTRUCTIONS[p.id]||''):''}));
   const promoCode = appliedPromo ? appliedPromo.code : null;
-  const marketingOptIn=Boolean(document.getElementById("makkaMarketingOptIn")?.checked);
-  if(marketingOptIn && !/^\S+@\S+\.\S+$/.test(email)){showToast("Enter a valid email to subscribe to offers.");payBtn.disabled=false;payBtn.textContent="Continue to payment";return;}
+  const requestedPickup=document.getElementById('makkaPickupSlot').value;
+  if(!requestedPickup){showToast('Please choose an available pickup time.');payBtn.disabled=false;payBtn.textContent='Continue to payment';return;}
   try{
-    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",...(localStorage.getItem("makka_customer_token")?{"x-customer-token":localStorage.getItem("makka_customer_token")}:{})},body:JSON.stringify({items,name,phone,email,promoCode,marketingOptIn,customerToken:localStorage.getItem("makka_customer_token")||undefined})});
+    const res=await fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",...(localStorage.getItem("makka_customer_token")?{"x-customer-token":localStorage.getItem("makka_customer_token")}:{})},body:JSON.stringify({items,name,phone,email,promoCode,requested_pickup:requestedPickup,customerToken:localStorage.getItem("makka_customer_token")||undefined})});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||"Unable to start checkout");
-    window.location.href=data.url;
+    localStorage.setItem('makka_last_pickup',requestedPickup);window.location.href=data.url;
   }catch(e){showToast(e.message);payBtn.disabled=false;payBtn.textContent="Continue to payment";}
 }
 
@@ -2530,7 +2532,7 @@ async function handlePaymentReturn(){
     try{
       const res=await fetch(`/.netlify/functions/verify-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
       const data=await res.json();
-      if(data.authorized){CART={};saveLocal();renderCartChrome();renderHomePreviews();makkaRememberGuestOrder(data);showToast(`Order ${data.orderCode||""} confirmed! Check Account & Orders for details.`);}
+      if(data.authorized){CART={};saveLocal();renderCartChrome();renderHomePreviews();makkaRememberGuestOrder(data);closeCheckoutModal();closeCart();makkaShowOrderSuccess(data);}
     }catch(e){console.error(e);}
     window.history.replaceState({},"",window.location.pathname);
   } else if(params.get("payment")==="cancelled"){
@@ -2882,7 +2884,7 @@ let makkaMode='login';
 function makkaAuthMode(mode){makkaMode=mode;document.getElementById('makkaSignupFields').hidden=mode!=='signup';document.getElementById('makkaAuthSubmit').textContent=mode==='signup'?'Create Account':'Sign In';document.getElementById('makkaAuthPassword').autocomplete=mode==='signup'?'new-password':'current-password';}
 async function makkaAccountFetch(endpoint,method='GET',body){const token=localStorage.getItem('makka_customer_token');const res=await fetch('/.netlify/functions/'+endpoint,{method,headers:{'Content-Type':'application/json',...(token?{'x-customer-token':token}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await res.json();if(!res.ok)throw new Error(data.error||'Request failed');return data;}
 async function makkaSubmitAuth(ev){ev.preventDefault();try{const body={email:document.getElementById('makkaAuthEmail').value.trim(),password:document.getElementById('makkaAuthPassword').value};if(makkaMode==='signup'){body.name=document.getElementById('makkaAuthName').value.trim();body.phone=document.getElementById('makkaAuthPhone').value.trim();}const result=await makkaAccountFetch(makkaMode==='signup'?'customer-signup':'customer-login','POST',body);localStorage.setItem('makka_customer_token',result.token);document.getElementById('makkaAuthPassword').value='';showToast('Signed in successfully');makkaRefreshAccount();}catch(e){showToast(e.message);}}
-async function makkaRefreshAccount(){const token=localStorage.getItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=!!token;document.getElementById('makkaSignedAccount').hidden=!token;if(!token){makkaRenderGuestOrders();return;}try{const profile=await makkaAccountFetch('customer-me');document.getElementById('makkaWelcome').textContent='My Orders';document.getElementById('makkaProfileName').value=profile.name||'';document.getElementById('makkaProfileEmail').value=profile.email||'';document.getElementById('makkaProfilePhone').value=profile.phone||'';const orders=await makkaAccountFetch('customer-orders');document.getElementById('makkaAccountOrders').innerHTML=Array.isArray(orders)&&orders.length?orders.map(o=>`<div class="makka-order"><strong>${escapeHtml(o.order_code||'Order')}</strong> · ${escapeHtml(o.status||'')}<small>${escapeHtml((o.items||[]).map(i=>i.name).join(', '))}</small><small>Total: $${Number(o.total||0).toFixed(2)}</small></div>`).join(''):'No account orders yet. Guest orders may not appear here.';}catch(e){if(/session expired|session ended|unauthorized|invalid token|sign in again|account is no longer active/i.test(e.message)){localStorage.removeItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=false;document.getElementById('makkaSignedAccount').hidden=true;makkaRenderGuestOrders();}else showToast(e.message);}}
+async function makkaRefreshAccount(){const token=localStorage.getItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=!!token;document.getElementById('makkaSignedAccount').hidden=!token;if(!token){makkaRenderGuestOrders();return;}try{const profile=await makkaAccountFetch('customer-me');document.getElementById('makkaWelcome').textContent='My Orders';document.getElementById('makkaProfileName').value=profile.name||'';document.getElementById('makkaProfileEmail').value=profile.email||'';document.getElementById('makkaProfilePhone').value=profile.phone||'';makkaLoadMarketing();const orders=await makkaAccountFetch('customer-orders');document.getElementById('makkaAccountOrders').innerHTML=Array.isArray(orders)&&orders.length?orders.map(o=>`<div class="makka-order"><strong>${escapeHtml(o.order_code||'Order')}</strong> · ${escapeHtml(o.status||'')}<small>${escapeHtml((o.items||[]).map(i=>i.name).join(', '))}</small><small>Total: $${Number(o.total||0).toFixed(2)}</small></div>`).join(''):'No account orders yet. Guest orders may not appear here.';}catch(e){if(/session expired|session ended|unauthorized|invalid token|sign in again|account is no longer active/i.test(e.message)){localStorage.removeItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=false;document.getElementById('makkaSignedAccount').hidden=true;makkaRenderGuestOrders();}else showToast(e.message);}}
 function makkaToggleProfileSettings(){const panel=document.getElementById('makkaProfileSettings'),btn=document.getElementById('makkaProfileSettingsBtn');if(!panel||!btn)return;panel.hidden=!panel.hidden;btn.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
 async function makkaSaveProfile(ev){ev.preventDefault();try{await makkaAccountFetch('customer-me','PATCH',{name:document.getElementById('makkaProfileName').value.trim(),phone:document.getElementById('makkaProfilePhone').value.trim()});showToast('Profile saved');makkaRefreshAccount();}catch(e){showToast(e.message);}}
 function makkaSignOut(){localStorage.removeItem('makka_customer_token');document.getElementById('makkaGuestAccount').hidden=false;document.getElementById('makkaSignedAccount').hidden=true;showToast('Signed out');}
@@ -2912,5 +2914,69 @@ function makkaRenderGuestOrders(){
 document.addEventListener('DOMContentLoaded',makkaRenderGuestOrders);
 
 </script>
-</body>
+<div class="makka-order-success" id="makkaOrderSuccess" role="dialog" aria-modal="true" aria-labelledby="makkaOrderSuccessTitle" hidden><div class="makka-success-card"><div class="makka-success-check">✓</div><h2 id="makkaOrderSuccessTitle">Order received!</h2><p>Your pickup order has been placed. You can follow its status in Account &amp; Orders.</p><p id="makkaSuccessOrderCode" class="makka-success-code"></p><p id="makkaSuccessPickup"></p><button onclick="makkaCloseSuccess()" class="makka-accent-btn">Continue shopping</button><button onclick="makkaCloseSuccess();switchView('orders')" class="makka-text-btn">View my orders</button></div></div><script id="makka-pickup-and-preferences">
+const makkaZone='America/New_York';
+function makkaDateNY(d){return new Intl.DateTimeFormat('en-CA',{timeZone:makkaZone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
+async function makkaInitializePickup(){const dateEl=document.getElementById('makkaPickupDate');if(!dateEl)return;const today=makkaDateNY(new Date());dateEl.min=today;dateEl.max=makkaDateNY(new Date(Date.now()+7*86400000));if(!dateEl.value||dateEl.value<today)dateEl.value=today;await makkaLoadSlots();makkaStartSlotUpdates();}
+let makkaSlotPoller=null;
+let makkaSlotFetchSequence=0;
+let makkaLastPickupDate='';
+function makkaStopSlotUpdates(){if(makkaSlotPoller){clearInterval(makkaSlotPoller);makkaSlotPoller=null;}}
+function makkaStartSlotUpdates(){
+  makkaStopSlotUpdates();
+  makkaSlotPoller=setInterval(()=>{
+    const modal=document.getElementById('checkoutModal');
+    if(modal?.classList.contains('open')&&!document.hidden)makkaLoadSlots({silent:true});
+  },12000);
+}
+async function makkaLoadSlots({silent=false}={}){
+  const date=document.getElementById('makkaPickupDate')?.value;
+  const select=document.getElementById('makkaPickupSlot');
+  const notice=document.getElementById('makkaPickupAvailabilityNotice');
+  if(!select||!date)return;
+  const request=++makkaSlotFetchSequence;
+  const previous=select.value;
+  const dateChanged=makkaLastPickupDate!==date;
+  if(!silent||dateChanged)select.innerHTML='<option value="">Checking available pickup times…</option>';
+  try{
+    const res=await fetch('/.netlify/functions/pickup-slots?date='+encodeURIComponent(date),{cache:'no-store'});
+    const data=await res.json();
+    if(!res.ok)throw Error(data.error||'Unable to load times');
+    if(request!==makkaSlotFetchSequence || document.getElementById('makkaPickupDate')?.value!==date)return;
+    const slots=Array.isArray(data.slots)?data.slots:[];
+    const firstAvailable=slots.find(x=>Number(x.remaining)>0);
+    const retained=slots.find(x=>x.start===previous&&Number(x.remaining)>0);
+    const selected=retained?.start||firstAvailable?.start||'';
+    select.replaceChildren();
+    if(!slots.length){select.add(new Option('No pickup windows available for this day',''));select.disabled=true;}
+    else {
+      select.add(new Option('Select an available pickup window',''));
+      for(const slot of slots){
+        const available=Number(slot.remaining)>0;
+        const option=new Option(slot.label+(available?` — ${slot.remaining} available`:' — Full'),slot.start);
+        option.disabled=!available;
+        select.add(option);
+      }
+      select.disabled=!firstAvailable;
+      if(selected)select.value=selected;
+    }
+    makkaLastPickupDate=date;
+    if(notice){
+      if(!firstAvailable)notice.textContent='All pickup slots are full for this day. Please select another date.';
+      else if(previous && !retained && !dateChanged)notice.textContent='Your previous time just filled up. We selected the next available pickup window. Please review it before paying.';
+      else if(dateChanged)notice.textContent='Showing currently available pickup windows. Availability refreshes every 12 seconds.';
+      else if(!notice.textContent.includes('previous time just filled up'))notice.textContent='Availability refreshes automatically every 12 seconds.';
+    }
+  }catch(e){
+    if(request!==makkaSlotFetchSequence)return;
+    if(!silent){select.replaceChildren(new Option('Unable to check pickup times',''));select.disabled=true;}
+    if(notice)notice.textContent='Pickup availability could not be checked. Please try again.';
+    console.error('pickup slots',e);
+  }
+}
+function makkaShowOrderSuccess(data){const el=document.getElementById('makkaOrderSuccess');document.getElementById('makkaSuccessOrderCode').textContent=data.orderCode?'Order '+data.orderCode:'';const pickup=localStorage.getItem('makka_last_pickup');document.getElementById('makkaSuccessPickup').textContent=pickup?'Requested pickup: '+new Date(pickup).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short',timeZone:makkaZone}):'Check your order status for pickup updates.';el.hidden=false;}
+function makkaCloseSuccess(){document.getElementById('makkaOrderSuccess').hidden=true;}
+async function makkaLoadMarketing(){const cb=document.getElementById('makkaAccountMarketing');if(!cb)return;try{const d=await makkaAccountFetch('marketing-preferences');cb.checked=!!d.opted_in;document.getElementById('makkaMarketingStatus').textContent='';}catch(e){document.getElementById('makkaMarketingStatus').textContent='Unable to load preference: '+e.message;}}
+async function makkaSaveMarketing(){const el=document.getElementById('makkaMarketingStatus');try{const checked=!!document.getElementById('makkaAccountMarketing').checked;await makkaAccountFetch('marketing-preferences','POST',{opted_in:checked});el.textContent=checked?'Subscribed to marketing emails.':'Unsubscribed from marketing emails.';}catch(e){el.textContent='Could not save preference: '+e.message;}}
+</script></body>
 </html>
