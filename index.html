@@ -1355,8 +1355,100 @@ body.dark .makka-cart-image-fallback{background-color:#334155!important;}
 /* Avoid shifting other tabs or changing navigation behavior. */
 .tabbar .tab-btn{margin:0 2px!important;}
 </style>
+
+<!-- Customer-facing display corrections, October 2026; no order/checkout logic modified -->
+<style id="makka-legibility-fab-featured-20261014">
+/* Dark department palettes were leaking light text into white product cards.
+   Anchor every WHITE card's foreground locally, independently of page theme. */
+body:not(.dark) .p-card { background:#fff!important; color:#18202b!important; border-color:#e5e7eb!important; }
+body:not(.dark) .p-card .p-card-body,
+body:not(.dark) .p-card .p-card-name,
+body:not(.dark) .p-card .p-card-foot,
+body:not(.dark) .p-card .p-card-price:not(.sale):not(.reduced),
+body:not(.dark) .p-card .p-card-price small {color:#17202c!important;}
+body:not(.dark) .p-card .p-card-brand,
+body:not(.dark) .p-card .p-card-orig { color:#637083!important; }
+body:not(.dark) .p-card .p-card-price.sale {color:#b71d2d!important;}
+body:not(.dark) .p-card .p-card-price.reduced {color:#147d3d!important;}
+body:not(.dark) .p-card .p-card-stock {background:#fff!important;}
+/* Category filters: use dark ink on white, white ink on selected gold/burgundy. */
+body:not(.dark) .cat-chip {color:#242424!important;background:#fff!important;border-color:#d8d6d3!important;}
+body:not(.dark) .cat-chip.active {color:#21180d!important;background:#e2bc68!important;border-color:#e2bc68!important;}
+/* Visible categories can use a dark page theme in the LIGHT app; text must still contrast. */
+body:not(.dark)[data-view="dept"] .deptpage-header {color:var(--fg);}
+/* Keep the assistant accessible above the cart summary (not covered by it). */
+#askMakkaFab {z-index:39;transition:bottom .22s ease,transform .2s ease;}
+body:has(#cartBar.show) #askMakkaFab {
+ bottom:calc(158px + env(safe-area-inset-bottom,0px))!important;
+}
+@media(min-width:640px){body:has(#cartBar.show) #askMakkaFab {bottom:104px!important;}}
+/* Featured products read as a distinct section, with each item's details retained. */
+#homeFeaturedSection{
+ margin:18px 16px 20px!important;padding:8px 0 15px!important;
+ background:var(--card)!important;border:1px solid var(--line)!important;
+ border-radius:20px!important;box-shadow:0 5px 22px rgba(22,24,28,.09);
+ overflow:hidden;
+}
+#homeFeaturedSection .sec-head{padding:14px 16px 12px!important;}
+#homeFeaturedSection .sec-head h2{font-size:1.09rem;letter-spacing:-.01em;}
+#homeFeaturedProducts{padding:5px 15px 9px!important;gap:12px;}
+#homeFeaturedProducts .p-card{flex:0 0 158px;min-width:158px;min-height:236px;}
+#homeFeaturedProducts .p-card-media{height:118px;}
+#homeFeaturedProducts .p-card-body{padding:11px;gap:6px;}
+#homeFeaturedProducts .p-card-name{min-height:2.4em;line-height:1.35;}
+body.dark #homeFeaturedSection{background:#1f2937!important;border-color:#475569!important;}
+</style>
+
+<style id="makka-featured-box-and-launch-20261014">
+/* Featured section only: distinct framed block, not a full homepage redesign. */
+#homeFeaturedSection {background:rgba(255,255,255,.96)!important;border:1.5px solid #a64d55!important;border-radius:22px!important;padding:11px 0 14px!important;box-shadow:0 8px 24px rgba(73,26,32,.1)!important;}
+#homeFeaturedSection .sec-head {padding:10px 16px 13px!important;}
+#homeFeaturedSection .sec-head h2 {font-size:1.19rem!important;color:#63101d!important;font-weight:800!important;}
+#homeFeaturedSection .makka-featured-heading p {font-size:.74rem;color:#697180;line-height:1.45;margin-top:4px;}
+#homeFeaturedProducts {padding:3px 16px 6px!important;gap:12px;scroll-padding-inline:16px;}
+#homeFeaturedProducts .p-card {border-radius:15px!important;box-shadow:0 3px 13px rgba(28,28,33,.10)!important;overflow:hidden;}
+#homeFeaturedProducts .p-card-media {height:120px!important;}
+#homeFeaturedSection .makka-featured-foot {display:flex;justify-content:center;gap:7px;margin-top:12px;}
+#homeFeaturedSection .makka-featured-foot span {height:6px;width:6px;background:#d4d2d2;border-radius:10px;}
+#homeFeaturedSection .makka-featured-foot span:first-child {width:20px;background:#801624;}
+body.dark #homeFeaturedSection {background:#241f25!important;border-color:#71434b!important;}
+body.dark #homeFeaturedSection .sec-head h2 {color:#f9e7e8!important;}
+body.dark #homeFeaturedSection .makka-featured-heading p {color:#c6b8c0;}
+/* The welcome screen is completely separate from page navigation and cart. */
+#makkaLaunchScreen {position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:calc(25px + env(safe-area-inset-top,0px)) 24px calc(25px + env(safe-area-inset-bottom,0px));background:#3c040b linear-gradient(rgba(22,0,4,.30),rgba(22,0,4,.30)),url('burgundy_arabesque_arch_background.png') center center / cover no-repeat;color:#fff7eb;text-align:center;opacity:1;transition:opacity .5s ease;}
+#makkaLaunchScreen.makka-launch-fade {opacity:0;pointer-events:none;}
+#makkaLaunchScreen[hidden] {display:none!important;}
+.makka-launch-inner {width:min(100%,370px);display:flex;align-items:center;flex-direction:column;gap:14px;text-shadow:0 2px 14px rgba(0,0,0,.35);}
+.makka-launch-logo {width:min(78vw,270px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.32));animation:makkaLogoPush 2.35s cubic-bezier(.17,.68,.26,1) both;will-change:transform,opacity;}
+.makka-launch-title {font-size:clamp(1.4rem,5.4vw,1.9rem);line-height:1.3;font-weight:800;color:#fff7ed;opacity:0;animation:makkaWordsIn .9s ease-out 1.95s forwards;}
+.makka-launch-sub {font-size:.88rem;line-height:1.5;color:#f6dfd2;max-width:285px;opacity:0;animation:makkaWordsIn .8s ease-out 2.65s forwards;}
+.makka-launch-progress {margin-top:12px;width:96px;height:4px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden;opacity:0;animation:makkaWordsIn .5s ease-out 3.2s forwards;}
+.makka-launch-progress::after {content:'';display:block;height:100%;width:100%;background:#f1bc58;transform-origin:left;animation:makkaLaunchTimer 5s linear forwards;}
+@keyframes makkaLaunchTimer{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes makkaLogoPush{0%{transform:scale(.45) translateY(28px);opacity:0}18%{opacity:1}75%{transform:scale(1.08) translateY(0);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes makkaWordsIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#makkaLaunchScreen{transition:none}.makka-launch-progress::after{animation:none}.makka-launch-logo,.makka-launch-title,.makka-launch-sub,.makka-launch-progress{animation:none!important;opacity:1!important;transform:none!important}}
+</style>
 </head>
 <body data-view="home" data-dept="meat">
+<div id="makkaLaunchScreen" role="status" aria-label="Welcome to Makka Halal Meat">
+  <div class="makka-launch-inner">
+    <img class="makka-launch-logo" src="makka-header-logo.svg" alt="Makka Halal Meat">
+    <h1 class="makka-launch-title">Welcome to your local Makka Halal Meat app!</h1>
+    <p class="makka-launch-sub">Fresh halal meat, groceries &amp; more. We appreciate your support.</p>
+    <div class="makka-launch-progress" aria-hidden="true"></div>
+  </div>
+</div>
+<script>
+/* Show once per document launch, then reveal the unchanged home view. */
+window.setTimeout(function(){
+ const splash=document.getElementById('makkaLaunchScreen');
+ if(!splash)return;
+ splash.classList.add('makka-launch-fade');
+ window.setTimeout(function(){splash.hidden=true;splash.remove();},480);
+},5000);
+</script>
+
 
 <!-- ══════════════ HOME VIEW ══════════════ -->
 <div id="homeView">
@@ -1435,7 +1527,7 @@ body.dark .makka-cart-image-fallback{background-color:#334155!important;}
       <div class="row-scroll" id="saleSectionRow"></div>
     </div>
 
-    <div id="homeFeaturedSection" style="display:none"><div class="sec-head"><h2>Featured Items</h2></div><div class="row-scroll" id="homeFeaturedProducts"></div></div>
+    <div id="homeFeaturedSection" style="display:none"><div class="sec-head"><div class="makka-featured-heading"><h2>Featured Items</h2><p>Popular picks from Makka Halal Meat</p></div></div><div class="row-scroll" id="homeFeaturedProducts"></div><div class="makka-featured-foot" aria-hidden="true"><span></span><span></span><span></span></div></div>
     <!-- product previews per dept -->
     <!-- Department product rows intentionally omitted; browse through category cards. -->
     <div id="homePreviews" hidden></div>
